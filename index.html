@@ -764,8 +764,8 @@ function parseDate(raw){
 
 function normalizeStatus(raw){
   const s = normName(raw);
-  if(s.includes("paye")) return "Paye";
-  if(s.includes("payer")) return "A payer";
+  if(s === "a payer" || s.includes("a payer") || s.includes("payer")) return "A payer";
+  if(s === "paye" || s.includes("paye")) return "Paye";
   return "En cours";
 }
 
