@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maison Lumena - Pilotage commercial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{
+  --ink:#18202b;
+  --muted:#667085;
+  --soft:#f5f7fb;
+  --panel:#ffffff;
+  --line:#e5e9f2;
+  --line-strong:#ccd4e1;
+  --plum:#552477;
+  --plum-2:#74389c;
+  --teal:#0f766e;
+  --mint:#e8f7f3;
+  --amber:#b76e00;
+  --amber-bg:#fff5df;
+  --coral:#c2413f;
+  --coral-bg:#fff0ef;
+  --blue:#2563eb;
+  --blue-bg:#edf4ff;
+  --green:#14804a;
+  --green-bg:#eaf8ef;
+  --shadow:0 12px 30px rgba(24,32,43,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:"DM Sans",Arial,sans-serif;
+  color:var(--ink);
+  background:var(--soft);
+  font-size:14px;
+  letter-spacing:0;
+}
+button,input,select{font:inherit}
+a{color:inherit;text-decoration:none}
+.shell{min-height:100vh}
+.topbar{
+  height:68px;
+  background:#111827;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+  position:sticky;
+  top:0;
+  z-index:20;
+  box-shadow:0 6px 20px rgba(17,24,39,.18);
+}
+.brand{display:flex;align-items:center;gap:12px;min-width:220px}
+.logo{
+  width:40px;height:40px;border-radius:8px;
+  display:grid;place-items:center;
+  background:#f6c453;color:#23153b;
+  font-weight:800;
+}
+.brand h1{margin:0;font-size:17px;line-height:1.1;font-weight:700}
+.brand span{display:block;font-size:11px;color:#b8c0cc;font-weight:500;margin-top:3px}
+.top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.icon-btn,.link-btn,.primary-btn{
+  min-height:36px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:8px;
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:0 12px;
+  cursor:pointer;
+  transition:.18s ease;
+}
+.icon-btn{width:36px;padding:0}
+.primary-btn{background:#f6c453;color:#271a3f;border-color:#f6c453;font-weight:700}
+.icon-btn:hover,.link-btn:hover{background:rgba(255,255,255,.16)}
+.primary-btn:hover{filter:brightness(1.04)}
+.icon{width:17px;height:17px;stroke-width:2}
+.main{max-width:1440px;margin:0 auto;padding:22px 24px 40px}
+.status-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+}
+.status{
+  display:flex;align-items:center;gap:8px;
+  color:var(--muted);
+  font-size:12px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:8px 11px;
+}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--amber)}
+.status.ok .status-dot{background:var(--green)}
+.status.err .status-dot{background:var(--coral)}
+.status.demo .status-dot{background:var(--blue)}
+.date-chip{color:var(--muted);font-size:12px}
+.toolbar{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:14px;
+  display:grid;
+  grid-template-columns:repeat(5,minmax(130px,1fr)) auto;
+  gap:12px;
+  align-items:end;
+  margin-bottom:16px;
+}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase}
+.field select,.field input{
+  height:38px;
+  border:1px solid var(--line-strong);
+  border-radius:8px;
+  background:#fff;
+  color:var(--ink);
+  padding:0 10px;
+  outline:none;
+}
+.field select:focus,.field input:focus{border-color:var(--plum);box-shadow:0 0 0 3px rgba(85,36,119,.12)}
+.ghost-btn{
+  height:38px;border:1px solid var(--line-strong);
+  border-radius:8px;background:#fff;color:var(--ink);
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  cursor:pointer;padding:0 12px;font-weight:700;
+}
+.ghost-btn:hover{background:#f7f8fb}
+.tabs{
+  display:flex;gap:4px;align-items:center;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:4px;
+  width:max-content;
+  max-width:100%;
+  overflow:auto;
+  margin-bottom:16px;
+}
+.tab{
+  height:38px;border:0;background:transparent;color:var(--muted);
+  border-radius:7px;padding:0 14px;
+  display:flex;align-items:center;gap:8px;
+  cursor:pointer;font-weight:700;white-space:nowrap;
+}
+.tab.active{background:var(--plum);color:#fff}
+.panel{display:none}
+.panel.active{display:block}
+.kpis{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(150px,1fr));
+  gap:12px;
+  margin-bottom:16px;
+}
+.kpi{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:15px;
+  min-height:118px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.kpi-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.kpi-label{font-size:11px;text-transform:uppercase;color:var(--muted);font-weight:800}
+.kpi-ico{
+  width:34px;height:34px;border-radius:8px;display:grid;place-items:center;
+  background:var(--blue-bg);color:var(--blue);
+}
+.kpi:nth-child(2) .kpi-ico{background:var(--green-bg);color:var(--green)}
+.kpi:nth-child(3) .kpi-ico{background:var(--amber-bg);color:var(--amber)}
+.kpi:nth-child(4) .kpi-ico{background:var(--mint);color:var(--teal)}
+.kpi:nth-child(5) .kpi-ico{background:#f2eafd;color:var(--plum)}
+.kpi:nth-child(6) .kpi-ico{background:var(--coral-bg);color:var(--coral)}
+.kpi-value{font-size:23px;line-height:1.1;font-weight:800;margin-top:12px}
+.kpi-note{font-size:12px;color:var(--muted);margin-top:5px}
+.grid-2{display:grid;grid-template-columns:1.3fr .7fr;gap:16px;margin-bottom:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  box-shadow:var(--shadow);
+}
+.card-head{
+  min-height:54px;
+  padding:15px 16px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.card-title{font-weight:800;font-size:14px}
+.card-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.card-body{padding:16px}
+.chart-box{height:286px;position:relative}
+.chart-box.sm{height:235px}
+.split-list{display:flex;flex-direction:column;gap:10px}
+.rank-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  align-items:center;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--line);
+}
+.rank-row:last-child{border-bottom:0;padding-bottom:0}
+.rank-name{font-weight:700}
+.rank-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.rank-val{font-weight:800;text-align:right}
+.progress{
+  height:8px;background:#edf1f7;border-radius:999px;overflow:hidden;margin-top:8px;
+}
+.progress span{display:block;height:100%;background:var(--teal);border-radius:999px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{font-size:11px;text-transform:uppercase;color:var(--muted);background:#f8fafc;font-weight:800}
+td{font-size:13px}
+tr:hover td{background:#fbfcff}
+.pill{
+  display:inline-flex;align-items:center;
+  min-height:24px;padding:0 9px;border-radius:999px;
+  font-size:11px;font-weight:800;
+}
+.pill.paye{background:var(--green-bg);color:var(--green)}
+.pill.attente{background:var(--amber-bg);color:var(--amber)}
+.pill.encours{background:var(--blue-bg);color:var(--blue)}
+.pill.gold{background:#fff4c7;color:#7a4a00;border:1px solid #f4d36a}
+.pill.silver{background:#edf2f7;color:#475569}
+.pill.bronze{background:#fff0e8;color:#9a3412}
+.client-layout{display:grid;grid-template-columns:330px 1fr;gap:16px}
+.client-list{
+  max-height:680px;
+  overflow:auto;
+}
+.client-item{
+  display:block;
+  width:100%;
+  border:0;
+  border-bottom:1px solid var(--line);
+  background:#fff;
+  padding:13px 14px;
+  text-align:left;
+  cursor:pointer;
+}
+.client-item:hover,.client-item.active{background:#f8f5fb}
+.client-name{font-weight:800}
+.client-mini{font-size:12px;color:var(--muted);margin-top:3px}
+.profile-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.metric{
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:13px;
+  background:#fff;
+}
+.metric label{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:800}
+.metric strong{display:block;font-size:19px;margin-top:6px}
+.timeline{display:flex;flex-direction:column;gap:10px}
+.event{
+  display:grid;grid-template-columns:84px 1fr auto;gap:12px;align-items:center;
+  border-bottom:1px solid var(--line);padding-bottom:10px;
+}
+.event:last-child{border-bottom:0}
+.event-date{font-size:12px;color:var(--muted)}
+.event-title{font-weight:800}
+.event-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.goal-board{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
+.goal-card{padding:16px}
+.goal-input{
+  display:flex;gap:8px;margin-top:12px;
+}
+.goal-input input{min-width:0;flex:1;height:38px;border:1px solid var(--line-strong);border-radius:8px;padding:0 10px}
+.empty{
+  padding:28px;
+  text-align:center;
+  color:var(--muted);
+}
+.mobile-only{display:none}
+@media(max-width:1120px){
+  .toolbar{grid-template-columns:repeat(3,1fr)}
+  .kpis{grid-template-columns:repeat(3,1fr)}
+  .grid-2,.grid-3,.goal-board{grid-template-columns:1fr}
+  .client-layout{grid-template-columns:1fr}
+  .profile-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:720px){
+  .topbar{height:auto;min-height:68px;padding:12px 14px;align-items:flex-start;flex-direction:column}
+  .top-actions{justify-content:flex-start}
+  .main{padding:16px 12px 32px}
+  .status-row{align-items:flex-start;flex-direction:column}
+  .toolbar{grid-template-columns:1fr}
+  .kpis{grid-template-columns:1fr}
+  .tabs{width:100%}
+  .profile-grid{grid-template-columns:1fr}
+  .event{grid-template-columns:1fr}
+  .link-label{display:none}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">ML</div>
+      <div>
+        <h1>Maison Lumena</h1>
+        <span>Pilotage commercial et suivi client</span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <a class="link-btn" href="https://docs.google.com/spreadsheets/d/18O-Eldm9kXzKEtts1TAzVvHXFYcceht0ClZXkIM5BMg/edit" target="_blank" rel="noreferrer"><i data-lucide="table-2" class="icon"></i><span class="link-label">Sheets</span></a>
+      <a class="link-btn" href="https://docs.google.com/forms/d/e/1FAIpQLScrmxE5iE2sapEjrCdMbEgWBc2Po5Dm4zg9gCRKBfT1Y9et6A/viewform" target="_blank" rel="noreferrer"><i data-lucide="user-plus" class="icon"></i><span class="link-label">Client</span></a>
+      <a class="primary-btn" href="https://docs.google.com/forms/d/e/1FAIpQLScQh_40U3eej77yrj2mLrrzbtqFGkpMnM9GYETYM27hFQvzng/viewform" target="_blank" rel="noreferrer"><i data-lucide="clipboard-list" class="icon"></i><span class="link-label">Visite</span></a>
+      <button class="icon-btn" id="reloadBtn" title="Actualiser"><i data-lucide="refresh-cw" class="icon"></i></button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="status-row">
+      <div id="status" class="status"><span class="status-dot"></span><span>Connexion aux donnees...</span></div>
+      <div id="currentDate" class="date-chip"></div>
+    </div>
+
+    <section class="toolbar" aria-label="Filtres">
+      <div class="field">
+        <label for="periodFilter">Periode</label>
+        <select id="periodFilter">
+          <option value="month">Mois en cours</option>
+          <option value="today">Aujourd'hui</option>
+          <option value="7">7 derniers jours</option>
+          <option value="30">30 derniers jours</option>
+          <option value="90">90 derniers jours</option>
+          <option value="all">Tout</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="serviceFilter">Service</label>
+        <select id="serviceFilter"><option value="all">Tous les services</option></select>
+      </div>
+      <div class="field">
+        <label for="employeeFilter">Equipe</label>
+        <select id="employeeFilter"><option value="all">Toute l'equipe</option></select>
+      </div>
+      <div class="field">
+        <label for="statusFilter">Statut</label>
+        <select id="statusFilter">
+          <option value="all">Tous</option>
+          <option value="Paye">Paye</option>
+          <option value="A payer">A payer</option>
+          <option value="En cours">En cours</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="searchInput">Recherche client</label>
+        <input id="searchInput" type="search" placeholder="Nom, telephone, objectif">
+      </div>
+      <button class="ghost-btn" id="exportBtn"><i data-lucide="download" class="icon"></i>CSV</button>
+    </section>
+
+    <nav class="tabs" aria-label="Navigation">
+      <button class="tab active" data-tab="overview"><i data-lucide="layout-dashboard" class="icon"></i>Pilotage</button>
+      <button class="tab" data-tab="sales"><i data-lucide="trending-up" class="icon"></i>Ventes</button>
+      <button class="tab" data-tab="services"><i data-lucide="sparkles" class="icon"></i>Services</button>
+      <button class="tab" data-tab="clients"><i data-lucide="users" class="icon"></i>Clients</button>
+      <button class="tab" data-tab="goals"><i data-lucide="target" class="icon"></i>Objectifs</button>
+    </nav>
+
+    <section id="overview" class="panel active">
+      <div class="kpis" id="kpiGrid"></div>
+      <div class="grid-2">
+        <article class="card">
+          <div class="card-head"><div><div class="card-title">Evolution du chiffre d'affaires</div><div class="card-sub">CA paye par jour sur la periode filtree</div></div></div>
+          <div class="card-body"><div class="chart-box"><canvas id="revenueChart"></canvas></div></div>
+        </article>
+        <article class="card">
+          <div class="card-head"><div><div class="card-title">Statuts de paiement</div><div class="card-sub">Repartition des prestations</div></div></div>
+          <div class="card-body"><div class="chart-box"><canvas id="statusChart"></canvas></div></div>
+        </article>
+      </div>
+      <div class="grid-3">
+        <article class="card">
+          <div class="card-head"><div><div class="card-title">Top services</div><div class="card-sub">Contribution au CA paye</div></div></div>
+          <div class="card-body"><div id="topServices" class="split-list"></div></div>
+        </article>
+        <article class="card">
+          <div class="card-head"><div><div class="card-title">Performance equipe</div><div class="card-sub">CA paye par employee</div></div></div>
+          <div class="card-body"><div id="topEmployees" class="split-list"></div></div>
+        </article>
+        <article class="card">
+          <div class="card-head"><div><div class="card-title">Actions client</div><div class="card-sub">Relances et opportunites</div></div></div>
+          <div class="card-body"><div id="actionList" class="split-list"></div></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="sales" class="panel">
+      <div class="grid-2">
+        <article class="card">
+          <div class="card-head"><div><div class="card-title">CA par service</div><div class="card-sub">Services les plus rentables</div></div></div>
+          <div class="card-body"><div class="chart-box"><canvas id="serviceRevenueChart"></canvas></div></div>
+        </article>
+        <article class="card">
+          <div class="card-head"><div><div class="card-title">Prestations par employee</div><div class="card-sub">Volume et encaissements</div></div></div>
+          <div class="card-body"><div class="chart-box"><canvas id="employeeChart"></canvas></div></div>
+        </article>
+      </div>
+      <article class="card">
+        <div class="card-head"><div><div class="card-title">Journal des ventes</div><div class="card-sub">Toutes les prestations filtrees</div></div></div>
+        <div class="table-wrap"><table id="salesTable"></table></div>
+      </article>
+    </section>
+
+    <section id="services" class="panel">
+      <div class="grid-3">
+        <article class="card">
+          <div class="card-head"><div><div class="card-title">Mix services</div><div class="card-sub">Part de chaque famille</div></div></div>
+          <div class="card-body"><div class="chart-box sm"><canvas id="serviceMixChart"></canvas></div></div>
+        </article>
+        <article class="card">
+          <div class="card-head"><div><div class="card-title">Prix moyen</div><div class="card-sub">Panier par service</div></div></div>
+          <div class="card-body"><div id="avgServiceList" class="split-list"></div></div>
+        </article>
+        <article class="card">
+          <div class="card-head"><div><div class="card-title">Objectifs clients</div><div class="card-sub">Demandes detectees</div></div></div>
+          <div class="card-body"><div id="objectiveList" class="split-list"></div></div>
+        </article>
+      </div>
+      <article class="card">
+        <div class="card-head"><div><div class="card-title">Synthese services</div><div class="card-sub">CA, volume, panier et poids commercial</div></div></div>
+        <div class="table-wrap"><table id="serviceTable"></table></div>
+      </article>
+    </section>
+
+    <section id="clients" class="panel">
+      <div class="client-layout">
+        <article class="card">
+          <div class="card-head"><div><div class="card-title">Portefeuille clients</div><div class="card-sub" id="clientCount"></div></div></div>
+          <div id="clientList" class="client-list"></div>
+        </article>
+        <article class="card">
+          <div class="card-head"><div><div class="card-title" id="profileTitle">Profil client</div><div class="card-sub" id="profileSub">Selectionnez une cliente</div></div></div>
+          <div class="card-body" id="clientProfile"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="goals" class="panel">
+      <div class="goal-board">
+        <article class="card goal-card">
+          <div class="card-title">Objectif CA mensuel</div>
+          <div class="card-sub">Compare au CA paye du mois</div>
+          <div class="goal-input"><input id="monthlyGoal" type="number" min="0" step="1000"><button class="ghost-btn" data-save-goal="monthlyGoal">OK</button></div>
+          <div id="monthlyGoalView"></div>
+        </article>
+        <article class="card goal-card">
+          <div class="card-title">Objectif visites mensuel</div>
+          <div class="card-sub">Nombre de prestations a atteindre</div>
+          <div class="goal-input"><input id="visitGoal" type="number" min="0" step="1"><button class="ghost-btn" data-save-goal="visitGoal">OK</button></div>
+          <div id="visitGoalView"></div>
+        </article>
+        <article class="card goal-card">
+          <div class="card-title">Objectif nouveaux clients</div>
+          <div class="card-sub">Inscriptions du mois</div>
+          <div class="goal-input"><input id="clientGoal" type="number" min="0" step="1"><button class="ghost-btn" data-save-goal="clientGoal">OK</button></div>
+          <div id="clientGoalView"></div>
+        </article>
+      </div>
+      <article class="card">
+        <div class="card-head"><div><div class="card-title">Clients a accompagner</div><div class="card-sub">Suivi par objectif et derniere activite</div></div></div>
+        <div class="table-wrap"><table id="followupTable"></table></div>
+      </article>
+    </section>
+  </main>
+</div>
+
+<script>
+const CONFIG = {
+  sheetId: "18O-Eldm9kXzKEtts1TAzVvHXFYcceht0ClZXkIM5BMg",
+  sheets: {
+    caisse: "CAISSE",
+    clients: "BASE_CLIENTS",
+    visites: "VISITES",
+    peau: "DIAGNOSTIC_PEAU",
+    cheveux: "DIAGNOSTIC_CHEVEUX",
+    sport: "SPORT_FITNESS"
+  }
+};
+
+const state = {
+  sales: [],
+  clients: [],
+  diagnostics: [],
+  filtered: [],
+  charts: {},
+  selectedClientId: null,
+  demo: false
+};
+
+const colors = {
+  plum: "#552477",
+  teal: "#0f766e",
+  amber: "#b76e00",
+  coral: "#c2413f",
+  blue: "#2563eb",
+  green: "#14804a",
+  gray: "#667085"
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.lucide) lucide.createIcons();
+  document.getElementById("currentDate").textContent = new Intl.DateTimeFormat("fr-FR", { weekday:"long", day:"2-digit", month:"long", year:"numeric" }).format(new Date());
+  bindUI();
+  loadData();
+});
+
+function bindUI(){
+  document.querySelectorAll(".tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById(btn.dataset.tab).classList.add("active");
+      Object.values(state.charts).forEach(c => c && c.resize());
+    });
+  });
+  ["periodFilter","serviceFilter","employeeFilter","statusFilter","searchInput"].forEach(id => {
+    document.getElementById(id).addEventListener(id === "searchInput" ? "input" : "change", applyFilters);
+  });
+  document.getElementById("reloadBtn").addEventListener("click", loadData);
+  document.getElementById("exportBtn").addEventListener("click", exportCurrentCsv);
+  document.querySelectorAll("[data-save-goal]").forEach(btn => btn.addEventListener("click", saveGoals));
+}
+
+async function loadData(){
+  setStatus("load", "Connexion au Google Sheets...");
+  try{
+    const [caisse, clients, visites, peau, cheveux, sport] = await Promise.all([
+      fetchSheet(CONFIG.sheets.caisse),
+      fetchSheet(CONFIG.sheets.clients),
+      fetchSheet(CONFIG.sheets.visites),
+      fetchSheet(CONFIG.sheets.peau),
+      fetchSheet(CONFIG.sheets.cheveux),
+      fetchSheet(CONFIG.sheets.sport)
+    ]);
+    if (!caisse || caisse.length < 2) throw new Error("CAISSE vide ou inaccessible");
+    state.demo = false;
+    state.sales = normalizeSales(caisse);
+    state.clients = buildClients(normalizeClients(clients || []), state.sales);
+    state.diagnostics = [
+      ...normalizeDiagnostics(peau || []),
+      ...normalizeDiagnostics(cheveux || []),
+      ...normalizeDiagnostics(sport || [])
+    ];
+    attachObjectives();
+    setStatus("ok", `${state.sales.length} prestations chargees depuis Google Sheets`);
+  }catch(err){
+    console.warn(err);
+    const demo = demoDataset();
+    state.demo = true;
+    state.sales = demo.sales;
+    state.clients = buildClients(demo.clients, state.sales);
+    state.diagnostics = demo.diagnostics;
+    attachObjectives();
+    setStatus("demo", "Mode apercu : partage Sheets requis pour les donnees live");
+  }
+  populateFilters();
+  loadGoals();
+  applyFilters();
+}
+
+async function fetchSheet(name){
+  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`;
+  const response = await fetch(url, { mode:"cors" });
+  if (!response.ok) throw new Error(`${name}: ${response.status}`);
+  const text = await response.text();
+  if (/^<!doctype html/i.test(text.trim())) throw new Error(`${name}: reponse HTML`);
+  return parseCSV(text);
+}
+
+function parseCSV(text){
+  const rows=[];let row=[];let cur="";let quoted=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i], next=text[i+1];
+    if(ch === '"' && quoted && next === '"'){cur += '"'; i++; continue;}
+    if(ch === '"'){quoted = !quoted; continue;}
+    if(ch === "," && !quoted){row.push(cur); cur=""; continue;}
+    if((ch === "\n" || ch === "\r") && !quoted){
+      if(ch === "\r" && next === "\n") i++;
+      row.push(cur); rows.push(row); row=[]; cur="";
+      continue;
+    }
+    cur += ch;
+  }
+  if(cur || row.length){row.push(cur); rows.push(row);}
+  return rows.filter(r => r.some(c => String(c).trim() !== ""));
+}
+
+function key(text){
+  return String(text || "")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .toLowerCase().replace(/[^a-z0-9]/g,"");
+}
+
+function indexer(headers){
+  const h = headers.map(key);
+  return (...names) => {
+    const keys = names.map(key);
+    for(const wanted of keys){
+      let i = h.findIndex(x => x === wanted);
+      if(i >= 0) return i;
+    }
+    for(const wanted of keys){
+      let i = h.findIndex(x => x.includes(wanted) || wanted.includes(x));
+      if(i >= 0) return i;
+    }
+    return -1;
+  };
+}
+
+function cell(row, i){return i >= 0 && i < row.length ? String(row[i] || "").trim() : "";}
+function money(raw){const n = String(raw || "").replace(/[^\d.-]/g,""); return n ? Number(n) || 0 : 0;}
+function fmtMoney(n){return Math.round(n || 0).toLocaleString("fr-FR") + " FCFA";}
+function fmtNum(n){return Math.round(n || 0).toLocaleString("fr-FR");}
+function fmtDate(d){return d ? new Intl.DateTimeFormat("fr-FR",{day:"2-digit",month:"short",year:"numeric"}).format(d) : "-";}
+function normPhone(v){return String(v || "").replace(/[^\d]/g,"");}
+function normName(v){return String(v || "").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();}
+function parseDate(raw){
+  if(raw instanceof Date) return raw;
+  const s = String(raw || "").trim();
+  if(!s) return null;
+  let m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})$/);
+  if(m){
+    const y = Number(m[3].length === 2 ? "20" + m[3] : m[3]);
+    return new Date(y, Number(m[2]) - 1, Number(m[1]));
+  }
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function normalizeStatus(raw){
+  const s = normName(raw);
+  if(s.includes("paye")) return "Paye";
+  if(s.includes("payer")) return "A payer";
+  return "En cours";
+}
+
+function normalizeSales(rows){
+  const idx = indexer(rows[0] || []);
+  const iDate = idx("DATE","DATE_VISITE");
+  const iIdClient = idx("ID_CLIENT");
+  const iClient = idx("NOM_CLIENTE","NOM_PRENOM","CLIENT");
+  const iTel = idx("TELEPHONE_CLIENTE","TELEPHONE","WHATSAPP");
+  const iEmployee = idx("EMPLOYEE","EMPLOYEE_RESPONSABLE","RESPONSABLE");
+  const iService = idx("SERVICE","SERVICE_PRINCIPAL","SERVICE_DEMANDE");
+  const iPrix = idx("PRIX_SERVICE","PRIX_DU_SERVICE_PRINCIPAL");
+  const iTotal = idx("PANIER_TOTAL","TOTAL","MONTANT");
+  const iStatus = idx("STATUT","STATUT_DE_LA_PRESTATION");
+  const iPay = idx("MODE_PAIEMENT");
+  return rows.slice(1).map((r, n) => {
+    const date = parseDate(cell(r,iDate));
+    const total = money(cell(r,iTotal)) || money(cell(r,iPrix));
+    return {
+      id: cell(r,0) || `SALE-${n}`,
+      date,
+      idClient: cell(r,iIdClient),
+      client: cell(r,iClient) || "Cliente non renseignee",
+      phone: cell(r,iTel),
+      phoneKey: normPhone(cell(r,iTel)),
+      employee: cell(r,iEmployee) || "Equipe",
+      service: cell(r,iService) || "Service non renseigne",
+      price: money(cell(r,iPrix)),
+      total,
+      status: normalizeStatus(cell(r,iStatus)),
+      payment: cell(r,iPay)
+    };
+  }).filter(x => x.client || x.service || x.total);
+}
+
+function normalizeClients(rows){
+  if(!rows || rows.length < 2) return [];
+  const idx = indexer(rows[0]);
+  const iId = idx("ID_CLIENT");
+  const iDate = idx("DATE_INSCRIPTION");
+  const iNom = idx("NOM_PRENOM","NOM_CLIENTE","NOM");
+  const iTel = idx("TELEPHONE","WHATSAPP");
+  const iMail = idx("EMAIL");
+  const iQuartier = idx("QUARTIER");
+  const iSource = idx("SOURCE");
+  const iStatut = idx("STATUT_FIDELITE");
+  const iNotes = idx("NOTES");
+  return rows.slice(1).map((r,n) => ({
+    id: cell(r,iId) || `CLI-${n}`,
+    date: parseDate(cell(r,iDate)),
+    name: cell(r,iNom) || "Cliente",
+    phone: cell(r,iTel),
+    phoneKey: normPhone(cell(r,iTel)),
+    email: cell(r,iMail),
+    area: cell(r,iQuartier),
+    source: cell(r,iSource),
+    loyalty: cell(r,iStatut) || "Bronze",
+    notes: cell(r,iNotes),
+    objectives: []
+  }));
+}
+
+function normalizeDiagnostics(rows){
+  if(!rows || rows.length < 2) return [];
+  const headers = rows[0];
+  const idx = indexer(headers);
+  const iClient = idx("ID_CLIENT");
+  const iName = idx("NOM_CLIENTE","NOM_PRENOM");
+  const iDate = idx("DATE");
+  const iObj = idx("OBJECTIF","OBJECTIF_SPORT","OBJECTIF_CAPILLAIRE","OBJECTIF_PEAU");
+  const iSvc = idx("SERVICE","TYPE_PEAU","TYPE_CHEVEUX","NIVEAU");
+  const iNotes = idx("NOTES","NOTES_COACH","NOTES_COIFFEUSE");
+  return rows.slice(1).map((r,n) => ({
+    id: `D-${n}`,
+    idClient: cell(r,iClient),
+    name: cell(r,iName),
+    date: parseDate(cell(r,iDate)),
+    objective: cell(r,iObj),
+    context: cell(r,iSvc),
+    notes: cell(r,iNotes)
+  })).filter(x => x.idClient || x.name || x.objective);
+}
+
+function buildClients(base, sales){
+  const map = new Map();
+  base.forEach(c => map.set(c.id || c.phoneKey || normName(c.name), {...c, sales:[], objectives:[]}));
+  sales.forEach(s => {
+    const keyValue = s.idClient || s.phoneKey || normName(s.client);
+    let c = map.get(s.idClient) || [...map.values()].find(x => (s.phoneKey && x.phoneKey === s.phoneKey) || normName(x.name) === normName(s.client));
+    if(!c){
+      c = {id:s.idClient || keyValue, name:s.client, phone:s.phone, phoneKey:s.phoneKey, email:"", area:"", source:"Visite", loyalty:"Bronze", notes:"", sales:[], objectives:[]};
+      map.set(c.id || keyValue, c);
+    }
+    c.sales.push(s);
+  });
+  return [...map.values()].map(c => {
+    const paid = c.sales.filter(s => s.status === "Paye");
+    const total = paid.reduce((sum,s) => sum + s.total, 0);
+    const last = c.sales.map(s => s.date).filter(Boolean).sort((a,b) => b-a)[0] || null;
+    const fav = topBy(c.sales, "service", "count")[0];
+    return {...c, total, visits:c.sales.length, lastVisit:last, favoriteService:fav ? fav.name : "-", loyalty: loyalty(c.sales.length)};
+  }).sort((a,b) => b.total - a.total);
+}
+
+function attachObjectives(){
+  state.clients.forEach(c => {
+    const diagnostics = state.diagnostics.filter(d => (d.idClient && d.idClient === c.id) || normName(d.name) === normName(c.name));
+    c.objectives = [...new Set(diagnostics.map(d => d.objective).filter(Boolean))];
+    c.diagnostics = diagnostics;
+  });
+}
+
+function loyalty(visits){
+  if(visits >= 10) return "Gold";
+  if(visits >= 5) return "Silver";
+  return "Bronze";
+}
+
+function populateFilters(){
+  fillSelect("serviceFilter", [...new Set(state.sales.map(x => x.service).filter(Boolean))].sort(), "Tous les services");
+  fillSelect("employeeFilter", [...new Set(state.sales.map(x => x.employee).filter(Boolean))].sort(), "Toute l'equipe");
+}
+
+function fillSelect(id, values, label){
+  const el = document.getElementById(id);
+  const current = el.value || "all";
+  el.innerHTML = `<option value="all">${label}</option>` + values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
+  el.value = values.includes(current) ? current : "all";
+}
+
+function applyFilters(){
+  const period = document.getElementById("periodFilter").value;
+  const service = document.getElementById("serviceFilter").value;
+  const employee = document.getElementById("employeeFilter").value;
+  const status = document.getElementById("statusFilter").value;
+  const search = normName(document.getElementById("searchInput").value);
+  const now = new Date(); now.setHours(0,0,0,0);
+  state.filtered = state.sales.filter(s => {
+    if(service !== "all" && s.service !== service) return false;
+    if(employee !== "all" && s.employee !== employee) return false;
+    if(status !== "all" && s.status !== status) return false;
+    if(search && !normName([s.client,s.phone,s.service,s.employee].join(" ")).includes(search)) return false;
+    if(period === "all") return true;
+    if(!s.date) return false;
+    const d = new Date(s.date); d.setHours(0,0,0,0);
+    if(period === "today") return d.getTime() === now.getTime();
+    if(period === "month") return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    const days = Number(period);
+    return (now - d) / 86400000 <= days;
+  });
+  renderAll();
+}
+
+function renderAll(){
+  renderKPIs();
+  renderCharts();
+  renderRankings();
+  renderTables();
+  renderClients();
+  renderGoals();
+  if(window.lucide) lucide.createIcons();
+}
+
+function computeKPIs(data){
+  const paid = data.filter(x => x.status === "Paye");
+  const waiting = data.filter(x => x.status === "A payer");
+  const totalPaid = paid.reduce((s,x) => s + x.total, 0);
+  const totalWaiting = waiting.reduce((s,x) => s + x.total, 0);
+  const uniqueClients = new Set(data.map(x => x.idClient || x.phoneKey || normName(x.client))).size;
+  const avg = paid.length ? totalPaid / paid.length : 0;
+  return { totalPaid, totalWaiting, count:data.length, avg, uniqueClients, conversion:data.length ? paid.length / data.length : 0 };
+}
+
+function renderKPIs(){
+  const k = computeKPIs(state.filtered);
+  document.getElementById("kpiGrid").innerHTML = [
+    kpi("CA paye", fmtMoney(k.totalPaid), `${fmtNum(state.filtered.filter(x => x.status === "Paye").length)} prestations`, "wallet"),
+    kpi("A encaisser", fmtMoney(k.totalWaiting), "Prestations a payer", "receipt"),
+    kpi("Prestations", fmtNum(k.count), "Volume filtre", "activity"),
+    kpi("Panier moyen", fmtMoney(k.avg), "Sur prestations payees", "shopping-bag"),
+    kpi("Clients actifs", fmtNum(k.uniqueClients), "Clients sur la periode", "users"),
+    kpi("Taux paye", `${Math.round(k.conversion * 100)}%`, "Paye vs total", "badge-check")
+  ].join("");
+}
+
+function kpi(label,value,note,icon){
+  return `<div class="kpi"><div class="kpi-top"><div class="kpi-label">${label}</div><div class="kpi-ico"><i data-lucide="${icon}" class="icon"></i></div></div><div><div class="kpi-value">${value}</div><div class="kpi-note">${note}</div></div></div>`;
+}
+
+function renderCharts(){
+  const daily = groupDaily(state.filtered.filter(x => x.status === "Paye"));
+  makeChart("revenueChart", "line", daily.labels, [{label:"CA paye", data:daily.values, borderColor:colors.plum, backgroundColor:"rgba(85,36,119,.12)", fill:true, tension:.35}], {yMoney:true});
+  const status = groupCount(state.filtered, "status");
+  makeChart("statusChart", "doughnut", status.labels, [{data:status.values, backgroundColor:[colors.green,colors.amber,colors.blue,colors.gray]}]);
+  const services = topBy(state.filtered.filter(x => x.status === "Paye"), "service", "sum");
+  makeChart("serviceRevenueChart", "bar", services.map(x => x.name), [{label:"CA paye", data:services.map(x => x.value), backgroundColor:colors.teal}], {yMoney:true});
+  const employees = topBy(state.filtered, "employee", "count");
+  makeChart("employeeChart", "bar", employees.map(x => x.name), [{label:"Prestations", data:employees.map(x => x.count), backgroundColor:colors.blue}], {});
+  const mix = topBy(state.filtered, "service", "count");
+  makeChart("serviceMixChart", "doughnut", mix.map(x => x.name), [{data:mix.map(x => x.count), backgroundColor:[colors.plum,colors.teal,colors.amber,colors.coral,colors.blue,colors.green]}]);
+}
+
+function makeChart(id,type,labels,datasets,opts={}){
+  const el = document.getElementById(id);
+  if(!el) return;
+  if(state.charts[id]) state.charts[id].destroy();
+  state.charts[id] = new Chart(el, {
+    type,
+    data:{labels,datasets},
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{legend:{display:type !== "bar" && type !== "line", labels:{boxWidth:12,font:{family:"DM Sans"}}}, tooltip:{callbacks:{label:c => opts.yMoney ? `${c.dataset.label || ""}: ${fmtMoney(c.parsed.y ?? c.raw)}` : `${c.label}: ${fmtNum(c.raw ?? c.parsed.y)}`}}},
+      scales:type === "doughnut" ? {} : {x:{grid:{display:false}, ticks:{font:{family:"DM Sans"}}}, y:{beginAtZero:true, ticks:{callback:v => opts.yMoney ? fmtMoney(v).replace(" FCFA","") : v, font:{family:"DM Sans"}}}}
+    }
+  });
+}
+
+function renderRankings(){
+  renderRank("topServices", topBy(state.filtered.filter(x => x.status === "Paye"), "service", "sum"), true);
+  renderRank("topEmployees", topBy(state.filtered.filter(x => x.status === "Paye"), "employee", "sum"), true);
+  renderActions();
+  renderAvgServices();
+  renderObjectiveList();
+}
+
+function renderRank(id, rows, moneyMode){
+  const max = rows[0]?.value || rows[0]?.count || 1;
+  document.getElementById(id).innerHTML = rows.slice(0,6).map(r => {
+    const val = moneyMode ? r.value : r.count;
+    return `<div class="rank-row"><div><div class="rank-name">${escapeHtml(r.name)}</div><div class="rank-meta">${fmtNum(r.count)} prestation(s)</div><div class="progress"><span style="width:${Math.max(4, val/max*100)}%"></span></div></div><div class="rank-val">${moneyMode ? fmtMoney(r.value) : fmtNum(r.count)}</div></div>`;
+  }).join("") || empty("Aucune donnee");
+}
+
+function renderActions(){
+  const now = new Date();
+  const candidates = state.clients
+    .filter(c => c.visits > 0)
+    .map(c => ({...c, inactiveDays:c.lastVisit ? Math.floor((now - c.lastVisit)/86400000) : 999}))
+    .filter(c => c.inactiveDays >= 21 || c.objectives.length)
+    .sort((a,b) => b.inactiveDays - a.inactiveDays)
+    .slice(0,6);
+  document.getElementById("actionList").innerHTML = candidates.map(c => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(c.name)}</div><div class="rank-meta">${c.inactiveDays} jour(s) sans visite${c.objectives[0] ? " · " + escapeHtml(c.objectives[0]) : ""}</div></div><div class="rank-val">${fmtMoney(c.total)}</div></div>`).join("") || empty("Aucune relance prioritaire");
+}
+
+function renderAvgServices(){
+  const rows = topBy(state.filtered, "service", "sum").map(r => ({...r, avg:r.count ? r.value/r.count : 0}));
+  document.getElementById("avgServiceList").innerHTML = rows.slice(0,7).map(r => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(r.name)}</div><div class="rank-meta">${fmtNum(r.count)} prestation(s)</div></div><div class="rank-val">${fmtMoney(r.avg)}</div></div>`).join("") || empty("Aucun service");
+}
+
+function renderObjectiveList(){
+  const all = state.clients.flatMap(c => c.objectives.map(o => ({client:c.name, objective:o})));
+  const grouped = {};
+  all.forEach(x => { grouped[x.objective] = (grouped[x.objective] || 0) + 1; });
+  const rows = Object.entries(grouped).sort((a,b) => b[1]-a[1]).slice(0,7);
+  document.getElementById("objectiveList").innerHTML = rows.map(([name,count]) => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(name)}</div><div class="rank-meta">Objectif client detecte</div></div><div class="rank-val">${count}</div></div>`).join("") || empty("Les objectifs apparaitront apres les diagnostics");
+}
+
+function renderTables(){
+  renderTable("salesTable", ["Date","Cliente","Service","Employee","Montant","Statut"], state.filtered.slice().sort((a,b) => (b.date||0)-(a.date||0)).map(s => [fmtDate(s.date), s.client, s.service, s.employee, fmtMoney(s.total), pillStatus(s.status)]));
+  const services = topBy(state.filtered, "service", "sum");
+  renderTable("serviceTable", ["Service","Prestations","CA paye","Panier moyen","Poids"], services.map(s => [s.name, fmtNum(s.count), fmtMoney(s.value), fmtMoney(s.count ? s.value/s.count : 0), `${Math.round((s.value/(services.reduce((a,b)=>a+b.value,0)||1))*100)}%`]));
+  const followups = state.clients.slice().sort((a,b) => (a.lastVisit||0)-(b.lastVisit||0)).slice(0,20);
+  renderTable("followupTable", ["Cliente","Derniere visite","Visites","CA paye","Objectifs","Priorite"], followups.map(c => [c.name, fmtDate(c.lastVisit), fmtNum(c.visits), fmtMoney(c.total), c.objectives.join(", ") || "-", priority(c)]));
+}
+
+function renderTable(id, headers, rows){
+  const el = document.getElementById(id);
+  el.innerHTML = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>`;
+}
+
+function renderClients(){
+  const search = normName(document.getElementById("searchInput").value);
+  const clients = state.clients.filter(c => !search || normName([c.name,c.phone,c.objectives.join(" "),c.favoriteService].join(" ")).includes(search));
+  document.getElementById("clientCount").textContent = `${clients.length} client(s)`;
+  if(!state.selectedClientId && clients[0]) state.selectedClientId = clients[0].id;
+  document.getElementById("clientList").innerHTML = clients.map(c => `<button class="client-item ${c.id === state.selectedClientId ? "active" : ""}" data-client="${escapeHtml(c.id)}"><div class="client-name">${escapeHtml(c.name)}</div><div class="client-mini">${fmtNum(c.visits)} visite(s) · ${fmtMoney(c.total)} · ${escapeHtml(c.loyalty)}</div></button>`).join("") || empty("Aucun client");
+  document.querySelectorAll(".client-item").forEach(btn => btn.addEventListener("click", () => {state.selectedClientId = btn.dataset.client; renderClients();}));
+  const c = clients.find(x => x.id === state.selectedClientId) || clients[0];
+  renderClientProfile(c);
+}
+
+function renderClientProfile(c){
+  const box = document.getElementById("clientProfile");
+  if(!c){box.innerHTML = empty("Selectionnez une cliente"); return;}
+  document.getElementById("profileTitle").textContent = c.name;
+  document.getElementById("profileSub").textContent = [c.phone, c.area, c.email].filter(Boolean).join(" · ") || "Profil client";
+  const events = c.sales.slice().sort((a,b) => (b.date||0)-(a.date||0)).slice(0,10);
+  box.innerHTML = `
+    <div class="profile-grid">
+      <div class="metric"><label>Statut</label><strong>${badgeLoyalty(c.loyalty)}</strong></div>
+      <div class="metric"><label>CA paye</label><strong>${fmtMoney(c.total)}</strong></div>
+      <div class="metric"><label>Visites</label><strong>${fmtNum(c.visits)}</strong></div>
+      <div class="metric"><label>Service favori</label><strong>${escapeHtml(c.favoriteService)}</strong></div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <div class="card-title">Objectifs connus</div>
+        <div class="split-list" style="margin-top:12px">${c.objectives.length ? c.objectives.map(o => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(o)}</div><div class="rank-meta">A suivre lors de la prochaine visite</div></div></div>`).join("") : empty("Aucun objectif renseigne")}</div>
+      </div>
+      <div>
+        <div class="card-title">Activite recente</div>
+        <div class="timeline" style="margin-top:12px">${events.map(e => `<div class="event"><div class="event-date">${fmtDate(e.date)}</div><div><div class="event-title">${escapeHtml(e.service)}</div><div class="event-sub">${escapeHtml(e.employee)} · ${escapeHtml(e.status)}</div></div><strong>${fmtMoney(e.total)}</strong></div>`).join("") || empty("Aucune activite")}</div>
+      </div>
+    </div>`;
+}
+
+function renderGoals(){
+  const now = new Date();
+  const monthSales = state.sales.filter(s => s.date && s.date.getMonth() === now.getMonth() && s.date.getFullYear() === now.getFullYear());
+  const paid = monthSales.filter(s => s.status === "Paye").reduce((sum,s) => sum + s.total, 0);
+  const visits = monthSales.length;
+  const newClients = state.clients.filter(c => c.date && c.date.getMonth() === now.getMonth() && c.date.getFullYear() === now.getFullYear()).length;
+  renderGoal("monthlyGoalView", paid, Number(localStorage.getItem("mlGoalMonthly") || 3000000), fmtMoney);
+  renderGoal("visitGoalView", visits, Number(localStorage.getItem("mlGoalVisits") || 120), fmtNum);
+  renderGoal("clientGoalView", newClients, Number(localStorage.getItem("mlGoalClients") || 40), fmtNum);
+}
+
+function renderGoal(id, value, target, formatter){
+  const pct = target ? Math.min(100, Math.round(value / target * 100)) : 0;
+  document.getElementById(id).innerHTML = `<div style="margin-top:14px"><div class="rank-row"><div><div class="rank-name">${formatter(value)} realises</div><div class="rank-meta">Objectif : ${formatter(target)}</div><div class="progress"><span style="width:${pct}%"></span></div></div><div class="rank-val">${pct}%</div></div></div>`;
+}
+
+function loadGoals(){
+  document.getElementById("monthlyGoal").value = localStorage.getItem("mlGoalMonthly") || 3000000;
+  document.getElementById("visitGoal").value = localStorage.getItem("mlGoalVisits") || 120;
+  document.getElementById("clientGoal").value = localStorage.getItem("mlGoalClients") || 40;
+}
+
+function saveGoals(){
+  localStorage.setItem("mlGoalMonthly", document.getElementById("monthlyGoal").value || 0);
+  localStorage.setItem("mlGoalVisits", document.getElementById("visitGoal").value || 0);
+  localStorage.setItem("mlGoalClients", document.getElementById("clientGoal").value || 0);
+  renderGoals();
+}
+
+function groupDaily(data){
+  const map = new Map();
+  data.forEach(x => {
+    if(!x.date) return;
+    const k = x.date.toISOString().slice(0,10);
+    map.set(k, (map.get(k)||0) + x.total);
+  });
+  const entries = [...map.entries()].sort((a,b) => a[0].localeCompare(b[0]));
+  return {labels:entries.map(x => new Intl.DateTimeFormat("fr-FR",{day:"2-digit",month:"short"}).format(new Date(x[0]))), values:entries.map(x => x[1])};
+}
+
+function groupCount(data, field){
+  const map = new Map();
+  data.forEach(x => map.set(x[field], (map.get(x[field])||0) + 1));
+  const entries = [...map.entries()].sort((a,b) => b[1]-a[1]);
+  return {labels:entries.map(x => x[0]), values:entries.map(x => x[1])};
+}
+
+function topBy(data, field, mode){
+  const map = new Map();
+  data.forEach(x => {
+    const name = x[field] || "-";
+    if(!map.has(name)) map.set(name, {name, count:0, value:0});
+    const row = map.get(name);
+    row.count++;
+    row.value += x.status === "Paye" || mode === "count" ? x.total : 0;
+  });
+  return [...map.values()].sort((a,b) => mode === "count" ? b.count - a.count : b.value - a.value);
+}
+
+function pillStatus(status){
+  const cls = status === "Paye" ? "paye" : status === "A payer" ? "attente" : "encours";
+  return `<span class="pill ${cls}">${escapeHtml(status)}</span>`;
+}
+
+function badgeLoyalty(status){
+  const cls = normName(status).includes("gold") ? "gold" : normName(status).includes("silver") ? "silver" : "bronze";
+  return `<span class="pill ${cls}">${escapeHtml(status || "Bronze")}</span>`;
+}
+
+function priority(c){
+  const days = c.lastVisit ? Math.floor((new Date() - c.lastVisit) / 86400000) : 999;
+  if(days > 45) return `<span class="pill attente">Relance</span>`;
+  if(c.objectives.length) return `<span class="pill encours">Suivi objectif</span>`;
+  return `<span class="pill paye">Stable</span>`;
+}
+
+function setStatus(type, text){
+  const el = document.getElementById("status");
+  el.className = "status " + (type === "load" ? "" : type);
+  el.querySelector("span:last-child").textContent = text;
+}
+
+function empty(text){return `<div class="empty">${escapeHtml(text)}</div>`;}
+function escapeHtml(v){return String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+
+function exportCurrentCsv(){
+  const headers = ["Date","Cliente","Telephone","Service","Employee","Montant","Statut","Paiement"];
+  const rows = state.filtered.map(s => [fmtDate(s.date), s.client, s.phone, s.service, s.employee, s.total, s.status, s.payment]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${String(v ?? "").replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "maison-lumena-ventes.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function demoDataset(){
+  const services = ["Soin visage / Institut","Coiffure / Soin capillaire","Sport / Fitness","Massage / Relaxation","Manucure / Pedicure","Epilation"];
+  const employees = ["Awa","Mariam","Nadine","Fatou","Sarah"];
+  const clients = ["Aissatou Kone","Mariam Diallo","Nadia Traore","Fatou Bamba","Aminata Coulibaly","Sarah Kouame","Kadi Diarra","Maya Soro"];
+  const sales = [];
+  for(let i=0;i<80;i++){
+    const d = new Date(); d.setDate(d.getDate() - Math.floor(Math.random()*55));
+    const service = services[i % services.length];
+    const client = clients[i % clients.length];
+    const price = [35000,25000,18000,30000,12000,10000][i % 6] + Math.floor(Math.random()*8)*1000;
+    sales.push({id:`DEMO-${i}`,date:d,idClient:`CLI-${i%clients.length}`,client,phone:`07000000${i%8}`,phoneKey:`07000000${i%8}`,employee:employees[i%employees.length],service,price,total:price,status:i%5===0?"A payer":i%7===0?"En cours":"Paye",payment:"Mobile Money"});
+  }
+  return {
+    sales,
+    clients: clients.map((name,i) => ({id:`CLI-${i}`,date:new Date(2026,2+i%2,3+i),name,phone:`07000000${i}`,phoneKey:`07000000${i}`,email:"",area:["Cocody","Marcory","Plateau","Bingerville"][i%4],source:"Instagram",loyalty:"Bronze",notes:""})),
+    diagnostics: [
+      {idClient:"CLI-0",objective:"Hydratation profonde"},
+      {idClient:"CLI-1",objective:"Reparation capillaire"},
+      {idClient:"CLI-2",objective:"Perte de poids"},
+      {idClient:"CLI-3",objective:"Teint unifie"}
+    ]
+  };
+}
+</script>
+</body>
+</html>
