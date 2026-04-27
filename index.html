@@ -290,6 +290,51 @@ tr:hover td{background:#fbfcff}
   text-align:center;
   color:var(--muted);
 }
+.auth-wall{
+  position:fixed;
+  inset:0;
+  z-index:999;
+  display:grid;
+  place-items:center;
+  padding:20px;
+  background:#111827;
+  color:#fff;
+}
+.auth-panel{
+  width:100%;
+  max-width:420px;
+  background:#fff;
+  color:var(--ink);
+  border-radius:8px;
+  box-shadow:0 24px 80px rgba(0,0,0,.32);
+  padding:28px;
+}
+.auth-panel .logo{margin-bottom:18px}
+.auth-panel h2{margin:0;font-size:22px}
+.auth-panel p{margin:8px 0 20px;color:var(--muted);line-height:1.55}
+.auth-form{display:flex;flex-direction:column;gap:12px}
+.auth-form label{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted)}
+.auth-form input{
+  height:42px;
+  border:1px solid var(--line-strong);
+  border-radius:8px;
+  padding:0 12px;
+  outline:none;
+}
+.auth-form input:focus{border-color:var(--plum);box-shadow:0 0 0 3px rgba(85,36,119,.12)}
+.auth-submit{
+  height:42px;
+  border:0;
+  border-radius:8px;
+  background:var(--plum);
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+}
+.auth-error{display:none;color:var(--coral);font-size:12px;font-weight:700}
+.auth-error.show{display:block}
+.auth-note{font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5}
+.shell.locked{display:none}
 .mobile-only{display:none}
 @media(max-width:1120px){
   .toolbar{grid-template-columns:repeat(3,1fr)}
@@ -313,7 +358,22 @@ tr:hover td{background:#fbfcff}
 </style>
 </head>
 <body>
-<div class="shell">
+<section id="authWall" class="auth-wall" aria-label="Connexion">
+  <div class="auth-panel">
+    <div class="logo">ML</div>
+    <h2>Acces reserve</h2>
+    <p>Connectez-vous pour afficher les indicateurs commerciaux et le suivi client Maison Lumena.</p>
+    <form id="authForm" class="auth-form">
+      <label for="authPassword">Mot de passe</label>
+      <input id="authPassword" type="password" autocomplete="current-password" placeholder="Mot de passe">
+      <button class="auth-submit" type="submit">Entrer</button>
+      <div id="authError" class="auth-error">Mot de passe incorrect.</div>
+    </form>
+    <div class="auth-note">Changez le mot de passe dans le code avant publication si besoin.</div>
+  </div>
+</section>
+
+<div id="appShell" class="shell locked">
   <header class="topbar">
     <div class="brand">
       <div class="logo">ML</div>
@@ -327,6 +387,7 @@ tr:hover td{background:#fbfcff}
       <a class="link-btn" href="https://docs.google.com/forms/d/e/1FAIpQLScrmxE5iE2sapEjrCdMbEgWBc2Po5Dm4zg9gCRKBfT1Y9et6A/viewform" target="_blank" rel="noreferrer"><i data-lucide="user-plus" class="icon"></i><span class="link-label">Client</span></a>
       <a class="primary-btn" href="https://docs.google.com/forms/d/e/1FAIpQLScQh_40U3eej77yrj2mLrrzbtqFGkpMnM9GYETYM27hFQvzng/viewform" target="_blank" rel="noreferrer"><i data-lucide="clipboard-list" class="icon"></i><span class="link-label">Visite</span></a>
       <button class="icon-btn" id="reloadBtn" title="Actualiser"><i data-lucide="refresh-cw" class="icon"></i></button>
+      <button class="icon-btn" id="logoutBtn" title="Verrouiller"><i data-lucide="log-out" class="icon"></i></button>
     </div>
   </header>
 
@@ -491,6 +552,10 @@ tr:hover td{background:#fbfcff}
 <script>
 const CONFIG = {
   sheetId: "18O-Eldm9kXzKEtts1TAzVvHXFYcceht0ClZXkIM5BMg",
+  auth: {
+    sessionKey: "maisonLumenaDashboardAuth",
+    passwordHash: "098de97262fccdda4b27a7c4d4c07f95cb120d6db1d6dae989dd8e70d5f5034a"
+  },
   sheets: {
     caisse: "CAISSE",
     clients: "BASE_CLIENTS",
@@ -525,10 +590,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (window.lucide) lucide.createIcons();
   document.getElementById("currentDate").textContent = new Intl.DateTimeFormat("fr-FR", { weekday:"long", day:"2-digit", month:"long", year:"numeric" }).format(new Date());
   bindUI();
-  loadData();
+  initAuth();
 });
 
 function bindUI(){
+  document.getElementById("authForm").addEventListener("submit", handleLogin);
+  document.getElementById("logoutBtn").addEventListener("click", logout);
   document.querySelectorAll(".tab").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
@@ -544,6 +611,49 @@ function bindUI(){
   document.getElementById("reloadBtn").addEventListener("click", loadData);
   document.getElementById("exportBtn").addEventListener("click", exportCurrentCsv);
   document.querySelectorAll("[data-save-goal]").forEach(btn => btn.addEventListener("click", saveGoals));
+}
+
+function initAuth(){
+  if(sessionStorage.getItem(CONFIG.auth.sessionKey) === "ok"){
+    unlockApp();
+  }else{
+    document.getElementById("authPassword").focus();
+  }
+}
+
+async function handleLogin(event){
+  event.preventDefault();
+  const input = document.getElementById("authPassword");
+  const hash = await sha256(input.value);
+  if(hash === CONFIG.auth.passwordHash){
+    sessionStorage.setItem(CONFIG.auth.sessionKey, "ok");
+    input.value = "";
+    document.getElementById("authError").classList.remove("show");
+    unlockApp();
+  }else{
+    document.getElementById("authError").classList.add("show");
+    input.select();
+  }
+}
+
+function unlockApp(){
+  document.getElementById("authWall").style.display = "none";
+  document.getElementById("appShell").classList.remove("locked");
+  if(!state.sales.length) loadData();
+  if(window.lucide) lucide.createIcons();
+}
+
+function logout(){
+  sessionStorage.removeItem(CONFIG.auth.sessionKey);
+  document.getElementById("appShell").classList.add("locked");
+  document.getElementById("authWall").style.display = "grid";
+  document.getElementById("authPassword").focus();
+}
+
+async function sha256(text){
+  const bytes = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2,"0")).join("");
 }
 
 async function loadData(){
