@@ -384,6 +384,9 @@ tbody tr:hover td{background:#F7F2FC}
 .pill.sub-expire{background:var(--coral-bg);color:var(--coral)}
 .pill.sub-termine{background:#EEF2F6;color:#667085}
 .pill.sub-suspendu{background:var(--blue-bg);color:var(--blue)}
+.pill.com-paid{background:var(--green-bg);color:var(--green)}
+.pill.com-unpaid{background:var(--amber-bg);color:var(--amber)}
+.pill.com-pending{background:var(--blue-bg);color:var(--blue)}
 .pill.gold{
   background:linear-gradient(135deg,#FFF8D6,#FEF0A0);
   color:#7A4A00;border:1px solid var(--gold-mid);
@@ -612,6 +615,7 @@ tbody tr:hover td{background:#F7F2FC}
       <button class="tab" data-tab="services"><i data-lucide="sparkles" class="icon"></i>Services</button>
       <button class="tab" data-tab="clients"><i data-lucide="users" class="icon"></i>Clients</button>
       <button class="tab" data-tab="subscriptions"><i data-lucide="calendar-check" class="icon"></i>Abonnements</button>
+      <button class="tab" data-tab="commissions"><i data-lucide="badge-dollar-sign" class="icon"></i>Commissions</button>
       <button class="tab" data-tab="goals"><i data-lucide="target" class="icon"></i>Objectifs</button>
     </nav>
 
@@ -707,6 +711,39 @@ tbody tr:hover td{background:#F7F2FC}
       </article>
     </section>
 
+    <section id="commissions" class="panel">
+      <div class="kpis" id="commissionKpis"></div>
+      <div class="grid-2">
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Commissions par prestataire</div>
+              <div class="card-sub">Total calcule sur les montants payes</div>
+            </div>
+          </div>
+          <div class="card-body"><div class="chart-box"><canvas id="commissionChart"></canvas></div></div>
+        </article>
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Detail des primes</div>
+              <div class="card-sub">Abonnements, satisfaction, resultats et evenements</div>
+            </div>
+          </div>
+          <div class="card-body"><div id="commissionPrimeList" class="split-list"></div></div>
+        </article>
+      </div>
+      <article class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Suivi mensuel des commissions</div>
+            <div class="card-sub">Paiements et montants dus par employee</div>
+          </div>
+        </div>
+        <div class="table-wrap"><table id="commissionsTable"></table></div>
+      </article>
+    </section>
+
     <section id="goals" class="panel">
       <div class="goal-board">
         <article class="card goal-card">
@@ -747,6 +784,7 @@ const CONFIG = {
     caisse: "CAISSE",
     clients: "BASE_CLIENTS",
     abonnements: "ABONNEMENTS",
+    commissions: "COMMISSIONS_MENSUELLES",
     visites: "VISITES",
     peau: "DIAGNOSTIC_PEAU",
     cheveux: "DIAGNOSTIC_CHEVEUX",
@@ -759,6 +797,8 @@ const state = {
   clients: [],
   subscriptions: [],
   filteredSubscriptions: [],
+  commissions: [],
+  filteredCommissions: [],
   diagnostics: [],
   filtered: [],
   charts: {},
@@ -849,10 +889,11 @@ async function sha256(text){
 async function loadData(){
   setStatus("load", "Connexion au Google Sheets...");
   try{
-    const [caisse, clients, abonnements, visites, peau, cheveux, sport] = await Promise.all([
+    const [caisse, clients, abonnements, commissions, visites, peau, cheveux, sport] = await Promise.all([
       fetchSheet(CONFIG.sheets.caisse),
       fetchSheet(CONFIG.sheets.clients),
       fetchSheet(CONFIG.sheets.abonnements),
+      fetchSheet(CONFIG.sheets.commissions),
       fetchSheet(CONFIG.sheets.visites),
       fetchSheet(CONFIG.sheets.peau),
       fetchSheet(CONFIG.sheets.cheveux),
@@ -862,6 +903,7 @@ async function loadData(){
     state.demo = false;
     state.sales = normalizeSales(caisse);
     state.subscriptions = normalizeSubscriptions(abonnements || []);
+    state.commissions = normalizeCommissions(commissions || []);
     state.clients = buildClients(normalizeClients(clients || []), state.sales);
     state.diagnostics = [
       ...normalizeDiagnostics(peau || []),
@@ -877,6 +919,7 @@ async function loadData(){
     state.demo = true;
     state.sales = demo.sales;
     state.subscriptions = demo.subscriptions;
+    state.commissions = demo.commissions;
     state.clients = buildClients(demo.clients, state.sales);
     state.diagnostics = demo.diagnostics;
     attachObjectives();
@@ -1099,6 +1142,39 @@ function normalizeSubscriptions(rows){
   }).filter(x => x.idClient || x.name || x.formule !== "-");
 }
 
+function normalizeCommissions(rows){
+  if(!rows || rows.length < 2) return [];
+  const idx = indexer(rows[0]);
+  const iMois = idx("MOIS");
+  const iEmployee = idx("NOM_EMPLOYEE","EMPLOYEE","PRESTATAIRE");
+  const iCa = idx("CA_INDIVIDUEL");
+  const iPresta = idx("COMMISSION_PRESTATIONS");
+  const iProduits = idx("COMMISSION_PRODUITS");
+  const iAbo = idx("PRIME_ABONNEMENT");
+  const iSatisfaction = idx("PRIME_SATISFACTION");
+  const iResultat = idx("PRIME_RESULTAT");
+  const iEvent = idx("COMMISSION_EVENEMENT");
+  const iTotal = idx("TOTAL_COMMISSION","TOTAL");
+  const iStatus = idx("STATUT_PAIEMENT");
+  const iDate = idx("DATE_CALCUL");
+
+  return rows.slice(1).map((r,n) => ({
+    id:`COM-${n}`,
+    month: cell(r,iMois),
+    employee: cell(r,iEmployee) || "Equipe",
+    ca: money(cell(r,iCa)),
+    prestation: money(cell(r,iPresta)),
+    produits: money(cell(r,iProduits)),
+    abonnement: money(cell(r,iAbo)),
+    satisfaction: money(cell(r,iSatisfaction)),
+    resultat: money(cell(r,iResultat)),
+    evenement: money(cell(r,iEvent)),
+    total: money(cell(r,iTotal)),
+    status: cell(r,iStatus) || "Non paye",
+    date: parseDate(cell(r,iDate))
+  })).filter(x => x.month || x.employee || x.total);
+}
+
 function normalizeDiagnostics(rows){
   if(!rows || rows.length < 2) return [];
   const headers = rows[0];
@@ -1203,6 +1279,11 @@ function applyFilters(){
     if(search && !normName([s.name,s.phone,s.formule,s.category,s.status].join(" ")).includes(search)) return false;
     return true;
   });
+  state.filteredCommissions = state.commissions.filter(c => {
+    if(employee !== "all" && c.employee !== employee) return false;
+    if(search && !normName([c.employee,c.month,c.status].join(" ")).includes(search)) return false;
+    return commissionMonthMatchesPeriod(c.month, period, now);
+  });
   renderAll();
 }
 
@@ -1213,6 +1294,7 @@ function renderAll(){
   renderTables();
   renderClients();
   renderSubscriptions();
+  renderCommissions();
   renderGoals();
   if(window.lucide) lucide.createIcons();
 }
@@ -1358,6 +1440,53 @@ function renderSubscriptions(){
   );
 }
 
+function renderCommissions(){
+  const period = document.getElementById("periodFilter").value;
+  const employee = document.getElementById("employeeFilter").value;
+  const search = normName(document.getElementById("searchInput").value);
+  const data = state.filteredCommissions.length || period !== "all" || employee !== "all" || search
+    ? state.filteredCommissions
+    : state.commissions;
+  const currentMonth = currentMonthKey();
+  const monthRows = state.commissions.filter(c => c.month === currentMonth);
+  const monthTotal = monthRows.reduce((sum,c) => sum + c.total, 0);
+  const visibleTotal = data.reduce((sum,c) => sum + c.total, 0);
+  const unpaid = data.filter(c => !normName(c.status).includes("paye") || normName(c.status).includes("non")).reduce((sum,c) => sum + c.total, 0);
+  const paid = data.filter(c => normName(c.status) === "paye").reduce((sum,c) => sum + c.total, 0);
+  const employees = new Set(data.map(c => c.employee).filter(Boolean)).size;
+
+  document.getElementById("commissionKpis").innerHTML = [
+    kpi("Commissions du mois", fmtMoney(monthTotal), currentMonth, "badge-dollar-sign"),
+    kpi("Total filtre", fmtMoney(visibleTotal), `${fmtNum(data.length)} ligne(s)`, "calculator"),
+    kpi("Non paye", fmtMoney(unpaid), "A regler", "clock"),
+    kpi("Paye", fmtMoney(paid), "Deja solde", "badge-check"),
+    kpi("Prestataires", fmtNum(employees), "Avec commissions", "users")
+  ].join("");
+
+  const ranked = data.slice().sort((a,b) => b.total - a.total);
+  makeChart("commissionChart", "bar", ranked.map(x => x.employee), [{label:"Total commission", data:ranked.map(x => x.total), backgroundColor:colors.plum}], {yMoney:true});
+  document.getElementById("commissionPrimeList").innerHTML = ranked.slice(0,8).map(c => {
+    const primes = c.abonnement + c.satisfaction + c.resultat + c.evenement;
+    return `<div class="rank-row"><div><div class="rank-name">${escapeHtml(c.employee)}</div><div class="rank-meta">Abo ${fmtMoney(c.abonnement)} | satisfaction ${fmtMoney(c.satisfaction)} | resultat ${fmtMoney(c.resultat)} | evenements ${fmtMoney(c.evenement)}</div></div><div class="rank-val">${fmtMoney(primes)}</div></div>`;
+  }).join("") || empty("Aucune commission calculee");
+
+  renderTable("commissionsTable",
+    ["Mois","Employee","CA individuel","Prestations","Produits","Abonnements","Resultat","Evenements","Total","Statut"],
+    ranked.map(c => [
+      c.month,
+      c.employee,
+      fmtMoney(c.ca),
+      fmtMoney(c.prestation),
+      fmtMoney(c.produits),
+      fmtMoney(c.abonnement),
+      fmtMoney(c.resultat),
+      fmtMoney(c.evenement),
+      fmtMoney(c.total),
+      commissionBadge(c.status)
+    ])
+  );
+}
+
 function renderClients(){
   const search = normName(document.getElementById("searchInput").value);
   const clients = state.clients.filter(c => !search || normName([c.name,c.phone,c.objectives.join(" "),c.favoriteService,c.subscription?.formule,c.subscription?.status].join(" ")).includes(search));
@@ -1480,6 +1609,32 @@ function subscriptionBadge(status){
   return `<span class="pill ${cls}">${escapeHtml(status || "Actif")}</span>`;
 }
 
+function commissionBadge(status){
+  const normalized = normName(status);
+  let cls = "com-pending";
+  if(normalized === "paye") cls = "com-paid";
+  else if(normalized.includes("non")) cls = "com-unpaid";
+  return `<span class="pill ${cls}">${escapeHtml(status || "Non paye")}</span>`;
+}
+
+function currentMonthKey(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,"0")}`;
+}
+
+function commissionMonthMatchesPeriod(month, period, now){
+  if(period === "all") return true;
+  if(!month) return false;
+  const parts = String(month).split("-");
+  if(parts.length < 2) return false;
+  const d = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+  if(period === "month" || period === "today") return month === currentMonthKey();
+  const days = Number(period);
+  const start = new Date(now);
+  start.setDate(start.getDate() - days);
+  return d >= new Date(start.getFullYear(), start.getMonth(), 1);
+}
+
 function statusWeight(status){
   const normalized = normName(status);
   if(normalized.includes("bientot")) return 1;
@@ -1536,8 +1691,22 @@ function demoDataset(){
     const price = [35000,25000,18000,30000,12000,10000][i % 6] + Math.floor(Math.random()*8)*1000;
     sales.push({id:`DEMO-${i}`,date:d,idClient:`CLI-${i%clients.length}`,client,phone:`07000000${i%8}`,phoneKey:`07000000${i%8}`,employee:employees[i%employees.length],service,price,total:price,status:i%5===0?"A payer":i%7===0?"En cours":"Paye",payment:"Mobile Money"});
   }
+  const month = currentMonthKey();
+  const commissions = employees.map((employee,i) => {
+    const paidSales = sales.filter(s => s.employee === employee && s.status === "Paye");
+    const ca = paidSales.reduce((sum,s) => sum + s.total, 0);
+    const prestation = Math.round(ca * .10);
+    const produits = i % 2 === 0 ? 6000 : 3500;
+    const abonnement = [2000,3000,5000,0,3000][i];
+    const satisfaction = i === 1 ? 10000 : 0;
+    const resultat = 10000;
+    const evenement = i === 2 ? 8000 : 0;
+    const total = prestation + produits + abonnement + satisfaction + resultat + evenement;
+    return {id:`COM-DEMO-${i}`,month,employee,ca,prestation,produits,abonnement,satisfaction,resultat,evenement,total,status:i === 3 ? "Paye" : "Non paye",date:new Date()};
+  });
   return {
     sales,
+    commissions,
     clients: clients.map((name,i) => ({id:`CLI-${i}`,date:new Date(2026,2+i%2,3+i),name,phone:`07000000${i}`,phoneKey:`07000000${i}`,email:"",area:["Cocody","Marcory","Plateau","Bingerville"][i%4],source:"Instagram",loyalty:"Bronze",notes:""})),
     subscriptions: clients.slice(0,6).map((name,i) => {
       const start = new Date(); start.setDate(start.getDate() - (i * 4));
