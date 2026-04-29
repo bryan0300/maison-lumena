@@ -180,7 +180,7 @@ a{color:inherit;text-decoration:none}
   border-radius:var(--r-md);
   padding:16px;
   display:grid;
-  grid-template-columns:repeat(5,minmax(130px,1fr)) auto;
+  grid-template-columns:repeat(6,minmax(130px,1fr)) auto;
   gap:12px;
   align-items:end;
   margin-bottom:18px;
@@ -379,6 +379,11 @@ tbody tr:hover td{background:#F7F2FC}
 .pill.paye{background:var(--green-bg);color:var(--green)}
 .pill.attente{background:var(--amber-bg);color:var(--amber)}
 .pill.encours{background:var(--blue-bg);color:var(--blue)}
+.pill.sub-actif{background:var(--green-bg);color:var(--green)}
+.pill.sub-bientot{background:var(--amber-bg);color:var(--amber)}
+.pill.sub-expire{background:var(--coral-bg);color:var(--coral)}
+.pill.sub-termine{background:#EEF2F6;color:#667085}
+.pill.sub-suspendu{background:var(--blue-bg);color:var(--blue)}
 .pill.gold{
   background:linear-gradient(135deg,#FFF8D6,#FEF0A0);
   color:#7A4A00;border:1px solid var(--gold-mid);
@@ -585,6 +590,16 @@ tbody tr:hover td{background:#F7F2FC}
         </select>
       </div>
       <div class="field">
+        <label for="abonnementFilter">Abonnements</label>
+        <select id="abonnementFilter">
+          <option value="all">Tous les abonnements</option>
+          <option value="Actif">Actifs</option>
+          <option value="Bientôt expiré">Bientôt expirés</option>
+          <option value="Expiré">Expirés</option>
+          <option value="Terminé">Terminés</option>
+        </select>
+      </div>
+      <div class="field">
         <label for="searchInput">Recherche client</label>
         <input id="searchInput" type="search" placeholder="Nom, telephone, objectif">
       </div>
@@ -596,6 +611,7 @@ tbody tr:hover td{background:#F7F2FC}
       <button class="tab" data-tab="sales"><i data-lucide="trending-up" class="icon"></i>Ventes</button>
       <button class="tab" data-tab="services"><i data-lucide="sparkles" class="icon"></i>Services</button>
       <button class="tab" data-tab="clients"><i data-lucide="users" class="icon"></i>Clients</button>
+      <button class="tab" data-tab="subscriptions"><i data-lucide="calendar-check" class="icon"></i>Abonnements</button>
       <button class="tab" data-tab="goals"><i data-lucide="target" class="icon"></i>Objectifs</button>
     </nav>
 
@@ -678,6 +694,19 @@ tbody tr:hover td{background:#F7F2FC}
       </div>
     </section>
 
+    <section id="subscriptions" class="panel">
+      <div class="kpis" id="subscriptionKpis"></div>
+      <article class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Suivi des abonnements</div>
+            <div class="card-sub">Statut, jours restants et séances restantes</div>
+          </div>
+        </div>
+        <div class="table-wrap"><table id="subscriptionsTable"></table></div>
+      </article>
+    </section>
+
     <section id="goals" class="panel">
       <div class="goal-board">
         <article class="card goal-card">
@@ -717,6 +746,7 @@ const CONFIG = {
   sheets: {
     caisse: "CAISSE",
     clients: "BASE_CLIENTS",
+    abonnements: "ABONNEMENTS",
     visites: "VISITES",
     peau: "DIAGNOSTIC_PEAU",
     cheveux: "DIAGNOSTIC_CHEVEUX",
@@ -727,6 +757,8 @@ const CONFIG = {
 const state = {
   sales: [],
   clients: [],
+  subscriptions: [],
+  filteredSubscriptions: [],
   diagnostics: [],
   filtered: [],
   charts: {},
@@ -763,7 +795,7 @@ function bindUI(){
       Object.values(state.charts).forEach(c => c && c.resize());
     });
   });
-  ["periodFilter","serviceFilter","employeeFilter","statusFilter","searchInput"].forEach(id => {
+  ["periodFilter","serviceFilter","employeeFilter","statusFilter","abonnementFilter","searchInput"].forEach(id => {
     document.getElementById(id).addEventListener(id === "searchInput" ? "input" : "change", applyFilters);
   });
   document.getElementById("reloadBtn").addEventListener("click", loadData);
@@ -817,9 +849,10 @@ async function sha256(text){
 async function loadData(){
   setStatus("load", "Connexion au Google Sheets...");
   try{
-    const [caisse, clients, visites, peau, cheveux, sport] = await Promise.all([
+    const [caisse, clients, abonnements, visites, peau, cheveux, sport] = await Promise.all([
       fetchSheet(CONFIG.sheets.caisse),
       fetchSheet(CONFIG.sheets.clients),
+      fetchSheet(CONFIG.sheets.abonnements),
       fetchSheet(CONFIG.sheets.visites),
       fetchSheet(CONFIG.sheets.peau),
       fetchSheet(CONFIG.sheets.cheveux),
@@ -828,6 +861,7 @@ async function loadData(){
     if (!caisse || caisse.length < 2) throw new Error("CAISSE vide ou inaccessible");
     state.demo = false;
     state.sales = normalizeSales(caisse);
+    state.subscriptions = normalizeSubscriptions(abonnements || []);
     state.clients = buildClients(normalizeClients(clients || []), state.sales);
     state.diagnostics = [
       ...normalizeDiagnostics(peau || []),
@@ -835,15 +869,18 @@ async function loadData(){
       ...normalizeDiagnostics(sport || [])
     ];
     attachObjectives();
+    attachSubscriptions();
     setStatus("ok", `${state.sales.length} prestations chargees depuis Google Sheets`);
   }catch(err){
     console.warn(err);
     const demo = demoDataset();
     state.demo = true;
     state.sales = demo.sales;
+    state.subscriptions = demo.subscriptions;
     state.clients = buildClients(demo.clients, state.sales);
     state.diagnostics = demo.diagnostics;
     attachObjectives();
+    attachSubscriptions();
     setStatus("demo", "Mode apercu : partage Sheets requis pour les donnees live");
   }
   populateFilters();
@@ -920,11 +957,38 @@ function parseDate(raw){
   return isNaN(d.getTime()) ? null : d;
 }
 
+function daysBetween(start, end){
+  if(!start || !end) return 0;
+  const a = new Date(start); const b = new Date(end);
+  a.setHours(0,0,0,0); b.setHours(0,0,0,0);
+  return Math.ceil((b - a) / 86400000);
+}
+
 function normalizeStatus(raw){
   const s = normName(raw);
   if(s === "a payer" || s.includes("a payer") || s.includes("payer")) return "A payer";
   if(s === "paye" || s.includes("paye")) return "Paye";
   return "En cours";
+}
+
+function normalizeSubscriptionStatus(raw, end, included, used, remaining, days){
+  const s = normName(raw);
+  if(s === "suspendu") return "Suspendu";
+  if(remaining <= 0 || (included > 0 && used >= included)) return "Terminé";
+  if(end && days < 0) return "Expiré";
+  if(end && days <= 7) return "Bientôt expiré";
+  if(s.includes("expire")) return "Expiré";
+  if(s.includes("termine")) return "Terminé";
+  if(s.includes("bientot")) return "Bientôt expiré";
+  return "Actif";
+}
+
+function alertForSubscription(status){
+  if(status === "Bientôt expiré") return "Attention";
+  if(status === "Expiré") return "Expiré";
+  if(status === "Terminé") return "Terminé";
+  if(status === "Suspendu") return "Suspendu";
+  return "OK";
 }
 
 function normalizeSales(rows){
@@ -986,6 +1050,55 @@ function normalizeClients(rows){
   }));
 }
 
+function normalizeSubscriptions(rows){
+  if(!rows || rows.length < 2) return [];
+  const idx = indexer(rows[0]);
+  const iId = idx("ID_ABONNEMENT");
+  const iClient = idx("ID_CLIENT");
+  const iName = idx("NOM_CLIENTE","NOM_PRENOM");
+  const iPhone = idx("TELEPHONE");
+  const iFormule = idx("FORMULE");
+  const iCategorie = idx("CATEGORIE");
+  const iStart = idx("DATE_DEBUT");
+  const iEnd = idx("DATE_FIN");
+  const iDuration = idx("DUREE_JOURS","VALIDITE_JOURS");
+  const iIncluded = idx("NB_SEANCES_INCLUSES");
+  const iUsed = idx("NB_SEANCES_UTILISEES");
+  const iRemaining = idx("NB_SEANCES_RESTANTES");
+  const iStatus = idx("STATUT_ABONNEMENT");
+  const iDays = idx("JOURS_RESTANTS");
+  const iAlert = idx("ALERTE");
+  const iNotes = idx("NOTES");
+
+  return rows.slice(1).map((r,n) => {
+    const start = parseDate(cell(r,iStart));
+    const end = parseDate(cell(r,iEnd));
+    const included = Number(cell(r,iIncluded)) || 0;
+    const used = Number(cell(r,iUsed)) || 0;
+    const remaining = iRemaining >= 0 ? Number(cell(r,iRemaining)) || 0 : Math.max(0, included - used);
+    const days = iDays >= 0 ? Number(cell(r,iDays)) || 0 : daysBetween(new Date(), end);
+    const status = normalizeSubscriptionStatus(cell(r,iStatus), end, included, used, remaining, days);
+    return {
+      id: cell(r,iId) || `ABO-${n}`,
+      idClient: cell(r,iClient),
+      name: cell(r,iName) || "Cliente",
+      phone: cell(r,iPhone),
+      formule: cell(r,iFormule) || "-",
+      category: cell(r,iCategorie) || "-",
+      start,
+      end,
+      duration: Number(cell(r,iDuration)) || daysBetween(start, end),
+      included,
+      used,
+      remaining,
+      status,
+      daysRemaining: days,
+      alert: cell(r,iAlert) || alertForSubscription(status),
+      notes: cell(r,iNotes)
+    };
+  }).filter(x => x.idClient || x.name || x.formule !== "-");
+}
+
 function normalizeDiagnostics(rows){
   if(!rows || rows.length < 2) return [];
   const headers = rows[0];
@@ -1036,6 +1149,16 @@ function attachObjectives(){
   });
 }
 
+function attachSubscriptions(){
+  state.clients.forEach(c => {
+    const subs = state.subscriptions
+      .filter(s => (s.idClient && s.idClient === c.id) || normName(s.name) === normName(c.name) || (s.phone && c.phone && normPhone(s.phone) === normPhone(c.phone)))
+      .sort((a,b) => (b.end || 0) - (a.end || 0));
+    c.subscriptions = subs;
+    c.subscription = subs.find(s => ["Actif","Bientôt expiré","Suspendu"].includes(s.status)) || subs[0] || null;
+  });
+}
+
 function loyalty(visits){
   if(visits >= 10) return "Gold";
   if(visits >= 5) return "Silver";
@@ -1059,6 +1182,7 @@ function applyFilters(){
   const service = document.getElementById("serviceFilter").value;
   const employee = document.getElementById("employeeFilter").value;
   const status = document.getElementById("statusFilter").value;
+  const abonnementStatus = document.getElementById("abonnementFilter").value;
   const search = normName(document.getElementById("searchInput").value);
   const now = new Date(); now.setHours(0,0,0,0);
   state.filtered = state.sales.filter(s => {
@@ -1074,6 +1198,11 @@ function applyFilters(){
     const days = Number(period);
     return (now - d) / 86400000 <= days;
   });
+  state.filteredSubscriptions = state.subscriptions.filter(s => {
+    if(abonnementStatus !== "all" && s.status !== abonnementStatus) return false;
+    if(search && !normName([s.name,s.phone,s.formule,s.category,s.status].join(" ")).includes(search)) return false;
+    return true;
+  });
   renderAll();
 }
 
@@ -1083,6 +1212,7 @@ function renderAll(){
   renderRankings();
   renderTables();
   renderClients();
+  renderSubscriptions();
   renderGoals();
   if(window.lucide) lucide.createIcons();
 }
@@ -1195,9 +1325,42 @@ function renderTable(id, headers, rows){
   el.innerHTML = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>`;
 }
 
+function renderSubscriptions(){
+  const data = state.filteredSubscriptions.length || document.getElementById("abonnementFilter").value !== "all"
+    ? state.filteredSubscriptions
+    : state.subscriptions;
+  const counts = {
+    actif: state.subscriptions.filter(s => s.status === "Actif").length,
+    bientot: state.subscriptions.filter(s => s.status === "Bientôt expiré").length,
+    expire: state.subscriptions.filter(s => s.status === "Expiré").length,
+    termine: state.subscriptions.filter(s => s.status === "Terminé").length,
+    suspendu: state.subscriptions.filter(s => s.status === "Suspendu").length
+  };
+  document.getElementById("subscriptionKpis").innerHTML = [
+    kpi("Actifs", fmtNum(counts.actif), "Abonnements utilisables", "check-circle"),
+    kpi("Bientôt expirés", fmtNum(counts.bientot), "7 jours ou moins", "alert-triangle"),
+    kpi("Expirés", fmtNum(counts.expire), "Date de fin dépassée", "x-circle"),
+    kpi("Terminés", fmtNum(counts.termine), "Séances épuisées", "archive"),
+    kpi("Suspendus", fmtNum(counts.suspendu), "Blocage manuel", "pause-circle")
+  ].join("");
+  renderTable("subscriptionsTable",
+    ["Cliente","Formule","Début","Fin","Jours","Séances","Statut","Alerte"],
+    data.slice().sort((a,b) => statusWeight(a.status) - statusWeight(b.status) || (a.daysRemaining - b.daysRemaining)).map(s => [
+      s.name,
+      s.formule,
+      fmtDate(s.start),
+      fmtDate(s.end),
+      fmtNum(s.daysRemaining),
+      `${fmtNum(s.remaining)} / ${fmtNum(s.included)}`,
+      subscriptionBadge(s.status),
+      escapeHtml(s.alert)
+    ])
+  );
+}
+
 function renderClients(){
   const search = normName(document.getElementById("searchInput").value);
-  const clients = state.clients.filter(c => !search || normName([c.name,c.phone,c.objectives.join(" "),c.favoriteService].join(" ")).includes(search));
+  const clients = state.clients.filter(c => !search || normName([c.name,c.phone,c.objectives.join(" "),c.favoriteService,c.subscription?.formule,c.subscription?.status].join(" ")).includes(search));
   document.getElementById("clientCount").textContent = `${clients.length} client(s)`;
   if(!state.selectedClientId && clients[0]) state.selectedClientId = clients[0].id;
   document.getElementById("clientList").innerHTML = clients.map(c => `<button class="client-item ${c.id === state.selectedClientId ? "active" : ""}" data-client="${escapeHtml(c.id)}"><div class="client-name">${escapeHtml(c.name)}</div><div class="client-mini">${fmtNum(c.visits)} visite(s) · ${fmtMoney(c.total)} · ${escapeHtml(c.loyalty)}</div></button>`).join("") || empty("Aucun client");
@@ -1212,14 +1375,26 @@ function renderClientProfile(c){
   document.getElementById("profileTitle").textContent = c.name;
   document.getElementById("profileSub").textContent = [c.phone, c.area, c.email].filter(Boolean).join(" · ") || "Profil client";
   const events = c.sales.slice().sort((a,b) => (b.date||0)-(a.date||0)).slice(0,10);
+  const sub = c.subscription;
   box.innerHTML = `
     <div class="profile-grid">
       <div class="metric"><label>Statut</label><strong>${badgeLoyalty(c.loyalty)}</strong></div>
       <div class="metric"><label>CA paye</label><strong>${fmtMoney(c.total)}</strong></div>
       <div class="metric"><label>Visites</label><strong>${fmtNum(c.visits)}</strong></div>
       <div class="metric"><label>Service favori</label><strong>${escapeHtml(c.favoriteService)}</strong></div>
+      <div class="metric"><label>Abonnement</label><strong>${sub ? escapeHtml(sub.formule) : "Aucun"}</strong></div>
+      <div class="metric"><label>Statut abo.</label><strong>${sub ? subscriptionBadge(sub.status) : "-"}</strong></div>
+      <div class="metric"><label>Jours restants</label><strong>${sub ? fmtNum(sub.daysRemaining) : "-"}</strong></div>
+      <div class="metric"><label>Séances restantes</label><strong>${sub ? fmtNum(sub.remaining) : "-"}</strong></div>
     </div>
     <div class="grid-2">
+      <div>
+        <div class="card-title">Abonnement</div>
+        <div class="split-list" style="margin-top:12px">${sub ? `
+          <div class="rank-row"><div><div class="rank-name">${escapeHtml(sub.formule)}</div><div class="rank-meta">${fmtDate(sub.start)} - ${fmtDate(sub.end)}</div></div><div class="rank-val">${subscriptionBadge(sub.status)}</div></div>
+          <div class="rank-row"><div><div class="rank-name">${fmtNum(sub.remaining)} séance(s) restante(s)</div><div class="rank-meta">${fmtNum(sub.used)} utilisée(s) sur ${fmtNum(sub.included)}</div></div><div class="rank-val">${fmtNum(sub.daysRemaining)} j</div></div>
+        ` : empty("Aucun abonnement connu")}</div>
+      </div>
       <div>
         <div class="card-title">Objectifs connus</div>
         <div class="split-list" style="margin-top:12px">${c.objectives.length ? c.objectives.map(o => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(o)}</div><div class="rank-meta">A suivre lors de la prochaine visite</div></div></div>`).join("") : empty("Aucun objectif renseigne")}</div>
@@ -1295,6 +1470,26 @@ function pillStatus(status){
   return `<span class="pill ${cls}">${escapeHtml(status)}</span>`;
 }
 
+function subscriptionBadge(status){
+  const normalized = normName(status);
+  let cls = "sub-actif";
+  if(normalized.includes("bientot")) cls = "sub-bientot";
+  else if(normalized.includes("expire")) cls = "sub-expire";
+  else if(normalized.includes("termine")) cls = "sub-termine";
+  else if(normalized.includes("suspendu")) cls = "sub-suspendu";
+  return `<span class="pill ${cls}">${escapeHtml(status || "Actif")}</span>`;
+}
+
+function statusWeight(status){
+  const normalized = normName(status);
+  if(normalized.includes("bientot")) return 1;
+  if(normalized === "actif") return 2;
+  if(normalized.includes("suspendu")) return 3;
+  if(normalized.includes("expire")) return 4;
+  if(normalized.includes("termine")) return 5;
+  return 9;
+}
+
 function badgeLoyalty(status){
   const cls = normName(status).includes("gold") ? "gold" : normName(status).includes("silver") ? "silver" : "bronze";
   return `<span class="pill ${cls}">${escapeHtml(status || "Bronze")}</span>`;
@@ -1344,6 +1539,16 @@ function demoDataset(){
   return {
     sales,
     clients: clients.map((name,i) => ({id:`CLI-${i}`,date:new Date(2026,2+i%2,3+i),name,phone:`07000000${i}`,phoneKey:`07000000${i}`,email:"",area:["Cocody","Marcory","Plateau","Bingerville"][i%4],source:"Instagram",loyalty:"Bronze",notes:""})),
+    subscriptions: clients.slice(0,6).map((name,i) => {
+      const start = new Date(); start.setDate(start.getDate() - (i * 4));
+      const end = new Date(); end.setDate(end.getDate() + [18,6,-3,12,0,30][i]);
+      const included = [8,8,8,1,1,8][i];
+      const used = [2,6,3,1,1,0][i];
+      const remaining = Math.max(0, included - used);
+      const days = daysBetween(new Date(), end);
+      const status = normalizeSubscriptionStatus(i === 5 ? "Suspendu" : "", end, included, used, remaining, days);
+      return {id:`ABO-${i}`,idClient:`CLI-${i}`,name,phone:`07000000${i}`,formule:["Yoga mensuel","Zumba mensuel","Haltères mensuel","Pack soirée","Pack mariée","Yoga mensuel"][i],category:"Abonnement",start,end,duration:30,included,used,remaining,status,daysRemaining:days,alert:alertForSubscription(status),notes:""};
+    }),
     diagnostics: [
       {idClient:"CLI-0",objective:"Hydratation profonde"},
       {idClient:"CLI-1",objective:"Reparation capillaire"},
