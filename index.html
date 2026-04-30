@@ -446,6 +446,18 @@ tbody tr:hover td{background:#F7F2FC}
   outline:none;transition:var(--ease);
 }
 .goal-input input:focus{border-color:var(--plum);box-shadow:0 0 0 3px var(--plum-glow)}
+.goal-table input{
+  width:118px;height:36px;
+  border:1.5px solid var(--line-strong);
+  border-radius:var(--r-sm);
+  padding:0 10px;
+  outline:none;
+  font:inherit;
+}
+.goal-table input:focus{border-color:var(--plum);box-shadow:0 0 0 3px var(--plum-glow)}
+.goal-meter{min-width:150px}
+.goal-meter + .goal-meter{margin-top:8px}
+.goal-meter .rank-meta{display:flex;justify-content:space-between;gap:8px}
 
 /* ─── Empty state ─── */
 .empty{
@@ -769,6 +781,16 @@ tbody tr:hover td{background:#F7F2FC}
         <div class="card-head"><div><div class="card-title">Clients a accompagner</div><div class="card-sub">Suivi par objectif et derniere activite</div></div></div>
         <div class="table-wrap"><table id="followupTable"></table></div>
       </article>
+      <div class="grid-2">
+        <article class="card">
+          <div class="card-head"><div><div class="card-title">Objectifs par employee</div><div class="card-sub">Seances et CA du mois en cours</div></div></div>
+          <div class="table-wrap"><table id="employeeGoalsTable" class="goal-table"></table></div>
+        </article>
+        <article class="card">
+          <div class="card-head"><div><div class="card-title">Objectifs par service</div><div class="card-sub">CA mensuel par famille de service</div></div></div>
+          <div class="table-wrap"><table id="serviceGoalsTable" class="goal-table"></table></div>
+        </article>
+      </div>
     </section>
   </main>
 </div>
@@ -780,11 +802,16 @@ const CONFIG = {
     sessionKey: "maisonLumenaDashboardAuth",
     passwordHash: "098de97262fccdda4b27a7c4d4c07f95cb120d6db1d6dae989dd8e70d5f5034a"
   },
+  goalKeys: {
+    employees: "mlEmployeeGoals",
+    services: "mlServiceGoals"
+  },
   sheets: {
     caisse: "CAISSE",
     clients: "BASE_CLIENTS",
     abonnements: "ABONNEMENTS",
     commissions: "COMMISSIONS_MENSUELLES",
+    employees: "EMPLOYEES",
     visites: "VISITES",
     peau: "DIAGNOSTIC_PEAU",
     cheveux: "DIAGNOSTIC_CHEVEUX",
@@ -795,6 +822,7 @@ const CONFIG = {
 const state = {
   sales: [],
   clients: [],
+  employees: [],
   subscriptions: [],
   filteredSubscriptions: [],
   commissions: [],
@@ -841,6 +869,7 @@ function bindUI(){
   document.getElementById("reloadBtn").addEventListener("click", loadData);
   document.getElementById("exportBtn").addEventListener("click", exportCurrentCsv);
   document.querySelectorAll("[data-save-goal]").forEach(btn => btn.addEventListener("click", saveGoals));
+  document.addEventListener("click", handleDynamicGoalSave);
 }
 
 function initAuth(){
@@ -889,11 +918,12 @@ async function sha256(text){
 async function loadData(){
   setStatus("load", "Connexion au Google Sheets...");
   try{
-    const [caisse, clients, abonnements, commissions, visites, peau, cheveux, sport] = await Promise.all([
+    const [caisse, clients, abonnements, commissions, employees, visites, peau, cheveux, sport] = await Promise.all([
       fetchSheet(CONFIG.sheets.caisse),
       fetchSheet(CONFIG.sheets.clients),
       fetchSheet(CONFIG.sheets.abonnements),
       fetchSheet(CONFIG.sheets.commissions),
+      fetchSheet(CONFIG.sheets.employees),
       fetchSheet(CONFIG.sheets.visites),
       fetchSheet(CONFIG.sheets.peau),
       fetchSheet(CONFIG.sheets.cheveux),
@@ -902,6 +932,7 @@ async function loadData(){
     if (!caisse || caisse.length < 2) throw new Error("CAISSE vide ou inaccessible");
     state.demo = false;
     state.sales = normalizeSales(caisse);
+    state.employees = normalizeEmployees(employees || []);
     state.subscriptions = normalizeSubscriptions(abonnements || []);
     state.commissions = normalizeCommissions(commissions || []);
     state.clients = buildClients(normalizeClients(clients || []), state.sales);
@@ -918,6 +949,7 @@ async function loadData(){
     const demo = demoDataset();
     state.demo = true;
     state.sales = demo.sales;
+    state.employees = demo.employees;
     state.subscriptions = demo.subscriptions;
     state.commissions = demo.commissions;
     state.clients = buildClients(demo.clients, state.sales);
@@ -1093,6 +1125,20 @@ function normalizeClients(rows){
   }));
 }
 
+function normalizeEmployees(rows){
+  if(!rows || rows.length < 2) return [];
+  const idx = indexer(rows[0]);
+  const iName = idx("NOM_EMPLOYEE","EMPLOYEE","NOM");
+  const iRole = idx("ROLE");
+  const iActif = idx("ACTIF");
+  return rows.slice(1).map((r,n) => ({
+    id: cell(r,0) || `EMP-${n}`,
+    name: cell(r,iName),
+    role: cell(r,iRole),
+    active: normName(cell(r,iActif) || "OUI") !== "non"
+  })).filter(x => x.name && x.active);
+}
+
 function normalizeSubscriptions(rows){
   if(!rows || rows.length < 2) return [];
   const idx = indexer(rows[0]);
@@ -1243,7 +1289,7 @@ function loyalty(visits){
 
 function populateFilters(){
   fillSelect("serviceFilter", [...new Set(state.sales.map(x => x.service).filter(Boolean))].sort(), "Tous les services");
-  fillSelect("employeeFilter", [...new Set(state.sales.map(x => x.employee).filter(Boolean))].sort(), "Toute l'equipe");
+  fillSelect("employeeFilter", [...new Set([...state.employees.map(x => x.name), ...state.sales.map(x => x.employee)].filter(Boolean))].sort(), "Toute l'equipe");
 }
 
 function fillSelect(id, values, label){
@@ -1544,11 +1590,107 @@ function renderGoals(){
   renderGoal("monthlyGoalView", paid, Number(localStorage.getItem("mlGoalMonthly") || 3000000), fmtMoney);
   renderGoal("visitGoalView", visits, Number(localStorage.getItem("mlGoalVisits") || 120), fmtNum);
   renderGoal("clientGoalView", newClients, Number(localStorage.getItem("mlGoalClients") || 40), fmtNum);
+  renderEmployeeGoals(monthSales);
+  renderServiceGoals(monthSales);
 }
 
 function renderGoal(id, value, target, formatter){
   const pct = target ? Math.min(100, Math.round(value / target * 100)) : 0;
   document.getElementById(id).innerHTML = `<div style="margin-top:14px"><div class="rank-row"><div><div class="rank-name">${formatter(value)} realises</div><div class="rank-meta">Objectif : ${formatter(target)}</div><div class="progress"><span style="width:${pct}%"></span></div></div><div class="rank-val">${pct}%</div></div></div>`;
+}
+
+function renderEmployeeGoals(monthSales){
+  const goals = readGoalMap(CONFIG.goalKeys.employees);
+  const stats = {};
+  monthSales.forEach(s => {
+    const name = s.employee || "Equipe";
+    if(!stats[name]) stats[name] = {sessions:0, ca:0};
+    stats[name].sessions += 1;
+    if(s.status === "Paye") stats[name].ca += s.total;
+  });
+  const employees = [...new Set([
+    ...state.employees.map(e => e.name),
+    ...state.sales.map(s => s.employee),
+    ...Object.keys(goals)
+  ].filter(Boolean))].sort();
+
+  const rows = employees.map(name => {
+    const g = goals[name] || {sessions:0, ca:0};
+    const s = stats[name] || {sessions:0, ca:0};
+    return `<tr data-goal-name="${escapeHtml(name)}">
+      <td>${escapeHtml(name)}</td>
+      <td>${fmtNum(s.sessions)}</td>
+      <td><input type="number" min="0" step="1" data-goal-field="sessions" value="${Number(g.sessions) || 0}"></td>
+      <td>${fmtMoney(s.ca)}</td>
+      <td><input type="number" min="0" step="1000" data-goal-field="ca" value="${Number(g.ca) || 0}"></td>
+      <td>${goalMeter(s.sessions, g.sessions, fmtNum)}${goalMeter(s.ca, g.ca, fmtMoney)}</td>
+      <td><button class="ghost-btn" data-save-dynamic-goal="employee">OK</button></td>
+    </tr>`;
+  }).join("");
+
+  document.getElementById("employeeGoalsTable").innerHTML =
+    `<thead><tr><th>Employee</th><th>Seances</th><th>Obj. seances</th><th>CA paye</th><th>Obj. CA</th><th>Avancement</th><th></th></tr></thead><tbody>${rows}</tbody>`;
+}
+
+function renderServiceGoals(monthSales){
+  const goals = readGoalMap(CONFIG.goalKeys.services);
+  const stats = {};
+  monthSales.filter(s => s.status === "Paye").forEach(s => {
+    const name = s.service || "Service";
+    stats[name] = (stats[name] || 0) + s.total;
+  });
+  const services = [...new Set([
+    ...state.sales.map(s => s.service),
+    ...Object.keys(goals)
+  ].filter(Boolean))].sort();
+
+  const rows = services.map(name => {
+    const target = Number(goals[name]?.ca) || 0;
+    const ca = stats[name] || 0;
+    return `<tr data-goal-name="${escapeHtml(name)}">
+      <td>${escapeHtml(name)}</td>
+      <td>${fmtMoney(ca)}</td>
+      <td><input type="number" min="0" step="1000" data-goal-field="ca" value="${target}"></td>
+      <td>${goalMeter(ca, target, fmtMoney)}</td>
+      <td><button class="ghost-btn" data-save-dynamic-goal="service">OK</button></td>
+    </tr>`;
+  }).join("");
+
+  document.getElementById("serviceGoalsTable").innerHTML =
+    `<thead><tr><th>Service</th><th>CA paye</th><th>Obj. CA</th><th>Avancement</th><th></th></tr></thead><tbody>${rows}</tbody>`;
+}
+
+function goalMeter(value, target, formatter){
+  const pct = target ? Math.min(100, Math.round(value / target * 100)) : 0;
+  return `<div class="goal-meter"><div class="rank-meta"><span>${formatter(value)}</span><strong>${pct}%</strong></div><div class="progress"><span style="width:${pct}%"></span></div></div>`;
+}
+
+function readGoalMap(key){
+  try{return JSON.parse(localStorage.getItem(key) || "{}") || {};}catch(err){return {};}
+}
+
+function writeGoalMap(key, value){
+  localStorage.setItem(key, JSON.stringify(value || {}));
+}
+
+function handleDynamicGoalSave(event){
+  const btn = event.target.closest("[data-save-dynamic-goal]");
+  if(!btn) return;
+  const row = btn.closest("tr");
+  if(!row) return;
+  const name = row.dataset.goalName;
+  const type = btn.dataset.saveDynamicGoal;
+  const keyName = type === "employee" ? CONFIG.goalKeys.employees : CONFIG.goalKeys.services;
+  const goals = readGoalMap(keyName);
+  const ca = Number(row.querySelector('[data-goal-field="ca"]')?.value || 0);
+  if(type === "employee"){
+    const sessions = Number(row.querySelector('[data-goal-field="sessions"]')?.value || 0);
+    goals[name] = {sessions, ca};
+  }else{
+    goals[name] = {ca};
+  }
+  writeGoalMap(keyName, goals);
+  renderGoals();
 }
 
 function loadGoals(){
@@ -1706,6 +1848,7 @@ function demoDataset(){
   });
   return {
     sales,
+    employees: employees.map((name,i) => ({id:`EMP-DEMO-${i}`, name, role:"Equipe", active:true})),
     commissions,
     clients: clients.map((name,i) => ({id:`CLI-${i}`,date:new Date(2026,2+i%2,3+i),name,phone:`07000000${i}`,phoneKey:`07000000${i}`,email:"",area:["Cocody","Marcory","Plateau","Bingerville"][i%4],source:"Instagram",loyalty:"Bronze",notes:""})),
     subscriptions: clients.slice(0,6).map((name,i) => {
