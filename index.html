@@ -111,6 +111,12 @@ a{color:inherit;text-decoration:none}
 }
 .brand span{display:block;font-size:11px;color:rgba(255,255,255,.55);font-weight:500;margin-top:3px;letter-spacing:.02em}
 .top-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.version-label{
+  color:rgba(255,255,255,.62);
+  font-size:11px;
+  font-weight:700;
+  padding:0 4px;
+}
 .icon-btn,.link-btn{
   min-height:36px;
   border:1px solid rgba(255,255,255,.15);
@@ -166,6 +172,8 @@ a{color:inherit;text-decoration:none}
 .status.ok .status-dot{background:var(--green);box-shadow:0 0 0 3px var(--green-bg)}
 .status.err .status-dot{background:var(--coral);box-shadow:0 0 0 3px var(--coral-bg)}
 .status.demo .status-dot{background:var(--blue);box-shadow:0 0 0 3px var(--blue-bg)}
+.status.warn .status-dot{background:var(--amber);box-shadow:0 0 0 3px var(--amber-bg)}
+.status-loaded{color:var(--muted);font-weight:700}
 .date-chip{
   color:var(--muted);font-size:12px;font-weight:500;
   background:var(--panel);border:1px solid var(--line);
@@ -547,7 +555,7 @@ tbody tr:hover td{background:#F7F2FC}
       <button class="auth-submit" type="submit">Entrer</button>
       <div id="authError" class="auth-error">Mot de passe incorrect.</div>
     </form>
-    <div class="auth-note">Changez le mot de passe dans le code avant publication si besoin.</div>
+    <div class="auth-note">Authentification securisee via Apps Script Web App.</div>
   </div>
 </section>
 
@@ -564,6 +572,8 @@ tbody tr:hover td{background:#F7F2FC}
       <a class="link-btn" href="https://docs.google.com/spreadsheets/d/18O-Eldm9kXzKEtts1TAzVvHXFYcceht0ClZXkIM5BMg/edit" target="_blank" rel="noreferrer"><i data-lucide="table-2" class="icon"></i><span class="link-label">Sheets</span></a>
       <a class="link-btn" href="https://docs.google.com/forms/d/e/1FAIpQLScrmxE5iE2sapEjrCdMbEgWBc2Po5Dm4zg9gCRKBfT1Y9et6A/viewform" target="_blank" rel="noreferrer"><i data-lucide="user-plus" class="icon"></i><span class="link-label">Client</span></a>
       <a class="primary-btn" href="https://docs.google.com/forms/d/e/1FAIpQLScQh_40U3eej77yrj2mLrrzbtqFGkpMnM9GYETYM27hFQvzng/viewform" target="_blank" rel="noreferrer"><i data-lucide="clipboard-list" class="icon"></i><span class="link-label">Visite</span></a>
+      <!-- [FIX-ARCHI-4] Version script lue depuis CONFIG. -->
+      <span id="appVersion" class="version-label"></span>
       <button class="icon-btn" id="reloadBtn" title="Actualiser"><i data-lucide="refresh-cw" class="icon"></i></button>
       <button class="icon-btn" id="logoutBtn" title="Verrouiller"><i data-lucide="log-out" class="icon"></i></button>
     </div>
@@ -571,7 +581,8 @@ tbody tr:hover td{background:#F7F2FC}
 
   <main class="main">
     <div class="status-row">
-      <div id="status" class="status"><span class="status-dot"></span><span>Connexion aux donnees...</span></div>
+      <!-- [FIX-ARCHI-4] Fraicheur du dernier chargement affichee dans la barre de statut. -->
+      <div id="status" class="status"><span class="status-dot"></span><span id="statusText">Connexion aux donnees...</span><span id="statusLoadedAt" class="status-loaded"></span></div>
       <div id="currentDate" class="date-chip"></div>
     </div>
 
@@ -613,6 +624,11 @@ tbody tr:hover td{background:#F7F2FC}
           <option value="Expiré">Expirés</option>
           <option value="Terminé">Terminés</option>
         </select>
+      </div>
+      <!-- [FIX-ABO-HTML-2] Filtre dédié aux formules d'abonnement. -->
+      <div class="field">
+        <label for="formuleFilter">Formule</label>
+        <select id="formuleFilter"><option value="all">Toutes les formules</option></select>
       </div>
       <div class="field">
         <label for="searchInput">Recherche client</label>
@@ -683,7 +699,8 @@ tbody tr:hover td{background:#F7F2FC}
           <div class="card-body"><div class="chart-box sm"><canvas id="serviceMixChart"></canvas></div></div>
         </article>
         <article class="card">
-          <div class="card-head"><div><div class="card-title">Prix moyen</div><div class="card-sub">Panier par service</div></div></div>
+          <!-- [FIX-ARCHI-3] Prix moyen calcule uniquement sur les prestations payees. -->
+          <div class="card-head"><div><div class="card-title">Prix moyen</div><div class="card-sub">Panier par service (prestations payees)</div></div></div>
           <div class="card-body"><div id="avgServiceList" class="split-list"></div></div>
         </article>
         <article class="card">
@@ -725,6 +742,16 @@ tbody tr:hover td{background:#F7F2FC}
 
     <section id="commissions" class="panel">
       <div class="kpis" id="commissionKpis"></div>
+      <!-- [FIX-COM-HTML-3] Courbe d'évolution mensuelle des commissions. -->
+      <article class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Évolution mensuelle des commissions</div>
+            <div class="card-sub">Total commissions par mois</div>
+          </div>
+        </div>
+        <div class="card-body"><div class="chart-box sm"><canvas id="commissionTrendChart"></canvas></div></div>
+      </article>
       <div class="grid-2">
         <article class="card">
           <div class="card-head">
@@ -751,6 +778,8 @@ tbody tr:hover td{background:#F7F2FC}
             <div class="card-title">Suivi mensuel des commissions</div>
             <div class="card-sub">Paiements et montants dus par employee</div>
           </div>
+          <!-- [FIX-COM-HTML-5] Recharge les commissions depuis Google Sheets. -->
+          <button class="ghost-btn" id="refreshCommissionsBtn"><i data-lucide="refresh-cw" class="icon"></i><span>Actualiser</span></button>
         </div>
         <div class="table-wrap"><table id="commissionsTable"></table></div>
       </article>
@@ -797,12 +826,17 @@ tbody tr:hover td{background:#F7F2FC}
 
 <script>
 const CONFIG = {
-  sheetId: "18O-Eldm9kXzKEtts1TAzVvHXFYcceht0ClZXkIM5BMg",
+  // [FIX-SEC-1] Coller ici l'URL /exec du deploiement Web App Apps Script.
+  apiUrl: "https://script.google.com/macros/s/AKfycbw5QzWmfI_4PVmmF8wEiaZPfM1O_mKNT5AcuyNOQGJGNmSQ82Ys4DxVhz7Ug6SWFFW-/exec",
   auth: {
     sessionKey: "maisonLumenaDashboardAuth",
-    passwordHash: "098de97262fccdda4b27a7c4d4c07f95cb120d6db1d6dae989dd8e70d5f5034a"
+    tokenKey: "maisonLumenaDashboardToken",
+    expiresKey: "maisonLumenaDashboardTokenExpires"
   },
   goalKeys: {
+    monthly: "mlGoalMonthly",
+    visits: "mlGoalVisits",
+    clients: "mlGoalClients",
     employees: "mlEmployeeGoals",
     services: "mlServiceGoals"
   },
@@ -815,7 +849,8 @@ const CONFIG = {
     visites: "VISITES",
     peau: "DIAGNOSTIC_PEAU",
     cheveux: "DIAGNOSTIC_CHEVEUX",
-    sport: "SPORT_FITNESS"
+    sport: "SPORT_FITNESS",
+    config: "CONFIG"
   }
 };
 
@@ -831,6 +866,10 @@ const state = {
   filtered: [],
   charts: {},
   selectedClientId: null,
+  config: {},
+  goals: {},
+  lastLoadedAt: null,
+  freshnessTimer: null,
   demo: false
 };
 
@@ -863,19 +902,25 @@ function bindUI(){
       Object.values(state.charts).forEach(c => c && c.resize());
     });
   });
-  ["periodFilter","serviceFilter","employeeFilter","statusFilter","abonnementFilter","searchInput"].forEach(id => {
+  // [FIX-ABO-HTML-2] Le filtre formule participe au recalcul global.
+  ["periodFilter","serviceFilter","employeeFilter","statusFilter","abonnementFilter","formuleFilter","searchInput"].forEach(id => {
     document.getElementById(id).addEventListener(id === "searchInput" ? "input" : "change", applyFilters);
   });
   document.getElementById("reloadBtn").addEventListener("click", loadData);
   document.getElementById("exportBtn").addEventListener("click", exportCurrentCsv);
+  document.getElementById("refreshCommissionsBtn").addEventListener("click", refreshCommissionsData);
   document.querySelectorAll("[data-save-goal]").forEach(btn => btn.addEventListener("click", saveGoals));
   document.addEventListener("click", handleDynamicGoalSave);
 }
 
 function initAuth(){
-  if(sessionStorage.getItem(CONFIG.auth.sessionKey) === "ok"){
+  const expires = Number(sessionStorage.getItem(CONFIG.auth.expiresKey) || 0);
+  if(sessionStorage.getItem(CONFIG.auth.sessionKey) === "ok" && sessionStorage.getItem(CONFIG.auth.tokenKey) && expires > Date.now()){
     unlockApp();
   }else{
+    sessionStorage.removeItem(CONFIG.auth.sessionKey);
+    sessionStorage.removeItem(CONFIG.auth.tokenKey);
+    sessionStorage.removeItem(CONFIG.auth.expiresKey);
     document.getElementById("authPassword").focus();
   }
 }
@@ -883,14 +928,19 @@ function initAuth(){
 async function handleLogin(event){
   event.preventDefault();
   const input = document.getElementById("authPassword");
-  const hash = await sha256(input.value);
-  if(hash === CONFIG.auth.passwordHash){
+  const error = document.getElementById("authError");
+  try{
+    // [FIX-SEC-1] Le mot de passe est verifie cote Apps Script, pas dans le HTML public.
+    const auth = await apiGetToken(input.value);
     sessionStorage.setItem(CONFIG.auth.sessionKey, "ok");
+    sessionStorage.setItem(CONFIG.auth.tokenKey, auth.token);
+    sessionStorage.setItem(CONFIG.auth.expiresKey, String(auth.expires || 0));
     input.value = "";
-    document.getElementById("authError").classList.remove("show");
+    error.classList.remove("show");
     unlockApp();
-  }else{
-    document.getElementById("authError").classList.add("show");
+  }catch(err){
+    error.textContent = err.message || "Mot de passe incorrect.";
+    error.classList.add("show");
     input.select();
   }
 }
@@ -904,21 +954,63 @@ function unlockApp(){
 
 function logout(){
   sessionStorage.removeItem(CONFIG.auth.sessionKey);
+  sessionStorage.removeItem(CONFIG.auth.tokenKey);
+  sessionStorage.removeItem(CONFIG.auth.expiresKey);
   document.getElementById("appShell").classList.add("locked");
   document.getElementById("authWall").style.display = "grid";
   document.getElementById("authPassword").focus();
 }
 
-async function sha256(text){
-  const bytes = new TextEncoder().encode(text);
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2,"0")).join("");
+// [FIX-COM-HTML-5] Bouton d'actualisation local de l'onglet Commissions.
+async function refreshCommissionsData(){
+  const btn = document.getElementById("refreshCommissionsBtn");
+  const label = btn.querySelector("span");
+  btn.disabled = true;
+  label.textContent = "...";
+  try{
+    await loadData();
+  }finally{
+    label.textContent = "Actualiser";
+    btn.disabled = false;
+    if(window.lucide) lucide.createIcons();
+  }
+}
+
+// [FIX-SEC-1] Appel d'authentification au Web App Apps Script.
+async function apiGetToken(password){
+  if(!isApiConfigured()) throw new Error("Configurez d'abord CONFIG.apiUrl avec l'URL Web App Apps Script.");
+  const sep = CONFIG.apiUrl.includes("?") ? "&" : "?";
+  const response = await fetch(`${CONFIG.apiUrl}${sep}pwd=${encodeURIComponent(password || "")}`, { method:"GET" });
+  const json = await response.json();
+  if(json.error || !json.token) throw new Error(json.error === "Unauthorized" ? "Mot de passe incorrect." : (json.error || "Authentification impossible."));
+  return json;
+}
+
+// [FIX-SEC-2] Toutes les lectures passent par le proxy Apps Script authentifie.
+async function apiPost(payload){
+  if(!isApiConfigured()) throw new Error("CONFIG.apiUrl non configure.");
+  const token = sessionStorage.getItem(CONFIG.auth.tokenKey);
+  const response = await fetch(CONFIG.apiUrl, {
+    method:"POST",
+    headers: {"Content-Type":"text/plain;charset=utf-8"},
+    body: JSON.stringify({...payload, token})
+  });
+  const json = await response.json();
+  if(json.error){
+    if(json.status === 401) logout();
+    throw new Error(json.error);
+  }
+  return json;
+}
+
+function isApiConfigured(){
+  return /^https:\/\/script\.google\.com\/macros\/s\/.+\/(exec|dev)(\?.*)?$/.test(String(CONFIG.apiUrl || ""));
 }
 
 async function loadData(){
-  setStatus("load", "Connexion au Google Sheets...");
+  setStatus("load", "Connexion au proxy securise...");
   try{
-    const [caisse, clients, abonnements, commissions, employees, visites, peau, cheveux, sport] = await Promise.all([
+    const [caisse, clients, abonnements, commissions, employees, visites, peau, cheveux, sport, config] = await Promise.all([
       fetchSheet(CONFIG.sheets.caisse),
       fetchSheet(CONFIG.sheets.clients),
       fetchSheet(CONFIG.sheets.abonnements),
@@ -927,10 +1019,13 @@ async function loadData(){
       fetchSheet(CONFIG.sheets.visites),
       fetchSheet(CONFIG.sheets.peau),
       fetchSheet(CONFIG.sheets.cheveux),
-      fetchSheet(CONFIG.sheets.sport)
+      fetchSheet(CONFIG.sheets.sport),
+      fetchSheet(CONFIG.sheets.config)
     ]);
     if (!caisse || caisse.length < 2) throw new Error("CAISSE vide ou inaccessible");
     state.demo = false;
+    // [FIX-ARCHI-4] Version lue depuis CONFIG.
+    state.config = normalizeConfig(config || []);
     state.sales = normalizeSales(caisse);
     state.employees = normalizeEmployees(employees || []);
     state.subscriptions = normalizeSubscriptions(abonnements || []);
@@ -943,11 +1038,14 @@ async function loadData(){
     ];
     attachObjectives();
     attachSubscriptions();
+    state.lastLoadedAt = new Date();
+    renderAppVersion();
     setStatus("ok", `${state.sales.length} prestations chargees depuis Google Sheets`);
   }catch(err){
     console.warn(err);
     const demo = demoDataset();
     state.demo = true;
+    state.config = { VERSION_SCRIPT: "demo" };
     state.sales = demo.sales;
     state.employees = demo.employees;
     state.subscriptions = demo.subscriptions;
@@ -956,38 +1054,62 @@ async function loadData(){
     state.diagnostics = demo.diagnostics;
     attachObjectives();
     attachSubscriptions();
+    state.lastLoadedAt = new Date();
+    renderAppVersion();
     setStatus("demo", "Mode apercu : partage Sheets requis pour les donnees live");
   }
   populateFilters();
-  loadGoals();
+  await loadGoals();
   applyFilters();
+  startFreshnessTimer();
 }
 
 async function fetchSheet(name){
-  const url = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`;
-  const response = await fetch(url, { mode:"cors" });
-  if (!response.ok) throw new Error(`${name}: ${response.status}`);
-  const text = await response.text();
-  if (/^<!doctype html/i.test(text.trim())) throw new Error(`${name}: reponse HTML`);
-  return parseCSV(text);
+  // [FIX-SEC-2] Plus aucun acces direct a gviz ni exposition du Sheet ID.
+  const json = await apiPost({action:"sheet", sheet:name});
+  return json.data || [];
 }
 
 function parseCSV(text){
-  const rows=[];let row=[];let cur="";let quoted=false;
-  for(let i=0;i<text.length;i++){
-    const ch=text[i], next=text[i+1];
-    if(ch === '"' && quoted && next === '"'){cur += '"'; i++; continue;}
-    if(ch === '"'){quoted = !quoted; continue;}
-    if(ch === "," && !quoted){row.push(cur); cur=""; continue;}
+  // [FIX-ARCHI-2] Parser RFC 4180 robuste pour les imports CSV de secours.
+  text = String(text || "").replace(/^\uFEFF/, "");
+  const rows = [];
+  let row = [];
+  let cur = "";
+  let quoted = false;
+  for(let i = 0; i < text.length; i++){
+    const ch = text[i];
+    const next = text[i + 1];
+    if(ch === '"' && quoted && next === '"'){
+      cur += '"';
+      i++;
+      continue;
+    }
+    if(ch === '"'){
+      quoted = !quoted;
+      continue;
+    }
+    if(ch === "," && !quoted){
+      row.push(cur);
+      cur = "";
+      continue;
+    }
     if((ch === "\n" || ch === "\r") && !quoted){
       if(ch === "\r" && next === "\n") i++;
-      row.push(cur); rows.push(row); row=[]; cur="";
+      row.push(cur);
+      rows.push(row);
+      row = [];
+      cur = "";
       continue;
     }
     cur += ch;
   }
-  if(cur || row.length){row.push(cur); rows.push(row);}
+  row.push(cur);
+  rows.push(row);
   return rows.filter(r => r.some(c => String(c).trim() !== ""));
+  // Tests manuels :
+  // parseCSV('\uFEFFa,b\n,"x,y"\n"guillemets ""ok""","ligne\ninterne"')
+  // doit gerer BOM, champ vide, virgule, guillemets doubles et saut de ligne cite.
 }
 
 function key(text){
@@ -1037,6 +1159,17 @@ function daysBetween(start, end){
   const a = new Date(start); const b = new Date(end);
   a.setHours(0,0,0,0); b.setHours(0,0,0,0);
   return Math.ceil((b - a) / 86400000);
+}
+
+// [FIX-ABO-HTML-1] Helper commun de filtrage période pour les abonnements.
+function dateMatchesPeriod(date, period, now){
+  if(period === "all") return true;
+  if(!date) return false;
+  const d = new Date(date); d.setHours(0,0,0,0);
+  if(period === "today") return d.getTime() === now.getTime();
+  if(period === "month") return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  const days = Number(period);
+  return (now - d) / 86400000 <= days;
 }
 
 function normalizeStatus(raw){
@@ -1242,6 +1375,19 @@ function normalizeDiagnostics(rows){
   })).filter(x => x.idClient || x.name || x.objective);
 }
 
+// [FIX-ARCHI-4] Parametres CONFIG exposes au dashboard via le proxy Apps Script.
+function normalizeConfig(rows){
+  if(!rows || rows.length < 2) return {};
+  const idx = indexer(rows[0]);
+  const iKey = idx("PARAMETRE","CLE");
+  const iValue = idx("VALEUR","VALUE");
+  return rows.slice(1).reduce((acc,r) => {
+    const k = cell(r,iKey);
+    if(k) acc[k] = cell(r,iValue);
+    return acc;
+  }, {});
+}
+
 function buildClients(base, sales){
   const map = new Map();
   base.forEach(c => map.set(c.id || c.phoneKey || normName(c.name), {...c, sales:[], objectives:[]}));
@@ -1290,6 +1436,8 @@ function loyalty(visits){
 function populateFilters(){
   fillSelect("serviceFilter", [...new Set(state.sales.map(x => x.service).filter(Boolean))].sort(), "Tous les services");
   fillSelect("employeeFilter", [...new Set([...state.employees.map(x => x.name), ...state.sales.map(x => x.employee)].filter(Boolean))].sort(), "Toute l'equipe");
+  // [FIX-ABO-HTML-2] Liste dynamique des formules d'abonnement.
+  fillSelect("formuleFilter", [...new Set(state.subscriptions.map(x => x.formule).filter(Boolean))].sort(), "Toutes les formules");
 }
 
 function fillSelect(id, values, label){
@@ -1305,6 +1453,7 @@ function applyFilters(){
   const employee = document.getElementById("employeeFilter").value;
   const status = document.getElementById("statusFilter").value;
   const abonnementStatus = document.getElementById("abonnementFilter").value;
+  const formule = document.getElementById("formuleFilter").value;
   const search = normName(document.getElementById("searchInput").value);
   const now = new Date(); now.setHours(0,0,0,0);
   state.filtered = state.sales.filter(s => {
@@ -1321,7 +1470,11 @@ function applyFilters(){
     return (now - d) / 86400000 <= days;
   });
   state.filteredSubscriptions = state.subscriptions.filter(s => {
+    // [FIX-ABO-HTML-1] Les abonnements suivent le filtre période via leur date de début.
+    if(!dateMatchesPeriod(s.start, period, now)) return false;
     if(abonnementStatus !== "all" && s.status !== abonnementStatus) return false;
+    // [FIX-ABO-HTML-2] Filtre par formule.
+    if(formule !== "all" && s.formule !== formule) return false;
     if(search && !normName([s.name,s.phone,s.formule,s.category,s.status].join(" ")).includes(search)) return false;
     return true;
   });
@@ -1428,7 +1581,8 @@ function renderActions(){
 }
 
 function renderAvgServices(){
-  const rows = topBy(state.filtered, "service", "sum").map(r => ({...r, avg:r.count ? r.value/r.count : 0}));
+  // [FIX-ARCHI-3] Le panier moyen par service exclut les ventes non payees.
+  const rows = topBy(state.filtered.filter(x => x.status === "Paye"), "service", "sum").map(r => ({...r, avg:r.count ? r.value/r.count : 0}));
   document.getElementById("avgServiceList").innerHTML = rows.slice(0,7).map(r => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(r.name)}</div><div class="rank-meta">${fmtNum(r.count)} prestation(s)</div></div><div class="rank-val">${fmtMoney(r.avg)}</div></div>`).join("") || empty("Aucun service");
 }
 
@@ -1454,22 +1608,27 @@ function renderTable(id, headers, rows){
 }
 
 function renderSubscriptions(){
-  const data = state.filteredSubscriptions.length || document.getElementById("abonnementFilter").value !== "all"
-    ? state.filteredSubscriptions
-    : state.subscriptions;
+  // [FIX-ABO-HTML-1] Le tableau respecte toujours les filtres, dont la période.
+  const data = state.filteredSubscriptions;
+  const now = new Date();
   const counts = {
     actif: state.subscriptions.filter(s => s.status === "Actif").length,
     bientot: state.subscriptions.filter(s => s.status === "Bientôt expiré").length,
     expire: state.subscriptions.filter(s => s.status === "Expiré").length,
     termine: state.subscriptions.filter(s => s.status === "Terminé").length,
-    suspendu: state.subscriptions.filter(s => s.status === "Suspendu").length
+    suspendu: state.subscriptions.filter(s => s.status === "Suspendu").length,
+    // [FIX-ABO-HTML-4] KPIs de tendance basés sur tous les abonnements.
+    nouveauxMois: state.subscriptions.filter(s => s.start && s.start.getMonth() === now.getMonth() && s.start.getFullYear() === now.getFullYear()).length,
+    expiresMois: state.subscriptions.filter(s => s.end && s.end.getMonth() === now.getMonth() && s.end.getFullYear() === now.getFullYear() && ["Expiré","Terminé"].includes(s.status)).length
   };
   document.getElementById("subscriptionKpis").innerHTML = [
     kpi("Actifs", fmtNum(counts.actif), "Abonnements utilisables", "check-circle"),
     kpi("Bientôt expirés", fmtNum(counts.bientot), "7 jours ou moins", "alert-triangle"),
     kpi("Expirés", fmtNum(counts.expire), "Date de fin dépassée", "x-circle"),
     kpi("Terminés", fmtNum(counts.termine), "Séances épuisées", "archive"),
-    kpi("Suspendus", fmtNum(counts.suspendu), "Blocage manuel", "pause-circle")
+    kpi("Suspendus", fmtNum(counts.suspendu), "Blocage manuel", "pause-circle"),
+    kpi("Nouveaux ce mois", fmtNum(counts.nouveauxMois), "Debuts sur le mois", "plus-circle"),
+    kpi("Expirés ce mois", fmtNum(counts.expiresMois), "Fin ou seances terminees", "calendar-x")
   ].join("");
   renderTable("subscriptionsTable",
     ["Cliente","Formule","Début","Fin","Jours","Séances","Statut","Alerte"],
@@ -1497,19 +1656,24 @@ function renderCommissions(){
   const monthRows = state.commissions.filter(c => c.month === currentMonth);
   const monthTotal = monthRows.reduce((sum,c) => sum + c.total, 0);
   const visibleTotal = data.reduce((sum,c) => sum + c.total, 0);
-  const unpaid = data.filter(c => !normName(c.status).includes("paye") || normName(c.status).includes("non")).reduce((sum,c) => sum + c.total, 0);
+  // [FIX-COM-HTML-2] Tout statut différent de Paye est considéré non payé.
+  const unpaid = data.filter(c => normName(c.status) !== "paye").reduce((sum,c) => sum + c.total, 0);
   const paid = data.filter(c => normName(c.status) === "paye").reduce((sum,c) => sum + c.total, 0);
   const employees = new Set(data.map(c => c.employee).filter(Boolean)).size;
 
   document.getElementById("commissionKpis").innerHTML = [
     kpi("Commissions du mois", fmtMoney(monthTotal), currentMonth, "badge-dollar-sign"),
     kpi("Total filtre", fmtMoney(visibleTotal), `${fmtNum(data.length)} ligne(s)`, "calculator"),
-    kpi("Non paye", fmtMoney(unpaid), "A regler", "clock"),
+    // [FIX-COM-HTML-4] Note contextualisée selon le filtre période.
+    kpi("Non paye", fmtMoney(unpaid), commissionPeriodNote(period), "clock"),
     kpi("Paye", fmtMoney(paid), "Deja solde", "badge-check"),
     kpi("Prestataires", fmtNum(employees), "Avec commissions", "users")
   ].join("");
 
   const ranked = data.slice().sort((a,b) => b.total - a.total);
+  // [FIX-COM-HTML-3] Graphique line de l'évolution mensuelle.
+  const trend = commissionTrendData();
+  makeChart("commissionTrendChart", "line", trend.labels, [{label:"Total commissions", data:trend.values, borderColor:colors.plum, backgroundColor:"rgba(85,36,119,.12)", fill:true, tension:.35}], {yMoney:true});
   makeChart("commissionChart", "bar", ranked.map(x => x.employee), [{label:"Total commission", data:ranked.map(x => x.total), backgroundColor:colors.plum}], {yMoney:true});
   document.getElementById("commissionPrimeList").innerHTML = ranked.slice(0,8).map(c => {
     const primes = c.abonnement + c.satisfaction + c.resultat + c.evenement;
@@ -1517,7 +1681,8 @@ function renderCommissions(){
   }).join("") || empty("Aucune commission calculee");
 
   renderTable("commissionsTable",
-    ["Mois","Employee","CA individuel","Prestations","Produits","Abonnements","Resultat","Evenements","Total","Statut"],
+    // [FIX-COM-HTML-1] Ajout de la prime satisfaction dans le tableau.
+    ["Mois","Employee","CA individuel","Prestations","Produits","Abonnements","Satisfaction","Resultat","Evenements","Total","Statut"],
     ranked.map(c => [
       c.month,
       c.employee,
@@ -1525,12 +1690,37 @@ function renderCommissions(){
       fmtMoney(c.prestation),
       fmtMoney(c.produits),
       fmtMoney(c.abonnement),
+      fmtMoney(c.satisfaction),
       fmtMoney(c.resultat),
       fmtMoney(c.evenement),
       fmtMoney(c.total),
       commissionBadge(c.status)
     ])
   );
+}
+
+// [FIX-COM-HTML-3] Données de tendance mensuelle des commissions.
+function commissionTrendData(){
+  const map = new Map();
+  state.commissions.forEach(c => {
+    if(!c.month) return;
+    map.set(c.month, (map.get(c.month) || 0) + c.total);
+  });
+  const entries = [...map.entries()].sort((a,b) => a[0].localeCompare(b[0]));
+  return {
+    labels: entries.map(([month]) => {
+      const parts = month.split("-");
+      return parts.length === 2 ? `${parts[1]}/${parts[0]}` : month;
+    }),
+    values: entries.map(([,value]) => value)
+  };
+}
+
+// [FIX-COM-HTML-4] Libellé de période pour le KPI Non payé.
+function commissionPeriodNote(period){
+  if(period === "month" || period === "today") return "Mois en cours";
+  if(period === "all") return "Toutes périodes";
+  return `Derniers ${period} jours`;
 }
 
 function renderClients(){
@@ -1551,6 +1741,13 @@ function renderClientProfile(c){
   document.getElementById("profileSub").textContent = [c.phone, c.area, c.email].filter(Boolean).join(" · ") || "Profil client";
   const events = c.sales.slice().sort((a,b) => (b.date||0)-(a.date||0)).slice(0,10);
   const sub = c.subscription;
+  // [FIX-ABO-HTML-3] Historique compact des 5 derniers abonnements du client.
+  const subscriptionHistory = (c.subscriptions || []).slice()
+    .sort((a,b) => (b.start || 0) - (a.start || 0))
+    .slice(0,5);
+  const subscriptionHistoryHtml = subscriptionHistory.length
+    ? `<table><thead><tr><th>Formule</th><th>Début</th><th>Fin</th><th>Séances</th><th>Statut</th></tr></thead><tbody>${subscriptionHistory.map(s => `<tr><td>${escapeHtml(s.formule)}</td><td>${fmtDate(s.start)}</td><td>${fmtDate(s.end)}</td><td>${fmtNum(s.remaining)} / ${fmtNum(s.included)}</td><td>${subscriptionBadge(s.status)}</td></tr>`).join("")}</tbody></table>`
+    : empty("Aucun historique abonnement");
   box.innerHTML = `
     <div class="profile-grid">
       <div class="metric"><label>Statut</label><strong>${badgeLoyalty(c.loyalty)}</strong></div>
@@ -1571,6 +1768,10 @@ function renderClientProfile(c){
         ` : empty("Aucun abonnement connu")}</div>
       </div>
       <div>
+        <div class="card-title">Historique abonnements</div>
+        <div class="table-wrap" style="margin-top:12px">${subscriptionHistoryHtml}</div>
+      </div>
+      <div>
         <div class="card-title">Objectifs connus</div>
         <div class="split-list" style="margin-top:12px">${c.objectives.length ? c.objectives.map(o => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(o)}</div><div class="rank-meta">A suivre lors de la prochaine visite</div></div></div>`).join("") : empty("Aucun objectif renseigne")}</div>
       </div>
@@ -1587,9 +1788,10 @@ function renderGoals(){
   const paid = monthSales.filter(s => s.status === "Paye").reduce((sum,s) => sum + s.total, 0);
   const visits = monthSales.length;
   const newClients = state.clients.filter(c => c.date && c.date.getMonth() === now.getMonth() && c.date.getFullYear() === now.getFullYear()).length;
-  renderGoal("monthlyGoalView", paid, Number(localStorage.getItem("mlGoalMonthly") || 3000000), fmtMoney);
-  renderGoal("visitGoalView", visits, Number(localStorage.getItem("mlGoalVisits") || 120), fmtNum);
-  renderGoal("clientGoalView", newClients, Number(localStorage.getItem("mlGoalClients") || 40), fmtNum);
+  // [FIX-ARCHI-1] Objectifs lus depuis Google Sheets, avec localStorage en cache.
+  renderGoal("monthlyGoalView", paid, Number(getGoalValue(CONFIG.goalKeys.monthly, 3000000)), fmtMoney);
+  renderGoal("visitGoalView", visits, Number(getGoalValue(CONFIG.goalKeys.visits, 120)), fmtNum);
+  renderGoal("clientGoalView", newClients, Number(getGoalValue(CONFIG.goalKeys.clients, 40)), fmtNum);
   renderEmployeeGoals(monthSales);
   renderServiceGoals(monthSales);
 }
@@ -1666,14 +1868,24 @@ function goalMeter(value, target, formatter){
 }
 
 function readGoalMap(key){
-  try{return JSON.parse(localStorage.getItem(key) || "{}") || {};}catch(err){return {};}
+  // [FIX-ARCHI-1] Priorite a l'etat charge depuis OBJECTIFS, fallback cache local.
+  const raw = state.goals[key] ?? localStorage.getItem(key) ?? "{}";
+  try{return JSON.parse(raw || "{}") || {};}catch(err){return {};}
 }
 
-function writeGoalMap(key, value){
-  localStorage.setItem(key, JSON.stringify(value || {}));
+async function writeGoalMap(key, value){
+  // [FIX-ARCHI-1] Sauvegarde Sheets + cache local.
+  const raw = JSON.stringify(value || {});
+  state.goals[key] = raw;
+  localStorage.setItem(key, raw);
+  try{
+    await apiPost({action:"sauvegarderObjectif", cle:key, valeur:raw});
+  }catch(err){
+    console.warn("Sauvegarde objectif en cache local uniquement", err);
+  }
 }
 
-function handleDynamicGoalSave(event){
+async function handleDynamicGoalSave(event){
   const btn = event.target.closest("[data-save-dynamic-goal]");
   if(!btn) return;
   const row = btn.closest("tr");
@@ -1689,21 +1901,48 @@ function handleDynamicGoalSave(event){
   }else{
     goals[name] = {ca};
   }
-  writeGoalMap(keyName, goals);
+  await writeGoalMap(keyName, goals);
   renderGoals();
 }
 
-function loadGoals(){
-  document.getElementById("monthlyGoal").value = localStorage.getItem("mlGoalMonthly") || 3000000;
-  document.getElementById("visitGoal").value = localStorage.getItem("mlGoalVisits") || 120;
-  document.getElementById("clientGoal").value = localStorage.getItem("mlGoalClients") || 40;
+async function loadGoals(){
+  // [FIX-ARCHI-1] Charge OBJECTIFS depuis Apps Script, fallback localStorage si besoin.
+  try{
+    const json = await apiPost({action:"lireObjectifs"});
+    state.goals = json.objectifs || {};
+    localStorage.setItem("mlGoalsCache", JSON.stringify(state.goals));
+  }catch(err){
+    console.warn("Objectifs Sheets indisponibles, utilisation du cache local", err);
+    try{state.goals = JSON.parse(localStorage.getItem("mlGoalsCache") || "{}") || {};}catch(cacheErr){state.goals = {};}
+  }
+  document.getElementById("monthlyGoal").value = getGoalValue(CONFIG.goalKeys.monthly, 3000000);
+  document.getElementById("visitGoal").value = getGoalValue(CONFIG.goalKeys.visits, 120);
+  document.getElementById("clientGoal").value = getGoalValue(CONFIG.goalKeys.clients, 40);
 }
 
-function saveGoals(){
-  localStorage.setItem("mlGoalMonthly", document.getElementById("monthlyGoal").value || 0);
-  localStorage.setItem("mlGoalVisits", document.getElementById("visitGoal").value || 0);
-  localStorage.setItem("mlGoalClients", document.getElementById("clientGoal").value || 0);
+async function saveGoals(){
+  // [FIX-ARCHI-1] Sauvegarde des trois objectifs globaux dans OBJECTIFS.
+  await Promise.all([
+    saveGoalValue(CONFIG.goalKeys.monthly, document.getElementById("monthlyGoal").value || 0),
+    saveGoalValue(CONFIG.goalKeys.visits, document.getElementById("visitGoal").value || 0),
+    saveGoalValue(CONFIG.goalKeys.clients, document.getElementById("clientGoal").value || 0)
+  ]);
   renderGoals();
+}
+
+function getGoalValue(key, fallback){
+  const value = state.goals[key] ?? localStorage.getItem(key);
+  return value === undefined || value === null || value === "" ? fallback : value;
+}
+
+async function saveGoalValue(key, value){
+  state.goals[key] = String(value);
+  localStorage.setItem(key, String(value));
+  try{
+    await apiPost({action:"sauvegarderObjectif", cle:key, valeur:String(value)});
+  }catch(err){
+    console.warn("Sauvegarde objectif en cache local uniquement", err);
+  }
 }
 
 function groupDaily(data){
@@ -1801,8 +2040,44 @@ function priority(c){
 
 function setStatus(type, text){
   const el = document.getElementById("status");
-  el.className = "status " + (type === "load" ? "" : type);
-  el.querySelector("span:last-child").textContent = text;
+  // [FIX-ARCHI-4] Conserve le statut courant et ajoute la fraicheur ensuite.
+  el.dataset.statusType = type === "load" ? "" : type;
+  document.getElementById("statusText").textContent = text;
+  updateStatusFreshness();
+}
+
+function updateStatusFreshness(){
+  // [FIX-ARCHI-4] Indique l'heure du dernier chargement et signale les donnees anciennes.
+  const el = document.getElementById("status");
+  const loaded = document.getElementById("statusLoadedAt");
+  if(!el || !loaded) return;
+  const base = el.dataset.statusType || "";
+  let stale = false;
+  if(state.lastLoadedAt){
+    const age = Date.now() - state.lastLoadedAt.getTime();
+    stale = age > 30 * 60 * 1000;
+    loaded.textContent = stale
+      ? "Donnees > 30 min · Actualiser"
+      : `· Charge a ${state.lastLoadedAt.toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"})}`;
+  }else{
+    loaded.textContent = "";
+  }
+  el.className = `status ${base}${stale ? " warn" : ""}`.trim();
+}
+
+function startFreshnessTimer(){
+  // [FIX-ARCHI-4] Reevalue la fraicheur sans recharger les donnees.
+  if(state.freshnessTimer) clearInterval(state.freshnessTimer);
+  state.freshnessTimer = setInterval(updateStatusFreshness, 60000);
+  updateStatusFreshness();
+}
+
+function renderAppVersion(){
+  // [FIX-ARCHI-4] Affiche VERSION_SCRIPT lu depuis la feuille CONFIG.
+  const el = document.getElementById("appVersion");
+  if(!el) return;
+  const version = state.config?.VERSION_SCRIPT || "";
+  el.textContent = version ? `v${version}` : "";
 }
 
 function empty(text){return `<div class="empty">${escapeHtml(text)}</div>`;}
