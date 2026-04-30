@@ -979,9 +979,8 @@ async function refreshCommissionsData(){
 // [FIX-SEC-1] Appel d'authentification au Web App Apps Script.
 async function apiGetToken(password){
   if(!isApiConfigured()) throw new Error("Configurez d'abord CONFIG.apiUrl avec l'URL Web App Apps Script.");
-  const sep = CONFIG.apiUrl.includes("?") ? "&" : "?";
-  const response = await fetch(`${CONFIG.apiUrl}${sep}pwd=${encodeURIComponent(password || "")}`, { method:"GET" });
-  const json = await response.json();
+  // [FIX-SEC-2] JSONP evite le blocage CORS entre GitHub Pages et Apps Script.
+  const json = await jsonpRequest({pwd: password || ""});
   if(json.error || !json.token) throw new Error(json.error === "Unauthorized" ? "Mot de passe incorrect." : (json.error || "Authentification impossible."));
   return json;
 }
@@ -990,17 +989,45 @@ async function apiGetToken(password){
 async function apiPost(payload){
   if(!isApiConfigured()) throw new Error("CONFIG.apiUrl non configure.");
   const token = sessionStorage.getItem(CONFIG.auth.tokenKey);
-  const response = await fetch(CONFIG.apiUrl, {
-    method:"POST",
-    headers: {"Content-Type":"text/plain;charset=utf-8"},
-    body: JSON.stringify({...payload, token})
-  });
-  const json = await response.json();
+  // [FIX-SEC-2] Nom conserve, transport JSONP pour compatibilite GitHub Pages.
+  const json = await jsonpRequest({...payload, token});
   if(json.error){
     if(json.status === 401) logout();
     throw new Error(json.error);
   }
   return json;
+}
+
+// [FIX-SEC-2] Transport JSONP compatible Apps Script Web App depuis un site statique.
+function jsonpRequest(payload){
+  return new Promise((resolve, reject) => {
+    if(!isApiConfigured()) return reject(new Error("CONFIG.apiUrl non configure."));
+    const callback = `__mlJsonp${Date.now()}${Math.random().toString(16).slice(2)}`;
+    const url = new URL(CONFIG.apiUrl);
+    Object.entries({...payload, callback}).forEach(([key, value]) => {
+      url.searchParams.set(key, value === undefined || value === null ? "" : String(value));
+    });
+    const script = document.createElement("script");
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error("Connexion Apps Script impossible."));
+    }, 20000);
+    function cleanup(){
+      clearTimeout(timer);
+      delete window[callback];
+      script.remove();
+    }
+    window[callback] = data => {
+      cleanup();
+      resolve(data || {});
+    };
+    script.onerror = () => {
+      cleanup();
+      reject(new Error("Connexion Apps Script impossible."));
+    };
+    script.src = url.toString();
+    document.head.appendChild(script);
+  });
 }
 
 function isApiConfigured(){
