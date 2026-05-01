@@ -261,15 +261,16 @@ a{color:inherit;text-decoration:none}
 /* ─── KPI Grid ─── */
 .kpis{
   display:grid;
-  grid-template-columns:repeat(6,minmax(150px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(172px,1fr));
   gap:14px;margin-bottom:18px;
+  align-items:stretch;
 }
 .kpi{
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:var(--r-md);
-  padding:0;
-  min-height:120px;
+  padding:0 0 12px;
+  min-height:132px;
   display:flex;flex-direction:column;
   overflow:hidden;
   box-shadow:var(--shadow);
@@ -288,30 +289,62 @@ a{color:inherit;text-decoration:none}
   border-radius:0;
   flex-shrink:0;
 }
-.kpi:nth-child(2)::before{background:linear-gradient(90deg,var(--green),#34d399)}
-.kpi:nth-child(3)::before{background:linear-gradient(90deg,var(--amber),#fbbf24)}
-.kpi:nth-child(4)::before{background:linear-gradient(90deg,var(--teal),#2dd4bf)}
-.kpi:nth-child(5)::before{background:linear-gradient(90deg,var(--plum),var(--plum-2))}
-.kpi:nth-child(6)::before{background:linear-gradient(90deg,var(--coral),#f87171)}
+.kpi--good::before{background:linear-gradient(90deg,var(--green),#34d399)}
+.kpi--warn::before{background:linear-gradient(90deg,var(--amber),#fbbf24)}
+.kpi--danger::before{background:linear-gradient(90deg,var(--coral),#f87171)}
+.kpi--teal::before{background:linear-gradient(90deg,var(--teal),#2dd4bf)}
+.kpi--plum::before{background:linear-gradient(90deg,var(--plum),var(--plum-2))}
+.kpi--gold::before{background:linear-gradient(90deg,var(--gold),var(--gold-mid))}
+.kpi--neutral::before{background:linear-gradient(90deg,#8B7AA5,#CFC4DD)}
 /* Inner content */
-.kpi-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:14px 14px 0}
-.kpi-label{font-size:10.5px;text-transform:uppercase;color:var(--muted);font-weight:700;letter-spacing:.06em;line-height:1.3}
+.kpi-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:14px 16px 0}
+.kpi-label{font-size:10.5px;text-transform:uppercase;color:var(--muted);font-weight:800;letter-spacing:.07em;line-height:1.3}
 .kpi-ico{
   width:36px;height:36px;border-radius:10px;
   display:grid;place-items:center;flex-shrink:0;
   background:var(--blue-bg);color:var(--blue);
 }
-.kpi:nth-child(2) .kpi-ico{background:var(--green-bg);color:var(--green)}
-.kpi:nth-child(3) .kpi-ico{background:var(--amber-bg);color:var(--amber)}
-.kpi:nth-child(4) .kpi-ico{background:var(--mint);color:var(--teal)}
-.kpi:nth-child(5) .kpi-ico{background:#F0E6FD;color:var(--plum)}
-.kpi:nth-child(6) .kpi-ico{background:var(--coral-bg);color:var(--coral)}
+.kpi--good .kpi-ico{background:var(--green-bg);color:var(--green)}
+.kpi--warn .kpi-ico{background:var(--amber-bg);color:var(--amber)}
+.kpi--danger .kpi-ico{background:var(--coral-bg);color:var(--coral)}
+.kpi--teal .kpi-ico{background:var(--mint);color:var(--teal)}
+.kpi--plum .kpi-ico{background:#F0E6FD;color:var(--plum)}
+.kpi--gold .kpi-ico{background:var(--gold-light);color:var(--gold)}
+.kpi--neutral .kpi-ico{background:var(--soft);color:var(--muted)}
 .kpi-value{
-  font-size:22px;line-height:1.1;font-weight:800;
-  padding:10px 14px 0;
+  font-size:23px;line-height:1.08;font-weight:800;
+  padding:10px 16px 0;
   font-feature-settings:"tnum";
+  overflow-wrap:anywhere;
 }
-.kpi-note{font-size:11.5px;color:var(--muted);padding:4px 14px 14px;font-weight:500}
+.kpi-note{font-size:11.5px;color:var(--muted);padding:4px 16px 0;font-weight:600;min-height:22px}
+.kpi-meta{
+  margin:9px 16px 0;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  color:var(--muted);font-size:11px;font-weight:700;
+}
+.kpi-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  min-height:22px;padding:0 8px;border-radius:999px;
+  background:var(--soft);color:var(--muted);
+}
+.kpi--good .kpi-chip{background:var(--green-bg);color:var(--green)}
+.kpi--warn .kpi-chip{background:var(--amber-bg);color:var(--amber)}
+.kpi--danger .kpi-chip{background:var(--coral-bg);color:var(--coral)}
+.kpi-progress{
+  height:6px;margin:10px 16px 0;
+  background:var(--soft);border-radius:999px;overflow:hidden;
+}
+.kpi-progress span{
+  display:block;height:100%;width:0;
+  background:linear-gradient(90deg,var(--plum),var(--plum-2));
+  border-radius:inherit;
+}
+.kpi--good .kpi-progress span{background:linear-gradient(90deg,var(--green),#34d399)}
+.kpi--warn .kpi-progress span{background:linear-gradient(90deg,var(--amber),#fbbf24)}
+.kpi--danger .kpi-progress span{background:linear-gradient(90deg,var(--coral),#f87171)}
+.kpi--teal .kpi-progress span{background:linear-gradient(90deg,var(--teal),#2dd4bf)}
+.kpi--gold .kpi-progress span{background:linear-gradient(90deg,var(--gold),var(--gold-mid))}
 
 /* ─── Layout Grids ─── */
 .grid-2{display:grid;grid-template-columns:1.3fr .7fr;gap:16px;margin-bottom:16px}
@@ -676,6 +709,7 @@ tbody tr:hover td{background:#F7F2FC}
     </section>
 
     <section id="sales" class="panel">
+      <div class="kpis" id="salesKpis"></div>
       <div class="grid-2">
         <article class="card">
           <div class="card-head"><div><div class="card-title">CA par service</div><div class="card-sub">Services les plus rentables</div></div></div>
@@ -693,6 +727,7 @@ tbody tr:hover td{background:#F7F2FC}
     </section>
 
     <section id="services" class="panel">
+      <div class="kpis" id="servicesKpis"></div>
       <div class="grid-3">
         <article class="card">
           <div class="card-head"><div><div class="card-title">Mix services</div><div class="card-sub">Part de chaque famille</div></div></div>
@@ -715,6 +750,7 @@ tbody tr:hover td{background:#F7F2FC}
     </section>
 
     <section id="clients" class="panel">
+      <div class="kpis" id="clientsKpis"></div>
       <div class="client-layout">
         <article class="card">
           <div class="card-head"><div><div class="card-title">Portefeuille clients</div><div class="card-sub" id="clientCount"></div></div></div>
@@ -786,6 +822,7 @@ tbody tr:hover td{background:#F7F2FC}
     </section>
 
     <section id="goals" class="panel">
+      <div class="kpis" id="goalsKpis"></div>
       <div class="goal-board">
         <article class="card goal-card">
           <div class="card-title">Objectif CA mensuel</div>
@@ -1515,6 +1552,7 @@ function applyFilters(){
 
 function renderAll(){
   renderKPIs();
+  renderPageKPIs();
   renderCharts();
   renderRankings();
   renderTables();
@@ -1525,30 +1563,151 @@ function renderAll(){
   if(window.lucide) lucide.createIcons();
 }
 
+function renderPageKPIs(){
+  renderSalesKPIs();
+  renderServicesKPIs();
+  renderClientsKPIs();
+  renderGoalsKPIs();
+}
+
 function computeKPIs(data){
   const paid = data.filter(x => x.status === "Paye");
   const waiting = data.filter(x => x.status === "A payer");
   const totalPaid = paid.reduce((s,x) => s + x.total, 0);
   const totalWaiting = waiting.reduce((s,x) => s + x.total, 0);
+  const totalBilled = data.reduce((s,x) => s + x.total, 0);
   const uniqueClients = new Set(data.map(x => x.idClient || x.phoneKey || normName(x.client))).size;
   const avg = paid.length ? totalPaid / paid.length : 0;
-  return { totalPaid, totalWaiting, count:data.length, avg, uniqueClients, conversion:data.length ? paid.length / data.length : 0 };
+  return {
+    totalPaid,
+    totalWaiting,
+    totalBilled,
+    count:data.length,
+    paidCount:paid.length,
+    waitingCount:waiting.length,
+    avg,
+    uniqueClients,
+    conversion:data.length ? paid.length / data.length : 0,
+    moneyConversion:totalBilled ? totalPaid / totalBilled : 0
+  };
 }
 
 function renderKPIs(){
   const k = computeKPIs(state.filtered);
   document.getElementById("kpiGrid").innerHTML = [
-    kpi("CA paye", fmtMoney(k.totalPaid), `${fmtNum(state.filtered.filter(x => x.status === "Paye").length)} prestations`, "wallet"),
-    kpi("A encaisser", fmtMoney(k.totalWaiting), "Prestations a payer", "receipt"),
-    kpi("Prestations", fmtNum(k.count), "Volume filtre", "activity"),
-    kpi("Panier moyen", fmtMoney(k.avg), "Sur prestations payees", "shopping-bag"),
-    kpi("Clients actifs", fmtNum(k.uniqueClients), "Clients sur la periode", "users"),
-    kpi("Taux paye", `${Math.round(k.conversion * 100)}%`, "Paye vs total", "badge-check")
+    kpi("CA paye", fmtMoney(k.totalPaid), `${fmtNum(k.paidCount)} prestation(s) payee(s)`, "wallet", {variant:"good", progress:k.moneyConversion * 100, chip:`${Math.round(k.moneyConversion * 100)}% du CA saisi`}),
+    kpi("A encaisser", fmtMoney(k.totalWaiting), `${fmtNum(k.waitingCount)} prestation(s) a suivre`, "receipt", {variant:k.totalWaiting ? "warn" : "neutral", progress:k.totalBilled ? k.totalWaiting / k.totalBilled * 100 : 0, chip:k.totalWaiting ? "Relance" : "OK"}),
+    kpi("Prestations", fmtNum(k.count), "Volume sur la periode", "activity", {variant:"blue", meta:`${fmtNum(k.paidCount)} payees`}),
+    kpi("Panier moyen", fmtMoney(k.avg), "Sur prestations payees", "shopping-bag", {variant:"teal", meta:"Prix moyen"}),
+    kpi("Clients actifs", fmtNum(k.uniqueClients), "Clientes vues sur la periode", "users", {variant:"plum", meta:k.count ? `${fmtNum(k.count / Math.max(1,k.uniqueClients))} visite/client` : "0 visite"}),
+    kpi("Taux paye", `${Math.round(k.conversion * 100)}%`, "Prestations payees vs total", "badge-check", {variant:k.conversion >= .8 ? "good" : k.conversion >= .55 ? "warn" : "danger", progress:k.conversion * 100, chip:k.conversion >= .8 ? "Solide" : "A suivre"})
   ].join("");
 }
 
-function kpi(label,value,note,icon){
-  return `<div class="kpi"><div class="kpi-top"><div class="kpi-label">${label}</div><div class="kpi-ico"><i data-lucide="${icon}" class="icon"></i></div></div><div><div class="kpi-value">${value}</div><div class="kpi-note">${note}</div></div></div>`;
+function renderSalesKPIs(){
+  const el = document.getElementById("salesKpis");
+  if(!el) return;
+  const k = computeKPIs(state.filtered);
+  const topService = topBy(state.filtered.filter(x => x.status === "Paye"), "service", "sum")[0];
+  const topEmployee = topBy(state.filtered.filter(x => x.status === "Paye"), "employee", "sum")[0];
+  el.innerHTML = [
+    kpi("CA filtre", fmtMoney(k.totalPaid), "Encaisse sur la periode", "trending-up", {variant:"good", progress:k.moneyConversion * 100, chip:`${Math.round(k.moneyConversion * 100)}% paye`}),
+    kpi("Reste a encaisser", fmtMoney(k.totalWaiting), `${fmtNum(k.waitingCount)} ligne(s) a suivre`, "receipt", {variant:k.totalWaiting ? "warn" : "neutral", progress:k.totalBilled ? k.totalWaiting / k.totalBilled * 100 : 0, chip:k.totalWaiting ? "Relance" : "OK"}),
+    kpi("Top service", topService ? topService.name : "-", topService ? fmtMoney(topService.value) : "Aucune vente payee", "sparkles", {variant:"teal", meta:topService ? `${fmtNum(topService.count)} prestation(s)` : ""}),
+    kpi("Top employee", topEmployee ? topEmployee.name : "-", topEmployee ? fmtMoney(topEmployee.value) : "Aucune vente payee", "user-check", {variant:"plum", meta:topEmployee ? `${fmtNum(topEmployee.count)} prestation(s)` : ""}),
+    kpi("Panier moyen", fmtMoney(k.avg), "Sur ventes payees", "shopping-bag", {variant:"gold", meta:"Ticket moyen"})
+  ].join("");
+}
+
+function renderServicesKPIs(){
+  const el = document.getElementById("servicesKpis");
+  if(!el) return;
+  const paid = state.filtered.filter(x => x.status === "Paye");
+  const serviceRows = topBy(paid, "service", "sum");
+  const volumeRows = topBy(state.filtered, "service", "count");
+  const top = serviceRows[0];
+  const volumeTop = volumeRows[0];
+  const caTotal = paid.reduce((sum,s) => sum + s.total, 0);
+  const top3Share = caTotal ? serviceRows.slice(0,3).reduce((sum,row) => sum + row.value, 0) / caTotal : 0;
+  const avgService = serviceRows.length ? caTotal / serviceRows.reduce((sum,row) => sum + row.count, 0) : 0;
+  el.innerHTML = [
+    kpi("Services actifs", fmtNum(new Set(state.filtered.map(s => s.service).filter(Boolean)).size), "Familles vendues", "grid-2x2", {variant:"plum", meta:"Mix commercial"}),
+    kpi("Meilleur CA", top ? top.name : "-", top ? fmtMoney(top.value) : "Aucun CA paye", "trophy", {variant:"good", progress:top && caTotal ? top.value / caTotal * 100 : 0, chip:top && caTotal ? `${Math.round(top.value / caTotal * 100)}% du CA` : ""}),
+    kpi("Plus demande", volumeTop ? volumeTop.name : "-", volumeTop ? `${fmtNum(volumeTop.count)} prestation(s)` : "Aucun volume", "activity", {variant:"teal", meta:"Volume"}),
+    kpi("Panier service", fmtMoney(avgService), "Moyenne des prestations payees", "badge-dollar-sign", {variant:"gold", meta:"Prix moyen"}),
+    kpi("Concentration top 3", `${Math.round(top3Share * 100)}%`, "Poids CA des 3 premiers", "pie-chart", {variant:top3Share > .75 ? "warn" : "good", progress:top3Share * 100, chip:top3Share > .75 ? "Dependance" : "Equilibre"})
+  ].join("");
+}
+
+function renderClientsKPIs(){
+  const el = document.getElementById("clientsKpis");
+  if(!el) return;
+  const search = normName(document.getElementById("searchInput").value);
+  const clients = state.clients.filter(c => !search || normName([c.name,c.phone,c.objectives.join(" "),c.favoriteService,c.subscription?.formule,c.subscription?.status].join(" ")).includes(search));
+  const now = new Date();
+  const monthClients = clients.filter(c => c.date && c.date.getMonth() === now.getMonth() && c.date.getFullYear() === now.getFullYear()).length;
+  const activePeriod = new Set(state.filtered.map(s => s.idClient || s.phoneKey || normName(s.client))).size;
+  const toFollow = clients.filter(c => {
+    const inactiveDays = c.lastVisit ? Math.floor((now - c.lastVisit)/86400000) : 999;
+    return c.visits > 0 && (inactiveDays >= 21 || c.objectives.length);
+  }).length;
+  const withActiveSub = clients.filter(c => c.subscription && ["Actif","BientÃ´t expirÃ©","Suspendu"].includes(c.subscription.status)).length;
+  const caClient = clients.length ? clients.reduce((sum,c) => sum + c.total, 0) / clients.length : 0;
+  el.innerHTML = [
+    kpi("Portefeuille", fmtNum(clients.length), "Clientes dans la base", "users", {variant:"plum", meta:"CRM"}),
+    kpi("Actives periode", fmtNum(activePeriod), "Clientes avec visite filtree", "user-round-check", {variant:"good", progress:clients.length ? activePeriod / clients.length * 100 : 0, chip:clients.length ? `${Math.round(activePeriod / clients.length * 100)}%` : "0%"}),
+    kpi("Nouvelles ce mois", fmtNum(monthClients), "Inscriptions recentes", "user-plus", {variant:"teal", meta:"Acquisition"}),
+    kpi("A accompagner", fmtNum(toFollow), "Relance ou objectif detecte", "bell-ring", {variant:toFollow ? "warn" : "good", progress:clients.length ? toFollow / clients.length * 100 : 0, chip:toFollow ? "Action" : "OK"}),
+    kpi("Avec abonnement", fmtNum(withActiveSub), "Actif, bientot expire ou suspendu", "calendar-check", {variant:"gold", progress:clients.length ? withActiveSub / clients.length * 100 : 0}),
+    kpi("CA moyen/client", fmtMoney(caClient), "CA paye cumule moyen", "wallet", {variant:"neutral", meta:"Valeur client"})
+  ].join("");
+}
+
+function renderGoalsKPIs(){
+  const el = document.getElementById("goalsKpis");
+  if(!el) return;
+  const now = new Date();
+  const monthSales = state.sales.filter(s => s.date && s.date.getMonth() === now.getMonth() && s.date.getFullYear() === now.getFullYear());
+  const paid = monthSales.filter(s => s.status === "Paye").reduce((sum,s) => sum + s.total, 0);
+  const visits = monthSales.length;
+  const newClients = state.clients.filter(c => c.date && c.date.getMonth() === now.getMonth() && c.date.getFullYear() === now.getFullYear()).length;
+  const caTarget = Number(getGoalValue(CONFIG.goalKeys.monthly, 3000000)) || 0;
+  const visitTarget = Number(getGoalValue(CONFIG.goalKeys.visits, 120)) || 0;
+  const clientTarget = Number(getGoalValue(CONFIG.goalKeys.clients, 40)) || 0;
+  const employeeGoals = readGoalMap(CONFIG.goalKeys.employees);
+  const serviceGoals = readGoalMap(CONFIG.goalKeys.services);
+  el.innerHTML = [
+    kpi("Objectif CA", fmtMoney(paid), `Cible ${fmtMoney(caTarget)}`, "target", {variant:goalVariant(paid, caTarget), progress:goalPct(paid, caTarget), chip:`${goalPct(paid, caTarget)}%`}),
+    kpi("Objectif visites", fmtNum(visits), `Cible ${fmtNum(visitTarget)}`, "footprints", {variant:goalVariant(visits, visitTarget), progress:goalPct(visits, visitTarget), chip:`${goalPct(visits, visitTarget)}%`}),
+    kpi("Nouveaux clients", fmtNum(newClients), `Cible ${fmtNum(clientTarget)}`, "user-plus", {variant:goalVariant(newClients, clientTarget), progress:goalPct(newClients, clientTarget), chip:`${goalPct(newClients, clientTarget)}%`}),
+    kpi("Objectifs employee", fmtNum(Object.keys(employeeGoals).length), "Lignes configurees", "users", {variant:"plum", meta:"Equipe"}),
+    kpi("Objectifs service", fmtNum(Object.keys(serviceGoals).length), "Services suivis", "sparkles", {variant:"teal", meta:"CA par service"})
+  ].join("");
+}
+
+function goalPct(value,target){
+  return target ? Math.min(100, Math.round((Number(value) || 0) / target * 100)) : 0;
+}
+
+function goalVariant(value,target){
+  const pct = goalPct(value,target);
+  if(pct >= 90) return "good";
+  if(pct >= 60) return "warn";
+  return "danger";
+}
+
+function kpi(label,value,note,icon,options={}){
+  const variant = options.variant || "blue";
+  const progress = options.progress === undefined ? null : Math.max(0, Math.min(100, Number(options.progress) || 0));
+  const chip = options.chip ? `<span class="kpi-chip">${escapeHtml(options.chip)}</span>` : "";
+  const meta = options.meta ? `<span>${escapeHtml(options.meta)}</span>` : "";
+  return `<div class="kpi kpi--${variant}">
+    <div class="kpi-top"><div class="kpi-label">${escapeHtml(label)}</div><div class="kpi-ico"><i data-lucide="${icon}" class="icon"></i></div></div>
+    <div class="kpi-value">${value}</div>
+    <div class="kpi-note">${escapeHtml(note)}</div>
+    ${progress !== null ? `<div class="kpi-progress"><span style="width:${progress}%"></span></div>` : ""}
+    ${chip || meta ? `<div class="kpi-meta">${meta}${chip}</div>` : ""}
+  </div>`;
 }
 
 function renderCharts(){
@@ -1657,6 +1816,18 @@ function renderSubscriptions(){
     kpi("Nouveaux ce mois", fmtNum(counts.nouveauxMois), "Debuts sur le mois", "plus-circle"),
     kpi("Expirés ce mois", fmtNum(counts.expiresMois), "Fin ou seances terminees", "calendar-x")
   ].join("");
+  const totalSubs = state.subscriptions.length || 1;
+  const usableSubs = counts.actif + counts.bientot;
+  const attentionSubs = counts.bientot + counts.expire + counts.termine;
+  document.getElementById("subscriptionKpis").innerHTML = [
+    kpi("Utilisables", fmtNum(usableSubs), "Actifs + bientot expires", "check-circle", {variant:"good", progress:usableSubs / totalSubs * 100, chip:`${fmtNum(totalSubs)} total`}),
+    kpi("Actifs", fmtNum(counts.actif), "Abonnements sans alerte", "badge-check", {variant:"teal", progress:counts.actif / totalSubs * 100, chip:"OK"}),
+    kpi("A surveiller", fmtNum(attentionSubs), "Bientot expires, expires ou termines", "alert-triangle", {variant:attentionSubs ? "warn" : "good", progress:attentionSubs / totalSubs * 100, chip:attentionSubs ? "Action" : "Stable"}),
+    kpi("Expires", fmtNum(counts.expire), "Date de fin depassee", "x-circle", {variant:counts.expire ? "danger" : "neutral", progress:counts.expire / totalSubs * 100}),
+    kpi("Termines", fmtNum(counts.termine), "Seances epuisees", "archive", {variant:counts.termine ? "neutral" : "good", progress:counts.termine / totalSubs * 100}),
+    kpi("Nouveaux ce mois", fmtNum(counts.nouveauxMois), "Souscriptions du mois", "plus-circle", {variant:"plum", meta:"Tendance acquisition"}),
+    kpi("Expires ce mois", fmtNum(counts.expiresMois), "Fin ou seances terminees", "calendar-x", {variant:counts.expiresMois ? "warn" : "neutral", meta:"A renouveler"})
+  ].join("");
   renderTable("subscriptionsTable",
     ["Cliente","Formule","Début","Fin","Jours","Séances","Statut","Alerte"],
     data.slice().sort((a,b) => statusWeight(a.status) - statusWeight(b.status) || (a.daysRemaining - b.daysRemaining)).map(s => [
@@ -1695,6 +1866,15 @@ function renderCommissions(){
     kpi("Non paye", fmtMoney(unpaid), commissionPeriodNote(period), "clock"),
     kpi("Paye", fmtMoney(paid), "Deja solde", "badge-check"),
     kpi("Prestataires", fmtNum(employees), "Avec commissions", "users")
+  ].join("");
+
+  const commissionTotal = paid + unpaid || 1;
+  document.getElementById("commissionKpis").innerHTML = [
+    kpi("Commissions du mois", fmtMoney(monthTotal), currentMonth, "badge-dollar-sign", {variant:"plum", meta:"Mois courant"}),
+    kpi("Total filtre", fmtMoney(visibleTotal), `${fmtNum(data.length)} ligne(s)`, "calculator", {variant:"teal", meta:"Periode affichee"}),
+    kpi("Non paye", fmtMoney(unpaid), commissionPeriodNote(period), "clock", {variant:unpaid ? "warn" : "good", progress:unpaid / commissionTotal * 100, chip:unpaid ? "A regler" : "OK"}),
+    kpi("Paye", fmtMoney(paid), "Commissions soldees", "badge-check", {variant:"good", progress:paid / commissionTotal * 100, chip:`${Math.round(paid / commissionTotal * 100)}%`}),
+    kpi("Prestataires", fmtNum(employees), "Avec commissions", "users", {variant:"neutral", meta:"Equipe"})
   ].join("");
 
   const ranked = data.slice().sort((a,b) => b.total - a.total);
