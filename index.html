@@ -711,8 +711,28 @@ tbody tr:last-child td{border-bottom:0}
   color:var(--t3);font-size:12.5px;font-style:italic;
 }
 
-/* ─── Overview brief (hidden) ─── */
-#overviewBrief{display:none}
+/* ─── Overview brief ─── */
+#overviewBrief{
+  display:block;
+  margin-bottom:16px;
+  padding:16px 18px;
+  border:1px solid var(--gold-line);
+  border-radius:var(--r-lg);
+  background:linear-gradient(135deg,rgba(196,154,60,.12),rgba(155,124,255,.08));
+  color:var(--t2);
+  box-shadow:var(--shadow-sm);
+}
+.brief-title{
+  color:var(--gold);
+  font-family:"Playfair Display",serif;
+  font-size:16px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+.brief-line{
+  font-size:13px;
+  line-height:1.7;
+}
 
 /* ─── Section hidden from nav but kept in DOM ─── */
 /* #services is never made .active so stays display:none */
@@ -902,7 +922,7 @@ tbody tr:last-child td{border-bottom:0}
 
       <!-- ══ TABLEAU DE BORD ══ -->
       <section id="overview" class="panel active">
-        <!-- Brief exécutif (caché, rendu par JS) -->
+        <!-- Brief exécutif rendu par JS -->
         <div id="overviewBrief"></div>
         <!-- 4 KPIs principaux -->
         <div class="kpis" id="kpiGrid"></div>
@@ -1005,7 +1025,7 @@ tbody tr:last-child td{border-bottom:0}
       <!-- ══ CLIENTES ══ -->
       <section id="clients" class="panel">
         <!-- KPIs clientes (caché, rendu par JS) -->
-        <div class="kpis" id="clientsKpis" style="display:none"></div>
+        <div class="kpis" id="clientsKpis"></div>
         <div class="client-layout">
           <article class="card">
             <div class="card-head">
@@ -1065,8 +1085,15 @@ tbody tr:last-child td{border-bottom:0}
             <div class="card-body"><div id="commissionPrimeList" class="split-list"></div></div>
           </article>
         </div>
-        <!-- Trend chart caché mais rendu par JS -->
-        <div style="display:none"><canvas id="commissionTrendChart"></canvas></div>
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Évolution mensuelle des commissions</div>
+              <div class="card-sub">Total commissions toutes prestataires</div>
+            </div>
+          </div>
+          <div class="card-body"><div class="chart-box"><canvas id="commissionTrendChart"></canvas></div></div>
+        </article>
         <article class="card">
           <div class="card-head">
             <div>
@@ -1670,6 +1697,8 @@ function normalizeSubscriptions(rows){
   const iDays = idx("JOURS_RESTANTS");
   const iAlert = idx("ALERTE");
   const iNotes = idx("NOTES");
+  const iPricePaid = idx("PRIX_PAYE","TARIF_RETENU","TARIF_PAYE","PRIX");
+  const iPaymentMode = idx("MODE_PAIEMENT","PAIEMENT");
 
   return rows.slice(1).map((r,n) => {
     const start = parseDate(cell(r,iStart));
@@ -1695,7 +1724,9 @@ function normalizeSubscriptions(rows){
       status,
       daysRemaining: days,
       alert: cell(r,iAlert) || alertForSubscription(status),
-      notes: cell(r,iNotes)
+      notes: cell(r,iNotes),
+      pricePaid: money(cell(r,iPricePaid)),
+      paymentMode: cell(r,iPaymentMode)
     };
   }).filter(x => x.idClient || x.name || x.formule !== "-");
 }
@@ -1917,7 +1948,13 @@ function renderExecutiveBrief(){
   const activeClients = new Set(state.filtered.map(s => s.idClient || s.phoneKey || normName(s.client))).size;
   const watchSubs = state.subscriptions.filter(s => ["Bientôt expiré","Expiré","Terminé"].includes(s.status)).length;
   const unpaidCommissions = state.commissions.filter(c => normName(c.status) !== "paye").reduce((sum,c) => sum + c.total, 0);
-  el.innerHTML = `<div>${fmtMoney(k.totalPaid)} · ${fmtNum(k.count)} prestations · ${fmtNum(activeClients)} clientes · ${fmtNum(watchSubs)} abonnements à surveiller</div>`;
+  el.innerHTML = `
+    <div class="brief-title">Lecture rapide · ${escapeHtml(periodText)}</div>
+    <div class="brief-line">
+      ${fmtMoney(k.totalPaid)} encaissés · ${fmtNum(k.count)} prestations ·
+      ${fmtNum(activeClients)} clientes actives · ${fmtNum(watchSubs)} abonnements à surveiller ·
+      ${fmtMoney(unpaidCommissions)} commissions non payées.
+    </div>`;
 }
 
 function renderKPIs(){
@@ -2174,18 +2211,22 @@ function renderSubscriptions(){
   const totalSubs = state.subscriptions.length || 1;
   const usableSubs = counts.actif + counts.bientot;
   const attentionSubs = counts.bientot + counts.expire + counts.termine;
+  const subscriptionRevenue = state.subscriptions.reduce((sum,s) => sum + (Number(s.pricePaid) || 0), 0);
   document.getElementById("subscriptionKpis").innerHTML = [
     kpi("Utilisables", fmtNum(usableSubs), "Actifs + bientôt expirés", "check-circle", {variant:"good", progress:usableSubs / totalSubs * 100, chip:`${fmtNum(totalSubs)} total`}),
     kpi("Actifs", fmtNum(counts.actif), "Sans alerte", "badge-check", {variant:"teal", progress:counts.actif / totalSubs * 100}),
     kpi("À surveiller", fmtNum(attentionSubs), "Expirés, terminés ou bientôt", "alert-triangle", {variant:attentionSubs ? "warn" : "good", chip:attentionSubs ? "Action" : "Stable"}),
+    kpi("CA abonnements", fmtMoney(subscriptionRevenue), "Prix payes enregistres", "wallet", {variant:"gold", meta:"ABONNEMENTS"}),
     kpi("Nouveaux ce mois", fmtNum(counts.nouveauxMois), "Souscriptions du mois", "plus-circle", {variant:"plum", meta:"Acquisition"}),
     kpi("Expirés ce mois", fmtNum(counts.expiresMois), "À renouveler", "calendar-x", {variant:counts.expiresMois ? "warn" : "neutral"})
   ].join("");
   renderTable("subscriptionsTable",
-    ["Cliente","Formule","Début","Fin","Jours","Séances","Statut","Alerte"],
+    ["Cliente","Formule","Prix payé","Paiement","Début","Fin","Jours","Séances","Statut","Alerte"],
     data.slice().sort((a,b) => statusWeight(a.status) - statusWeight(b.status) || (a.daysRemaining - b.daysRemaining)).map(s => [
       s.name,
       s.formule,
+      fmtMoney(s.pricePaid),
+      escapeHtml(s.paymentMode || "-"),
       fmtDate(s.start),
       fmtDate(s.end),
       fmtNum(s.daysRemaining),
@@ -2297,7 +2338,7 @@ function renderClientProfile(c){
     .sort((a,b) => (b.start || 0) - (a.start || 0))
     .slice(0,5);
   const subscriptionHistoryHtml = subscriptionHistory.length
-    ? `<table><thead><tr><th>Formule</th><th>Début</th><th>Fin</th><th>Séances</th><th>Statut</th></tr></thead><tbody>${subscriptionHistory.map(s => `<tr><td>${escapeHtml(s.formule)}</td><td>${fmtDate(s.start)}</td><td>${fmtDate(s.end)}</td><td>${fmtNum(s.remaining)} / ${fmtNum(s.included)}</td><td>${subscriptionBadge(s.status)}</td></tr>`).join("")}</tbody></table>`
+    ? `<table><thead><tr><th>Formule</th><th>Prix</th><th>Début</th><th>Fin</th><th>Séances</th><th>Statut</th></tr></thead><tbody>${subscriptionHistory.map(s => `<tr><td>${escapeHtml(s.formule)}</td><td>${fmtMoney(s.pricePaid)}</td><td>${fmtDate(s.start)}</td><td>${fmtDate(s.end)}</td><td>${fmtNum(s.remaining)} / ${fmtNum(s.included)}</td><td>${subscriptionBadge(s.status)}</td></tr>`).join("")}</tbody></table>`
     : empty("Aucun historique d'abonnement");
   box.innerHTML = `
     <div class="profile-grid">
@@ -2306,6 +2347,7 @@ function renderClientProfile(c){
       <div class="metric"><label>Visites</label><strong>${fmtNum(c.visits)}</strong></div>
       <div class="metric"><label>Service favori</label><strong>${escapeHtml(c.favoriteService)}</strong></div>
       <div class="metric"><label>Abonnement</label><strong>${sub ? escapeHtml(sub.formule) : "Aucun"}</strong></div>
+      <div class="metric"><label>Prix abo.</label><strong>${sub ? fmtMoney(sub.pricePaid) : "-"}</strong></div>
       <div class="metric"><label>Statut abo.</label><strong>${sub ? subscriptionBadge(sub.status) : "-"}</strong></div>
       <div class="metric"><label>Jours restants</label><strong>${sub ? fmtNum(sub.daysRemaining) : "-"}</strong></div>
       <div class="metric"><label>Séances restantes</label><strong>${sub ? fmtNum(sub.remaining) : "-"}</strong></div>
@@ -2315,6 +2357,7 @@ function renderClientProfile(c){
         <div class="card-title" style="margin-bottom:12px">Abonnement actif</div>
         <div class="split-list">${sub ? `
           <div class="rank-row"><div><div class="rank-name">${escapeHtml(sub.formule)}</div><div class="rank-meta">${fmtDate(sub.start)} — ${fmtDate(sub.end)}</div></div><div class="rank-val">${subscriptionBadge(sub.status)}</div></div>
+          <div class="rank-row"><div><div class="rank-name">${fmtMoney(sub.pricePaid)}</div><div class="rank-meta">Paiement : ${escapeHtml(sub.paymentMode || "-")}</div></div><div class="rank-val">Abo.</div></div>
           <div class="rank-row"><div><div class="rank-name">${fmtNum(sub.remaining)} séance(s) restante(s)</div><div class="rank-meta">${fmtNum(sub.used)} utilisée(s) sur ${fmtNum(sub.included)}</div></div><div class="rank-val">${fmtNum(sub.daysRemaining)} j</div></div>
         ` : empty("Aucun abonnement actif")}</div>
       </div>
