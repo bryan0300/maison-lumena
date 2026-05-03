@@ -3,904 +3,1159 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Maison Lumena - Pilotage commercial</title>
+<title>Maison Lumena · Pilotage</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
-/* ─── Design System : Soft UI Evolution · Beauty & Wellness Luxe ─── */
+/* ═══════════════════════════════════════════
+   DESIGN SYSTEM — Maison Lumena Dark Luxury
+   ═══════════════════════════════════════════ */
 :root{
-  /* Brand */
-  --plum:#5A1F8C;
-  --plum-2:#7A35B8;
-  --plum-glow:rgba(90,31,140,.14);
-  --gold:#C08F1E;
-  --gold-light:#FFF8E6;
-  --gold-mid:#F4D98A;
-
-  /* Neutrals */
-  --ink:#1C0F2E;
-  --muted:#7B6A94;
-  --soft:#F4F0F8;
-  --soft-warm:#F7F3EF;
-  --panel:#FFFFFF;
-  --line:#EDE5F7;
-  --line-strong:#D9CEEE;
-
-  /* Semantic */
-  --teal:#0A7567;
-  --mint:#E3F7F3;
-  --amber:#A8620A;
-  --amber-bg:#FEF6E4;
-  --coral:#BC3535;
-  --coral-bg:#FFF0F0;
-  --blue:#1D4ED8;
-  --blue-bg:#EBF2FF;
-  --green:#126F42;
-  --green-bg:#E5F7EE;
-
-  /* Shadows – warm-tinted */
-  --shadow:0 2px 8px rgba(90,31,140,.06),0 8px 24px rgba(90,31,140,.08);
-  --shadow-lg:0 4px 16px rgba(90,31,140,.1),0 16px 40px rgba(90,31,140,.1);
-
-  /* Radii */
-  --r-sm:8px;
-  --r-md:12px;
-  --r-lg:16px;
-
-  /* Transitions */
-  --ease:.2s cubic-bezier(.4,0,.2,1);
+  --bg:#09090F;
+  --sidebar:#0D0E17;
+  --surface:#111219;
+  --surface-2:#181924;
+  --surface-3:#1F2030;
+  --bd:rgba(255,255,255,.055);
+  --bd-s:rgba(255,255,255,.11);
+  --gold:#C49A3C;
+  --gold-l:#D4AC52;
+  --gold-dim:rgba(196,154,60,.1);
+  --gold-line:rgba(196,154,60,.28);
+  --t1:#EBE6DC;
+  --t2:rgba(235,230,220,.48);
+  --t3:rgba(235,230,220,.22);
+  --green:#38D387;--green-bg:rgba(56,211,135,.1);
+  --amber:#F5A623;--amber-bg:rgba(245,166,35,.1);
+  --red:#EF6B6B;--red-bg:rgba(239,107,107,.1);
+  --blue:#5B9CF6;--blue-bg:rgba(91,156,246,.1);
+  --teal:#2EC4B6;--teal-bg:rgba(46,196,182,.1);
+  --violet:#9B7CFF;--violet-bg:rgba(155,124,255,.1);
+  --r:10px;--r-lg:16px;--r-sm:6px;
+  --ease:.18s cubic-bezier(.4,0,.2,1);
+  --shadow:0 4px 32px rgba(0,0,0,.55);
+  --shadow-sm:0 2px 12px rgba(0,0,0,.35);
 }
 
 /* ─── Reset ─── */
-*{box-sizing:border-box}
+*{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{
-  margin:0;
-  font-family:"DM Sans",Arial,sans-serif;
-  color:var(--ink);
-  background:var(--soft-warm);
-  font-size:14px;
+  font-family:"Plus Jakarta Sans",sans-serif;
+  background:var(--bg);
+  color:var(--t1);
+  font-size:13.5px;
   line-height:1.55;
-  letter-spacing:-.01em;
   -webkit-font-smoothing:antialiased;
+  min-height:100vh;
 }
-button,input,select{font:inherit;letter-spacing:inherit}
+button,input,select{font:inherit;color:inherit}
 a{color:inherit;text-decoration:none}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
-/* ─── Topbar ─── */
-.shell{min-height:100vh}
-.topbar{
-  height:68px;
-  background:linear-gradient(135deg,#2E0D52 0%,#4A1580 50%,#5A1F8C 100%);
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 28px;
-  position:sticky;
-  top:0;
-  z-index:20;
-  box-shadow:0 4px 24px rgba(46,13,82,.35);
-}
-.topbar::after{
-  content:'';
-  position:absolute;
-  bottom:0;left:0;right:0;
-  height:1px;
-  background:linear-gradient(90deg,rgba(255,255,255,.06),rgba(255,255,255,.18),rgba(255,255,255,.06));
-}
-.brand{display:flex;align-items:center;gap:14px;min-width:220px}
-.logo{
-  width:42px;height:42px;border-radius:10px;
+/* ═══════════════════════════════════════════
+   AUTH WALL
+   ═══════════════════════════════════════════ */
+.auth-wall{
+  position:fixed;inset:0;z-index:9999;
   display:grid;place-items:center;
-  background:linear-gradient(135deg,#E8C547,#C9921E);
-  color:#2E0D52;
-  font-weight:800;font-size:15px;
-  box-shadow:0 2px 8px rgba(200,149,30,.4);
-  font-family:"Lora",serif;
-  letter-spacing:.02em;
+  background:radial-gradient(ellipse 140% 100% at 50% 120%,#1A1030 0%,#09090F 60%);
+  padding:20px;
 }
-.brand h1{
-  margin:0;font-size:16px;line-height:1.15;
-  font-weight:700;font-family:"Lora",serif;
-  letter-spacing:.01em;
+.auth-wall::before{
+  content:'';
+  position:absolute;inset:0;
+  background:
+    radial-gradient(circle 400px at 20% 30%,rgba(196,154,60,.05),transparent),
+    radial-gradient(circle 600px at 80% 70%,rgba(155,124,255,.04),transparent);
+  pointer-events:none;
 }
-.brand span{display:block;font-size:11px;color:rgba(255,255,255,.55);font-weight:500;margin-top:3px;letter-spacing:.02em}
-.top-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.version-label{
-  color:rgba(255,255,255,.62);
-  font-size:11px;
-  font-weight:700;
-  padding:0 4px;
+.auth-card{
+  width:100%;max-width:400px;
+  background:var(--surface);
+  border:1px solid var(--bd-s);
+  border-radius:var(--r-lg);
+  padding:40px 36px;
+  box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 0 1px rgba(196,154,60,.08);
+  position:relative;
+  z-index:1;
 }
-.icon-btn,.link-btn{
-  min-height:36px;
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:var(--r-sm);
-  background:rgba(255,255,255,.08);
-  color:rgba(255,255,255,.9);
-  display:inline-flex;align-items:center;justify-content:center;gap:7px;
-  padding:0 13px;
-  cursor:pointer;
-  transition:var(--ease);
-  font-weight:600;font-size:13px;
-  backdrop-filter:blur(4px);
+.auth-monogram{
+  width:52px;height:52px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-l));
+  border-radius:12px;
+  display:grid;place-items:center;
+  font-family:"Playfair Display",serif;
+  font-weight:700;font-size:20px;
+  color:#0D0E17;
+  margin-bottom:24px;
+  box-shadow:0 4px 20px rgba(196,154,60,.3);
 }
-.icon-btn{width:36px;padding:0}
-.primary-btn{
-  min-height:36px;
-  border:0;border-radius:var(--r-sm);
-  background:linear-gradient(135deg,#E8C547,#C9921E);
-  color:#2E0D52;
-  display:inline-flex;align-items:center;justify-content:center;gap:7px;
-  padding:0 15px;
-  cursor:pointer;
-  transition:var(--ease);
-  font-weight:800;font-size:13px;
-  box-shadow:0 2px 8px rgba(200,149,30,.35);
+.auth-title{
+  font-family:"Playfair Display",serif;
+  font-size:22px;font-weight:600;
+  color:var(--t1);margin-bottom:8px;
 }
-.icon-btn:hover,.link-btn:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.25)}
-.primary-btn:hover{filter:brightness(1.06);box-shadow:0 4px 14px rgba(200,149,30,.5)}
-.icon{width:16px;height:16px;stroke-width:2;flex-shrink:0}
+.auth-sub{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:28px}
+.auth-label{
+  display:block;
+  font-size:10.5px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.08em;
+  color:var(--t3);margin-bottom:8px;
+}
+.auth-input{
+  width:100%;height:44px;
+  background:var(--surface-2);
+  border:1px solid var(--bd-s);
+  border-radius:var(--r);
+  padding:0 14px;
+  color:var(--t1);font-size:14px;
+  outline:none;transition:var(--ease);
+  margin-bottom:16px;
+}
+.auth-input:focus{border-color:var(--gold-line);box-shadow:0 0 0 3px var(--gold-dim)}
+.auth-btn{
+  width:100%;height:44px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-l));
+  border:none;border-radius:var(--r);
+  color:#0D0E17;font-weight:700;font-size:14px;
+  cursor:pointer;transition:var(--ease);
+  box-shadow:0 4px 16px rgba(196,154,60,.25);
+}
+.auth-btn:hover{filter:brightness(1.08);box-shadow:0 6px 24px rgba(196,154,60,.4)}
+.auth-error{display:none;color:var(--red);font-size:12px;font-weight:600;margin-top:12px}
+.auth-error.show{display:block}
+.auth-foot{font-size:11px;color:var(--t3);margin-top:20px;line-height:1.6}
 
-/* ─── Main ─── */
-.main{max-width:1440px;margin:0 auto;padding:24px 28px 48px}
+/* ═══════════════════════════════════════════
+   APP SHELL — SIDEBAR + MAIN
+   ═══════════════════════════════════════════ */
+.shell{display:flex;min-height:100vh}
+.shell.locked{display:none}
 
-/* ─── Status Row ─── */
-.status-row{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:12px;margin-bottom:18px;
+/* ─── Sidebar ─── */
+.sidebar{
+  width:220px;flex-shrink:0;
+  background:var(--sidebar);
+  border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;
+  z-index:10;
+  padding:0;
 }
-.status{
-  display:flex;align-items:center;gap:8px;
-  color:var(--muted);font-size:12px;font-weight:500;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:var(--r-sm);
-  padding:8px 13px;
-  box-shadow:0 1px 4px rgba(90,31,140,.05);
+.sb-brand{
+  padding:24px 20px 20px;
+  border-bottom:1px solid var(--bd);
+  flex-shrink:0;
 }
-.status-dot{
-  width:8px;height:8px;border-radius:50%;
-  background:var(--amber);
-  box-shadow:0 0 0 3px var(--amber-bg);
+.sb-logo{
+  width:36px;height:36px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-l));
+  border-radius:8px;
+  display:grid;place-items:center;
+  font-family:"Playfair Display",serif;
+  font-weight:700;font-size:15px;
+  color:#0D0E17;
+  margin-bottom:12px;
+  box-shadow:0 2px 10px rgba(196,154,60,.2);
 }
-.status.ok .status-dot{background:var(--green);box-shadow:0 0 0 3px var(--green-bg)}
-.status.err .status-dot{background:var(--coral);box-shadow:0 0 0 3px var(--coral-bg)}
-.status.demo .status-dot{background:var(--blue);box-shadow:0 0 0 3px var(--blue-bg)}
-.status.warn .status-dot{background:var(--amber);box-shadow:0 0 0 3px var(--amber-bg)}
-.status-loaded{color:var(--muted);font-weight:700}
-.date-chip{
-  color:var(--muted);font-size:12px;font-weight:500;
-  background:var(--panel);border:1px solid var(--line);
-  border-radius:var(--r-sm);padding:8px 13px;
-  box-shadow:0 1px 4px rgba(90,31,140,.05);
+.sb-name{
+  font-family:"Playfair Display",serif;
+  font-size:14px;font-weight:600;
+  color:var(--t1);line-height:1.2;letter-spacing:.01em;
 }
+.sb-tagline{font-size:10.5px;color:var(--t3);font-weight:400;margin-top:3px;letter-spacing:.02em}
 
-/* ─── Toolbar / Filters ─── */
-.toolbar{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:var(--r-md);
-  padding:16px;
-  display:grid;
-  grid-template-columns:repeat(6,minmax(130px,1fr)) auto;
-  gap:12px;
-  align-items:end;
-  margin-bottom:18px;
-  box-shadow:0 1px 6px rgba(90,31,140,.05);
-}
-.field{display:flex;flex-direction:column;gap:5px}
-.field label{
-  font-size:10.5px;font-weight:700;
-  color:var(--muted);text-transform:uppercase;
-  letter-spacing:.06em;
-}
-.field select,.field input{
-  height:40px;
-  border:1.5px solid var(--line-strong);
-  border-radius:var(--r-sm);
-  background:#fff;
-  color:var(--ink);
-  padding:0 11px;
-  outline:none;
-  transition:var(--ease);
-  font-size:13.5px;
-}
-.field select:focus,.field input:focus{
-  border-color:var(--plum);
-  box-shadow:0 0 0 3px var(--plum-glow);
-}
-.ghost-btn{
-  height:40px;
-  border:1.5px solid var(--line-strong);
-  border-radius:var(--r-sm);
-  background:#fff;color:var(--ink);
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  cursor:pointer;padding:0 14px;font-weight:700;font-size:13px;
-  transition:var(--ease);
-}
-.ghost-btn:hover{
-  background:var(--soft);
-  border-color:var(--plum-2);color:var(--plum);
-}
-
-/* ─── Tabs ─── */
-.tabs{
-  display:flex;gap:3px;align-items:center;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:var(--r-md);
-  padding:5px;
-  width:max-content;max-width:100%;overflow:auto;
-  margin-bottom:18px;
-  box-shadow:0 1px 6px rgba(90,31,140,.05);
+.sb-nav{flex:1;overflow-y:auto;padding:12px 10px}
+.sb-group-label{
+  font-size:9.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--t3);
+  padding:10px 10px 6px;
 }
 .tab{
-  height:38px;border:0;background:transparent;
-  color:var(--muted);font-weight:600;font-size:13px;
-  border-radius:var(--r-sm);
-  padding:0 16px;
-  display:flex;align-items:center;gap:7px;
-  cursor:pointer;white-space:nowrap;
+  width:100%;display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border:none;border-radius:var(--r-sm);
+  background:transparent;color:var(--t2);
+  font-size:13px;font-weight:500;
+  cursor:pointer;text-align:left;
   transition:var(--ease);
+  white-space:nowrap;
+  position:relative;
 }
-.tab:hover{background:var(--soft);color:var(--ink)}
+.tab:hover{background:var(--surface-2);color:var(--t1)}
 .tab.active{
-  background:linear-gradient(135deg,var(--plum),var(--plum-2));
-  color:#fff;
-  box-shadow:0 2px 10px var(--plum-glow);
+  background:var(--gold-dim);
+  color:var(--gold-l);
+  font-weight:600;
 }
-.panel{display:none}
-.panel.active{display:block}
+.tab.active::before{
+  content:'';
+  position:absolute;left:0;top:20%;bottom:20%;
+  width:3px;border-radius:0 3px 3px 0;
+  background:var(--gold);
+  transform:translateX(-10px);
+}
+.tab .icon{width:15px;height:15px;flex-shrink:0;stroke-width:2}
 
-.overview-brief{
-  background:linear-gradient(135deg,#fff,rgba(244,240,248,.86));
-  border:1px solid var(--line);
-  border-left:4px solid var(--gold);
-  border-radius:var(--r-md);
-  box-shadow:var(--shadow);
-  padding:16px 18px;
-  margin-bottom:18px;
-  display:grid;
-  grid-template-columns:minmax(0,1.45fr) minmax(280px,.55fr);
+.sb-bottom{
+  padding:14px 10px;
+  border-top:1px solid var(--bd);
+  flex-shrink:0;
+  display:flex;flex-direction:column;gap:4px;
+}
+.sb-status{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 10px;border-radius:var(--r-sm);
+  font-size:11.5px;color:var(--t2);
+}
+.status-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--amber);
+  box-shadow:0 0 0 3px rgba(245,166,35,.15);
+  flex-shrink:0;
+}
+.status.ok .status-dot{background:var(--green);box-shadow:0 0 0 3px rgba(56,211,135,.15)}
+.status.err .status-dot{background:var(--red);box-shadow:0 0 0 3px rgba(239,107,107,.15)}
+.status.demo .status-dot{background:var(--blue);box-shadow:0 0 0 3px rgba(91,156,246,.15)}
+.status.warn .status-dot{background:var(--amber);box-shadow:0 0 0 3px rgba(245,166,35,.15)}
+#statusText{font-size:11px;color:var(--t2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#statusLoadedAt{font-size:10px;color:var(--t3);white-space:nowrap}
+.sb-logout{
+  width:100%;display:flex;align-items:center;gap:9px;
+  padding:9px 10px;border:none;border-radius:var(--r-sm);
+  background:transparent;color:var(--t3);
+  font-size:12.5px;cursor:pointer;
+  transition:var(--ease);text-align:left;
+}
+.sb-logout:hover{background:var(--red-bg);color:var(--red)}
+.sb-version{font-size:10px;color:var(--t3);padding:4px 10px;letter-spacing:.02em}
+
+/* ─── App Main (right of sidebar) ─── */
+.app-main{flex:1;display:flex;flex-direction:column;min-width:0;overflow-x:hidden}
+
+/* ─── Top Header ─── */
+.topbar{
+  height:54px;
+  background:var(--surface);
+  border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;
+  position:sticky;top:0;z-index:8;
   gap:16px;
-  align-items:center;
+  flex-shrink:0;
 }
-.brief-title{
-  font-family:"Lora",serif;
-  font-weight:700;
-  font-size:16px;
-  margin-bottom:4px;
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar-right{display:flex;align-items:center;gap:6px}
+#currentDate{
+  font-size:12px;color:var(--t2);font-weight:400;
 }
-.brief-text{color:var(--muted);font-size:13px;max-width:980px}
-.brief-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
-.brief-pill{
-  min-height:28px;
-  display:inline-flex;align-items:center;gap:7px;
+.filter-toggle{
+  height:32px;padding:0 12px;
+  display:flex;align-items:center;gap:7px;
+  border:1px solid var(--bd-s);border-radius:var(--r-sm);
+  background:var(--surface-2);color:var(--t2);
+  font-size:12px;font-weight:500;
+  cursor:pointer;transition:var(--ease);
+}
+.filter-toggle:hover{border-color:var(--gold-line);color:var(--t1)}
+.filter-toggle.active{border-color:var(--gold-line);color:var(--gold);background:var(--gold-dim)}
+.top-btn{
+  height:32px;width:32px;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--bd-s);border-radius:var(--r-sm);
+  background:transparent;color:var(--t2);
+  cursor:pointer;transition:var(--ease);
+}
+.top-btn:hover{background:var(--surface-3);color:var(--t1);border-color:var(--bd-s)}
+.top-link{
+  height:32px;padding:0 11px;
+  display:flex;align-items:center;gap:6px;
+  border:1px solid var(--bd-s);border-radius:var(--r-sm);
+  background:transparent;color:var(--t2);
+  font-size:12px;font-weight:500;
+  cursor:pointer;transition:var(--ease);
+}
+.top-link:hover{background:var(--surface-3);color:var(--t1);border-color:var(--bd-s)}
+.top-link-primary{
+  height:32px;padding:0 13px;
+  display:flex;align-items:center;gap:6px;
+  border:none;border-radius:var(--r-sm);
+  background:linear-gradient(135deg,var(--gold),var(--gold-l));
+  color:#0D0E17;font-size:12px;font-weight:700;
+  cursor:pointer;transition:var(--ease);
+  box-shadow:0 2px 8px rgba(196,154,60,.2);
+}
+.top-link-primary:hover{filter:brightness(1.07)}
+.icon{width:14px;height:14px;flex-shrink:0;stroke-width:2}
+.divider{width:1px;height:20px;background:var(--bd-s);margin:0 2px}
+
+/* ─── Filter Drawer ─── */
+.filter-drawer{
+  background:var(--surface);
+  border-bottom:1px solid var(--bd);
+  padding:0 24px;
+  max-height:0;overflow:hidden;
+  transition:max-height .3s cubic-bezier(.4,0,.2,1), padding .3s;
+  flex-shrink:0;
+}
+.filter-drawer.open{max-height:100px;padding:14px 24px}
+.filter-row{
+  display:flex;gap:10px;align-items:flex-end;flex-wrap:nowrap;
+}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.field label{
+  font-size:9.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;
+  color:var(--t3);white-space:nowrap;
+}
+.field select,.field input{
+  height:34px;
+  background:var(--surface-2);
+  border:1px solid var(--bd-s);
+  border-radius:var(--r-sm);
+  color:var(--t1);
   padding:0 10px;
-  border-radius:999px;
-  background:#fff;
-  border:1px solid var(--line);
-  color:var(--ink);
-  font-size:12px;
-  font-weight:800;
+  outline:none;
+  transition:var(--ease);
+  font-size:12.5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.brief-pill.good{background:var(--green-bg);color:var(--green);border-color:rgba(18,111,66,.16)}
-.brief-pill.warn{background:var(--amber-bg);color:var(--amber);border-color:rgba(168,98,10,.18)}
-.brief-pill.plum{background:#F0E6FD;color:var(--plum);border-color:rgba(90,31,140,.16)}
+.field select:focus,.field input:focus{
+  border-color:var(--gold-line);
+  box-shadow:0 0 0 2px var(--gold-dim);
+}
+.field select option{background:#181924;color:var(--t1)}
+.filter-actions{display:flex;align-items:flex-end;gap:6px;flex-shrink:0;padding-bottom:0}
+.ghost-btn{
+  height:34px;padding:0 12px;
+  display:flex;align-items:center;gap:7px;
+  border:1px solid var(--bd-s);border-radius:var(--r-sm);
+  background:var(--surface-2);color:var(--t2);
+  font-size:12.5px;font-weight:500;
+  cursor:pointer;transition:var(--ease);
+  white-space:nowrap;
+}
+.ghost-btn:hover{border-color:var(--bd-s);color:var(--t1);background:var(--surface-3)}
+.ghost-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ─── Content area ─── */
+.app-content{
+  flex:1;
+  padding:24px;
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+
+/* ─── Panels ─── */
+.panel{display:none}
+.panel.active{display:flex;flex-direction:column;gap:18px}
 
 /* ─── KPI Grid ─── */
 .kpis{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(172px,1fr));
-  gap:14px;margin-bottom:18px;
-  align-items:stretch;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;
 }
 .kpi{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:var(--r-md);
-  padding:0 0 12px;
-  min-height:132px;
+  background:var(--surface);
+  border:1px solid var(--bd);
+  border-radius:var(--r);
+  padding:0 0 14px;
   display:flex;flex-direction:column;
   overflow:hidden;
-  box-shadow:var(--shadow);
   transition:var(--ease);
   position:relative;
 }
-.kpi:hover{
-  transform:translateY(-2px);
-  box-shadow:var(--shadow-lg);
-}
-/* Colored top accent bar */
+.kpi:hover{border-color:var(--bd-s);transform:translateY(-1px)}
 .kpi::before{
   content:'';
-  display:block;height:4px;width:100%;
-  background:linear-gradient(90deg,var(--blue),#60a5fa);
-  border-radius:0;
+  display:block;height:3px;width:100%;
+  background:var(--blue);
   flex-shrink:0;
 }
-.kpi--good::before{background:linear-gradient(90deg,var(--green),#34d399)}
-.kpi--warn::before{background:linear-gradient(90deg,var(--amber),#fbbf24)}
-.kpi--danger::before{background:linear-gradient(90deg,var(--coral),#f87171)}
-.kpi--teal::before{background:linear-gradient(90deg,var(--teal),#2dd4bf)}
-.kpi--plum::before{background:linear-gradient(90deg,var(--plum),var(--plum-2))}
-.kpi--gold::before{background:linear-gradient(90deg,var(--gold),var(--gold-mid))}
-.kpi--neutral::before{background:linear-gradient(90deg,#8B7AA5,#CFC4DD)}
-/* Inner content */
-.kpi-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:14px 16px 0}
-.kpi-label{font-size:10.5px;text-transform:uppercase;color:var(--muted);font-weight:800;letter-spacing:.07em;line-height:1.3}
+.kpi--good::before{background:linear-gradient(90deg,var(--green),#6EE7B7)}
+.kpi--warn::before{background:linear-gradient(90deg,var(--amber),#FCD34D)}
+.kpi--danger::before{background:linear-gradient(90deg,var(--red),#FCA5A5)}
+.kpi--teal::before{background:linear-gradient(90deg,var(--teal),#5EEAD4)}
+.kpi--plum::before{background:linear-gradient(90deg,var(--violet),#C4B5FD)}
+.kpi--gold::before{background:linear-gradient(90deg,var(--gold),var(--gold-l))}
+.kpi--neutral::before{background:linear-gradient(90deg,rgba(255,255,255,.15),rgba(255,255,255,.08))}
+.kpi-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:14px 16px 0}
+.kpi-label{
+  font-size:10.5px;text-transform:uppercase;
+  color:var(--t3);font-weight:700;letter-spacing:.08em;line-height:1.3;
+}
 .kpi-ico{
-  width:36px;height:36px;border-radius:10px;
+  width:32px;height:32px;border-radius:8px;
   display:grid;place-items:center;flex-shrink:0;
   background:var(--blue-bg);color:var(--blue);
 }
+.kpi-ico .icon{width:15px;height:15px}
 .kpi--good .kpi-ico{background:var(--green-bg);color:var(--green)}
 .kpi--warn .kpi-ico{background:var(--amber-bg);color:var(--amber)}
-.kpi--danger .kpi-ico{background:var(--coral-bg);color:var(--coral)}
-.kpi--teal .kpi-ico{background:var(--mint);color:var(--teal)}
-.kpi--plum .kpi-ico{background:#F0E6FD;color:var(--plum)}
-.kpi--gold .kpi-ico{background:var(--gold-light);color:var(--gold)}
-.kpi--neutral .kpi-ico{background:var(--soft);color:var(--muted)}
+.kpi--danger .kpi-ico{background:var(--red-bg);color:var(--red)}
+.kpi--teal .kpi-ico{background:var(--teal-bg);color:var(--teal)}
+.kpi--plum .kpi-ico{background:var(--violet-bg);color:var(--violet)}
+.kpi--gold .kpi-ico{background:var(--gold-dim);color:var(--gold-l)}
+.kpi--neutral .kpi-ico{background:rgba(255,255,255,.05);color:var(--t2)}
 .kpi-value{
-  font-size:23px;line-height:1.08;font-weight:800;
+  font-family:"Playfair Display",serif;
+  font-size:21px;line-height:1.1;
+  font-weight:600;
   padding:10px 16px 0;
-  font-feature-settings:"tnum";
+  letter-spacing:-.01em;
+  color:var(--t1);
   overflow-wrap:anywhere;
 }
-.kpi-note{font-size:11.5px;color:var(--muted);padding:4px 16px 0;font-weight:600;min-height:22px}
+.kpi-note{font-size:11px;color:var(--t3);padding:4px 16px 0;font-weight:500;min-height:18px}
 .kpi-meta{
-  margin:9px 16px 0;
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  color:var(--muted);font-size:11px;font-weight:700;
+  margin:8px 16px 0;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  color:var(--t3);font-size:10.5px;font-weight:600;
 }
 .kpi-chip{
-  display:inline-flex;align-items:center;gap:5px;
-  min-height:22px;padding:0 8px;border-radius:999px;
-  background:var(--soft);color:var(--muted);
+  display:inline-flex;align-items:center;gap:4px;
+  min-height:20px;padding:0 8px;border-radius:999px;
+  background:rgba(255,255,255,.06);color:var(--t2);
+  font-size:10.5px;font-weight:600;
 }
 .kpi--good .kpi-chip{background:var(--green-bg);color:var(--green)}
 .kpi--warn .kpi-chip{background:var(--amber-bg);color:var(--amber)}
-.kpi--danger .kpi-chip{background:var(--coral-bg);color:var(--coral)}
+.kpi--danger .kpi-chip{background:var(--red-bg);color:var(--red)}
 .kpi-progress{
-  height:6px;margin:10px 16px 0;
-  background:var(--soft);border-radius:999px;overflow:hidden;
+  height:3px;margin:10px 16px 0;
+  background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden;
 }
 .kpi-progress span{
   display:block;height:100%;width:0;
-  background:linear-gradient(90deg,var(--plum),var(--plum-2));
-  border-radius:inherit;
+  background:var(--blue);
+  border-radius:inherit;transition:width .5s cubic-bezier(.4,0,.2,1);
 }
-.kpi--good .kpi-progress span{background:linear-gradient(90deg,var(--green),#34d399)}
-.kpi--warn .kpi-progress span{background:linear-gradient(90deg,var(--amber),#fbbf24)}
-.kpi--danger .kpi-progress span{background:linear-gradient(90deg,var(--coral),#f87171)}
-.kpi--teal .kpi-progress span{background:linear-gradient(90deg,var(--teal),#2dd4bf)}
-.kpi--gold .kpi-progress span{background:linear-gradient(90deg,var(--gold),var(--gold-mid))}
-
-/* ─── Layout Grids ─── */
-.grid-2{display:grid;grid-template-columns:1.3fr .7fr;gap:16px;margin-bottom:16px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
+.kpi--good .kpi-progress span{background:var(--green)}
+.kpi--warn .kpi-progress span{background:var(--amber)}
+.kpi--danger .kpi-progress span{background:var(--red)}
+.kpi--teal .kpi-progress span{background:var(--teal)}
+.kpi--gold .kpi-progress span{background:var(--gold)}
 
 /* ─── Cards ─── */
 .card{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:var(--r-md);
-  box-shadow:var(--shadow);
+  background:var(--surface);
+  border:1px solid var(--bd);
+  border-radius:var(--r);
   overflow:hidden;
 }
 .card-head{
-  min-height:56px;
-  padding:16px 18px;
-  border-bottom:1px solid var(--line);
+  padding:16px 18px 14px;
+  border-bottom:1px solid var(--bd);
   display:flex;align-items:center;justify-content:space-between;gap:12px;
-  background:linear-gradient(180deg,#fff,rgba(244,240,248,.3));
 }
 .card-title{
-  font-weight:700;font-size:14px;
-  font-family:"Lora",serif;color:var(--ink);
+  font-family:"Playfair Display",serif;
+  font-size:14px;font-weight:600;
+  color:var(--t1);letter-spacing:.01em;
 }
-.card-sub{font-size:12px;color:var(--muted);margin-top:3px;font-weight:400}
+.card-sub{font-size:11.5px;color:var(--t3);margin-top:3px;font-weight:400}
 .card-body{padding:18px}
-.chart-box{height:286px;position:relative}
-.chart-box.sm{height:235px}
 
-/* ─── Rank / Split Lists ─── */
-.split-list{display:flex;flex-direction:column;gap:10px}
+/* ─── Charts ─── */
+.chart-box{height:260px;position:relative}
+.chart-box.tall{height:200px}
+.chart-box.sm{height:220px}
+
+/* ─── Layout grids ─── */
+.grid-2{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+.grid-2-equal{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+
+/* ─── Split / rank lists ─── */
+.split-list{display:flex;flex-direction:column;gap:0}
 .rank-row{
   display:grid;grid-template-columns:1fr auto;gap:10px;
   align-items:center;
-  padding-bottom:11px;
-  border-bottom:1px solid var(--line);
+  padding:11px 0;
+  border-bottom:1px solid var(--bd);
 }
-.rank-row:last-child{border-bottom:0;padding-bottom:0}
-.rank-name{font-weight:700;font-size:13.5px}
-.rank-meta{font-size:11.5px;color:var(--muted);margin-top:2px}
-.rank-val{font-weight:800;text-align:right;font-feature-settings:"tnum";font-size:13.5px}
-
-/* ─── Progress ─── */
-.progress{
-  height:7px;background:var(--line);
-  border-radius:999px;overflow:hidden;margin-top:9px;
-}
-.progress span{
-  display:block;height:100%;border-radius:999px;
-  background:linear-gradient(90deg,var(--teal),#34d399);
-  transition:width .5s cubic-bezier(.4,0,.2,1);
-}
+.rank-row:last-child{border-bottom:0}
+.rank-name{font-weight:600;font-size:13px;color:var(--t1)}
+.rank-meta{font-size:11px;color:var(--t3);margin-top:2px;font-weight:400}
+.rank-val{font-weight:700;text-align:right;font-size:13px;color:var(--t1);white-space:nowrap}
+.progress{height:4px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden;margin-top:8px}
+.progress span{display:block;height:100%;border-radius:999px;background:var(--teal);transition:width .5s ease}
 
 /* ─── Tables ─── */
-.table-wrap{overflow:auto}
-table{width:100%;border-collapse:collapse;min-width:760px}
-th,td{padding:13px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th,td{padding:12px 14px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:middle}
 th{
-  font-size:10.5px;text-transform:uppercase;
-  color:var(--muted);background:#FAF7FE;
-  font-weight:700;letter-spacing:.06em;
+  font-size:10px;text-transform:uppercase;
+  color:var(--t3);background:var(--surface-2);
+  font-weight:700;letter-spacing:.08em;
+  position:sticky;top:0;z-index:1;
+  white-space:nowrap;
 }
-td{font-size:13px}
+td{font-size:12.5px;color:var(--t2)}
+td:first-child{color:var(--t1);font-weight:500}
 tbody tr{transition:background var(--ease)}
-tbody tr:hover td{background:#F7F2FC}
+tbody tr:hover td{background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:0}
 
-/* ─── Pills / Badges ─── */
+/* ─── Pills ─── */
 .pill{
   display:inline-flex;align-items:center;
-  min-height:22px;padding:0 10px;border-radius:999px;
-  font-size:11px;font-weight:700;letter-spacing:.02em;
+  min-height:20px;padding:0 9px;border-radius:999px;
+  font-size:10.5px;font-weight:700;letter-spacing:.02em;
+  white-space:nowrap;
 }
 .pill.paye{background:var(--green-bg);color:var(--green)}
 .pill.attente{background:var(--amber-bg);color:var(--amber)}
 .pill.encours{background:var(--blue-bg);color:var(--blue)}
 .pill.sub-actif{background:var(--green-bg);color:var(--green)}
 .pill.sub-bientot{background:var(--amber-bg);color:var(--amber)}
-.pill.sub-expire{background:var(--coral-bg);color:var(--coral)}
-.pill.sub-termine{background:#EEF2F6;color:#667085}
+.pill.sub-expire{background:var(--red-bg);color:var(--red)}
+.pill.sub-termine{background:rgba(255,255,255,.06);color:var(--t2)}
 .pill.sub-suspendu{background:var(--blue-bg);color:var(--blue)}
 .pill.com-paid{background:var(--green-bg);color:var(--green)}
 .pill.com-unpaid{background:var(--amber-bg);color:var(--amber)}
 .pill.com-pending{background:var(--blue-bg);color:var(--blue)}
-.pill.gold{
-  background:linear-gradient(135deg,#FFF8D6,#FEF0A0);
-  color:#7A4A00;border:1px solid var(--gold-mid);
-}
-.pill.silver{background:#EDF2F7;color:#475569;border:1px solid #CBD5E1}
-.pill.bronze{background:#FFF0E8;color:#9A3412;border:1px solid #FDBA74}
+.pill.gold{background:rgba(196,154,60,.15);color:var(--gold-l);border:1px solid var(--gold-line)}
+.pill.silver{background:rgba(255,255,255,.08);color:var(--t2)}
+.pill.bronze{background:rgba(239,107,107,.1);color:#F4A261}
 
 /* ─── Client Layout ─── */
-.client-layout{display:grid;grid-template-columns:320px 1fr;gap:16px}
-.client-list{max-height:680px;overflow:auto}
+.client-layout{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
+.client-list{max-height:600px;overflow-y:auto;display:flex;flex-direction:column}
 .client-item{
-  display:block;width:100%;
-  border:0;border-bottom:1px solid var(--line);
-  background:#fff;padding:14px 16px;
+  display:flex;flex-direction:column;
+  border:none;border-bottom:1px solid var(--bd);
+  background:transparent;padding:12px 16px;
   text-align:left;cursor:pointer;
   transition:background var(--ease);
 }
-.client-item:hover{background:var(--soft)}
+.client-item:hover{background:var(--surface-2)}
 .client-item.active{
-  background:linear-gradient(135deg,#F0E6FD,#F7F2FC);
-  border-left:3px solid var(--plum);
-  padding-left:13px;
+  background:var(--gold-dim);
+  border-left:2px solid var(--gold);
+  padding-left:14px;
 }
-.client-name{font-weight:700;font-size:13.5px}
-.client-mini{font-size:12px;color:var(--muted);margin-top:3px}
+.client-name{font-weight:600;font-size:13px;color:var(--t1)}
+.client-mini{font-size:11px;color:var(--t3);margin-top:3px}
 
 /* ─── Profile ─── */
-.profile-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-.metric{
-  border:1px solid var(--line);border-radius:var(--r-md);
-  padding:14px;background:#fff;
-  transition:var(--ease);
+.profile-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:10px;margin-bottom:16px;
 }
-.metric:hover{box-shadow:0 2px 10px var(--plum-glow);border-color:var(--plum-2)}
-.metric label{font-size:10.5px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em}
-.metric strong{display:block;font-size:19px;margin-top:7px;font-weight:800;color:var(--ink)}
+.metric{
+  border:1px solid var(--bd);border-radius:var(--r);
+  padding:12px 14px;background:var(--surface-2);
+}
+.metric label{font-size:9.5px;color:var(--t3);text-transform:uppercase;font-weight:700;letter-spacing:.07em}
+.metric strong{display:block;font-size:15px;margin-top:6px;font-weight:700;color:var(--t1)}
 
 /* ─── Timeline ─── */
-.timeline{display:flex;flex-direction:column;gap:10px}
+.timeline{display:flex;flex-direction:column;gap:0}
 .event{
-  display:grid;grid-template-columns:80px 1fr auto;gap:12px;align-items:center;
-  border-bottom:1px solid var(--line);padding-bottom:11px;
+  display:grid;grid-template-columns:70px 1fr auto;gap:12px;align-items:center;
+  border-bottom:1px solid var(--bd);padding:11px 0;
 }
 .event:last-child{border-bottom:0}
-.event-date{font-size:11.5px;color:var(--muted);font-weight:500}
-.event-title{font-weight:700;font-size:13.5px}
-.event-sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+.event-date{font-size:11px;color:var(--t3);font-weight:500}
+.event-title{font-weight:600;font-size:13px;color:var(--t1)}
+.event-sub{font-size:11px;color:var(--t3);margin-top:2px}
 
 /* ─── Goals ─── */
-.goal-board{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
+.goal-board{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .goal-card{padding:18px}
-.goal-input{display:flex;gap:8px;margin-top:12px}
+.goal-card .card-title{font-family:"Playfair Display",serif;font-size:14px;font-weight:600;color:var(--t1)}
+.goal-card .card-sub{font-size:11.5px;color:var(--t3);margin-top:4px}
+.goal-input{display:flex;gap:8px;margin-top:14px}
 .goal-input input{
-  min-width:0;flex:1;height:40px;
-  border:1.5px solid var(--line-strong);
-  border-radius:var(--r-sm);padding:0 11px;
-  outline:none;transition:var(--ease);
+  min-width:0;flex:1;height:36px;
+  background:var(--surface-2);
+  border:1px solid var(--bd-s);
+  border-radius:var(--r-sm);padding:0 10px;
+  outline:none;transition:var(--ease);color:var(--t1);font-size:13px;
 }
-.goal-input input:focus{border-color:var(--plum);box-shadow:0 0 0 3px var(--plum-glow)}
+.goal-input input:focus{border-color:var(--gold-line);box-shadow:0 0 0 2px var(--gold-dim)}
 .goal-table input{
-  width:118px;height:36px;
-  border:1.5px solid var(--line-strong);
-  border-radius:var(--r-sm);
-  padding:0 10px;
-  outline:none;
-  font:inherit;
+  width:100px;height:32px;
+  background:var(--surface-2);
+  border:1px solid var(--bd-s);
+  border-radius:var(--r-sm);padding:0 8px;
+  outline:none;font-size:12px;color:var(--t1);
 }
-.goal-table input:focus{border-color:var(--plum);box-shadow:0 0 0 3px var(--plum-glow)}
-.goal-meter{min-width:150px}
-.goal-meter + .goal-meter{margin-top:8px}
+.goal-meter{min-width:130px}
+.goal-meter+.goal-meter{margin-top:6px}
 .goal-meter .rank-meta{display:flex;justify-content:space-between;gap:8px}
+
+/* ─── Employee / Service Goal Cards ─── */
+.goal-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.goal-person-card{
+  background:var(--surface-2);
+  border:1px solid var(--bd);
+  border-radius:var(--r);
+  padding:16px;
+  display:flex;flex-direction:column;gap:12px;
+  transition:var(--ease);
+}
+.goal-person-card:hover{border-color:var(--bd-s)}
+.goal-person-card.editing{border-color:var(--gold-line);background:var(--gold-dim)}
+.gpc-head{display:flex;align-items:center;gap:10px}
+.gpc-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--violet),var(--blue));
+  display:grid;place-items:center;
+  font-size:14px;font-weight:700;color:#fff;
+  flex-shrink:0;letter-spacing:.01em;
+}
+.gpc-name{font-weight:700;font-size:14px;color:var(--t1)}
+.gpc-role{font-size:11px;color:var(--t3);margin-top:2px}
+.gpc-metrics{display:flex;flex-direction:column;gap:8px}
+.gpc-metric{display:flex;flex-direction:column;gap:4px}
+.gpc-metric-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.gpc-metric-label{font-size:10.5px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.07em}
+.gpc-metric-vals{display:flex;align-items:baseline;gap:5px}
+.gpc-val{font-size:13px;font-weight:700;color:var(--t1)}
+.gpc-target{font-size:11px;color:var(--t3);font-weight:400}
+.gpc-pct{
+  font-size:11px;font-weight:700;padding:1px 7px;
+  border-radius:999px;
+  background:var(--green-bg);color:var(--green);
+}
+.gpc-pct.warn{background:var(--amber-bg);color:var(--amber)}
+.gpc-pct.danger{background:var(--red-bg);color:var(--red)}
+.gpc-pct.neutral{background:rgba(255,255,255,.06);color:var(--t3)}
+.gpc-bar{height:5px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}
+.gpc-bar span{display:block;height:100%;border-radius:999px;background:var(--green);transition:width .5s ease}
+.gpc-bar span.warn{background:var(--amber)}
+.gpc-bar span.danger{background:var(--red)}
+.gpc-inputs{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  padding-top:10px;border-top:1px solid var(--bd);
+}
+.gpc-input-group{display:flex;flex-direction:column;gap:4px}
+.gpc-input-group label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3)}
+.gpc-input-group input{
+  height:32px;width:100%;
+  background:var(--surface-3);
+  border:1px solid var(--bd-s);
+  border-radius:var(--r-sm);padding:0 9px;
+  outline:none;font-size:12.5px;color:var(--t1);
+  transition:var(--ease);
+}
+.gpc-input-group input:focus{border-color:var(--gold-line);background:rgba(196,154,60,.06)}
+.gpc-save{
+  width:100%;height:32px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-l));
+  border:none;border-radius:var(--r-sm);
+  color:#0D0E17;font-size:12px;font-weight:700;
+  cursor:pointer;transition:var(--ease);
+  box-shadow:0 2px 8px rgba(196,154,60,.15);
+}
+.gpc-save:hover{filter:brightness(1.08)}
+
+/* ─── Service goal rows ─── */
+.svc-goal-list{display:flex;flex-direction:column;gap:0}
+.svc-goal-row{
+  display:grid;
+  grid-template-columns:minmax(160px,1fr) 120px 120px 1fr 120px 60px;
+  gap:12px;align-items:center;
+  padding:13px 16px;
+  border-bottom:1px solid var(--bd);
+  transition:background var(--ease);
+}
+.svc-goal-row:last-child{border-bottom:0}
+.svc-goal-row:hover{background:var(--surface-2)}
+.svc-goal-row.header{
+  padding:10px 16px 8px;
+  border-bottom:1px solid var(--bd-s);
+  background:var(--surface-2);
+}
+.svc-goal-row.header span{
+  font-size:9.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--t3);
+}
+.svc-name{font-weight:600;font-size:13px;color:var(--t1)}
+.svc-ca{font-size:13px;color:var(--t1);font-weight:500;font-feature-settings:"tnum"}
+.svc-input{
+  height:32px;width:100%;
+  background:var(--surface-3);
+  border:1px solid var(--bd-s);
+  border-radius:var(--r-sm);padding:0 9px;
+  outline:none;font-size:12px;color:var(--t1);
+  transition:var(--ease);
+}
+.svc-input:focus{border-color:var(--gold-line);background:rgba(196,154,60,.06)}
+.svc-progress-cell{display:flex;flex-direction:column;gap:4px}
+.svc-progress-info{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.svc-progress-pct{font-size:11px;font-weight:700}
+.svc-progress-pct.good{color:var(--green)}
+.svc-progress-pct.warn{color:var(--amber)}
+.svc-progress-pct.danger{color:var(--red)}
+.svc-save-btn{
+  height:32px;padding:0 10px;
+  background:var(--surface-3);
+  border:1px solid var(--bd-s);border-radius:var(--r-sm);
+  color:var(--gold);font-size:12px;font-weight:700;
+  cursor:pointer;transition:var(--ease);
+  white-space:nowrap;
+}
+.svc-save-btn:hover{background:var(--gold-dim);border-color:var(--gold-line)}
 
 /* ─── Empty state ─── */
 .empty{
-  padding:32px;text-align:center;color:var(--muted);
-  font-size:13px;font-style:italic;
+  padding:32px 20px;text-align:center;
+  color:var(--t3);font-size:12.5px;font-style:italic;
 }
 
-/* ─── Auth Wall ─── */
-.auth-wall{
-  position:fixed;inset:0;z-index:999;
-  display:grid;place-items:center;padding:20px;
-  background:radial-gradient(ellipse at 30% 40%,#3B0E72,#1C0838 70%);
-  color:#fff;
-}
-.auth-panel{
-  width:100%;max-width:420px;
-  background:#fff;color:var(--ink);
-  border-radius:var(--r-lg);
-  box-shadow:0 32px 80px rgba(0,0,0,.4);
-  padding:32px;
-}
-.auth-panel .logo{
-  width:48px;height:48px;border-radius:12px;
-  display:grid;place-items:center;
-  background:linear-gradient(135deg,#E8C547,#C9921E);
-  color:#2E0D52;font-weight:800;font-size:16px;
-  font-family:"Lora",serif;
-  box-shadow:0 4px 14px rgba(200,149,30,.35);
-  margin-bottom:20px;
-}
-.auth-panel h2{margin:0;font-size:22px;font-family:"Lora",serif;color:var(--ink)}
-.auth-panel p{margin:8px 0 22px;color:var(--muted);line-height:1.6;font-size:13.5px}
-.auth-form{display:flex;flex-direction:column;gap:13px}
-.auth-form label{font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.06em}
-.auth-form input{
-  height:44px;
-  border:1.5px solid var(--line-strong);
-  border-radius:var(--r-sm);
-  padding:0 13px;outline:none;transition:var(--ease);font-size:14px;
-}
-.auth-form input:focus{border-color:var(--plum);box-shadow:0 0 0 3px var(--plum-glow)}
-.auth-submit{
-  height:44px;border:0;border-radius:var(--r-sm);
-  background:linear-gradient(135deg,var(--plum),var(--plum-2));
-  color:#fff;font-weight:700;font-size:14px;
-  cursor:pointer;transition:var(--ease);
-  box-shadow:0 3px 12px var(--plum-glow);
-}
-.auth-submit:hover{filter:brightness(1.08);box-shadow:0 6px 20px rgba(90,31,140,.3)}
-.auth-error{display:none;color:var(--coral);font-size:12px;font-weight:700}
-.auth-error.show{display:block}
-.auth-note{font-size:11px;color:var(--muted);margin-top:18px;line-height:1.6}
-.shell.locked{display:none}
-.mobile-only{display:none}
+/* ─── Overview brief (hidden) ─── */
+#overviewBrief{display:none}
+
+/* ─── Section hidden from nav but kept in DOM ─── */
+/* #services is never made .active so stays display:none */
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:999px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.18)}
 
 /* ─── Responsive ─── */
-@media(max-width:1120px){
-  .toolbar{grid-template-columns:repeat(3,1fr)}
-  .overview-brief{grid-template-columns:1fr}
-  .brief-pills{justify-content:flex-start}
-  .kpis{grid-template-columns:repeat(3,1fr)}
-  .grid-2,.grid-3,.goal-board{grid-template-columns:1fr}
-  .client-layout{grid-template-columns:1fr}
+@media(max-width:1100px){
+  .sidebar{width:180px}
+  .grid-2,.grid-2-equal{grid-template-columns:1fr}
+  .grid-3{grid-template-columns:repeat(2,1fr)}
   .profile-grid{grid-template-columns:repeat(2,1fr)}
+  .client-layout{grid-template-columns:240px 1fr}
 }
-@media(max-width:720px){
-  .topbar{height:auto;min-height:68px;padding:12px 16px;align-items:flex-start;flex-direction:column;gap:10px}
-  .top-actions{justify-content:flex-start}
-  .main{padding:16px 14px 36px}
-  .status-row{align-items:flex-start;flex-direction:column}
-  .overview-brief{padding:14px}
-  .brief-pills{gap:6px}
-  .toolbar{grid-template-columns:1fr}
-  .kpis{grid-template-columns:1fr}
-  .tabs{width:100%}
-  .profile-grid{grid-template-columns:1fr}
-  .event{grid-template-columns:1fr}
-  .link-label{display:none}
+@media(max-width:760px){
+  .sidebar{display:none}
+  .topbar{padding:0 16px}
+  .app-content{padding:16px}
+  .grid-3{grid-template-columns:1fr}
+  .goal-board{grid-template-columns:1fr}
+  .client-layout{grid-template-columns:1fr}
+  .filter-row{flex-wrap:wrap}
+  .kpis{grid-template-columns:repeat(2,1fr)}
 }
 </style>
 </head>
 <body>
+
+<!-- ══════════════════════════════════════════
+     AUTH WALL
+     ══════════════════════════════════════════ -->
 <section id="authWall" class="auth-wall" aria-label="Connexion">
-  <div class="auth-panel">
-    <div class="logo">ML</div>
-    <h2>Acces reserve</h2>
-    <p>Connectez-vous pour afficher les indicateurs commerciaux et le suivi client Maison Lumena.</p>
-    <form id="authForm" class="auth-form">
-      <label for="authPassword">Mot de passe</label>
-      <input id="authPassword" type="password" autocomplete="current-password" placeholder="Mot de passe">
-      <button class="auth-submit" type="submit">Entrer</button>
-      <div id="authError" class="auth-error">Mot de passe incorrect.</div>
+  <div class="auth-card">
+    <div class="auth-monogram">ML</div>
+    <div class="auth-title">Accès réservé</div>
+    <div class="auth-sub">Connectez-vous pour accéder aux indicateurs commerciaux et au suivi client de Maison Lumena.</div>
+    <form id="authForm">
+      <label class="auth-label" for="authPassword">Mot de passe</label>
+      <input class="auth-input" id="authPassword" type="password" autocomplete="current-password" placeholder="••••••••">
+      <button class="auth-btn" type="submit">Accéder au tableau de bord</button>
+      <div id="authError" class="auth-error"></div>
     </form>
-    <div class="auth-note">Authentification securisee via Apps Script Web App.</div>
+    <div class="auth-foot">Authentification sécurisée via Apps Script Web App. Vos données ne sont jamais stockées dans le navigateur.</div>
   </div>
 </section>
 
+<!-- ══════════════════════════════════════════
+     APP SHELL
+     ══════════════════════════════════════════ -->
 <div id="appShell" class="shell locked">
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">ML</div>
-      <div>
-        <h1>Maison Lumena</h1>
-        <span>Pilotage commercial et suivi client</span>
-      </div>
-    </div>
-    <div class="top-actions">
-      <a class="link-btn" href="https://docs.google.com/spreadsheets/d/18O-Eldm9kXzKEtts1TAzVvHXFYcceht0ClZXkIM5BMg/edit" target="_blank" rel="noreferrer"><i data-lucide="table-2" class="icon"></i><span class="link-label">Sheets</span></a>
-      <a class="link-btn" href="https://docs.google.com/forms/d/e/1FAIpQLScrmxE5iE2sapEjrCdMbEgWBc2Po5Dm4zg9gCRKBfT1Y9et6A/viewform" target="_blank" rel="noreferrer"><i data-lucide="user-plus" class="icon"></i><span class="link-label">Client</span></a>
-      <a class="primary-btn" href="https://docs.google.com/forms/d/e/1FAIpQLScQh_40U3eej77yrj2mLrrzbtqFGkpMnM9GYETYM27hFQvzng/viewform" target="_blank" rel="noreferrer"><i data-lucide="clipboard-list" class="icon"></i><span class="link-label">Visite</span></a>
-      <!-- [FIX-ARCHI-4] Version script lue depuis CONFIG. -->
-      <span id="appVersion" class="version-label"></span>
-      <button class="icon-btn" id="reloadBtn" title="Actualiser"><i data-lucide="refresh-cw" class="icon"></i></button>
-      <button class="icon-btn" id="logoutBtn" title="Verrouiller"><i data-lucide="log-out" class="icon"></i></button>
-    </div>
-  </header>
 
-  <main class="main">
-    <div class="status-row">
-      <!-- [FIX-ARCHI-4] Fraicheur du dernier chargement affichee dans la barre de statut. -->
-      <div id="status" class="status"><span class="status-dot"></span><span id="statusText">Connexion aux donnees...</span><span id="statusLoadedAt" class="status-loaded"></span></div>
-      <div id="currentDate" class="date-chip"></div>
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">ML</div>
+      <div class="sb-name">Maison Lumena</div>
+      <div class="sb-tagline">Pilotage commercial</div>
     </div>
 
-    <section class="toolbar" aria-label="Filtres">
-      <div class="field">
-        <label for="periodFilter">Periode</label>
-        <select id="periodFilter">
-          <option value="month">Mois en cours</option>
-          <option value="today">Aujourd'hui</option>
-          <option value="7">7 derniers jours</option>
-          <option value="30">30 derniers jours</option>
-          <option value="90">90 derniers jours</option>
-          <option value="all">Tout</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="serviceFilter">Service</label>
-        <select id="serviceFilter"><option value="all">Tous les services</option></select>
-      </div>
-      <div class="field">
-        <label for="employeeFilter">Equipe</label>
-        <select id="employeeFilter"><option value="all">Toute l'equipe</option></select>
-      </div>
-      <div class="field">
-        <label for="statusFilter">Statut</label>
-        <select id="statusFilter">
-          <option value="all">Tous</option>
-          <option value="Paye">Paye</option>
-          <option value="A payer">A payer</option>
-          <option value="En cours">En cours</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="abonnementFilter">Abonnements</label>
-        <select id="abonnementFilter">
-          <option value="all">Tous les abonnements</option>
-          <option value="Actif">Actifs</option>
-          <option value="Bientôt expiré">Bientôt expirés</option>
-          <option value="Expiré">Expirés</option>
-          <option value="Terminé">Terminés</option>
-        </select>
-      </div>
-      <!-- [FIX-ABO-HTML-2] Filtre dédié aux formules d'abonnement. -->
-      <div class="field">
-        <label for="formuleFilter">Formule</label>
-        <select id="formuleFilter"><option value="all">Toutes les formules</option></select>
-      </div>
-      <div class="field">
-        <label for="searchInput">Recherche client</label>
-        <input id="searchInput" type="search" placeholder="Nom, telephone, objectif">
-      </div>
-      <button class="ghost-btn" id="exportBtn"><i data-lucide="download" class="icon"></i>CSV</button>
-    </section>
-
-    <nav class="tabs" aria-label="Navigation">
-      <button class="tab active" data-tab="overview"><i data-lucide="layout-dashboard" class="icon"></i>Pilotage</button>
-      <button class="tab" data-tab="sales"><i data-lucide="trending-up" class="icon"></i>Ventes</button>
-      <button class="tab" data-tab="services"><i data-lucide="sparkles" class="icon"></i>Services</button>
-      <button class="tab" data-tab="clients"><i data-lucide="users" class="icon"></i>Clients</button>
-      <button class="tab" data-tab="subscriptions"><i data-lucide="calendar-check" class="icon"></i>Abonnements</button>
-      <button class="tab" data-tab="commissions"><i data-lucide="badge-dollar-sign" class="icon"></i>Commissions</button>
-      <button class="tab" data-tab="goals"><i data-lucide="target" class="icon"></i>Objectifs</button>
+    <nav class="sb-nav" aria-label="Navigation principale">
+      <div class="sb-group-label">Analyse</div>
+      <button class="tab active" data-tab="overview">
+        <i data-lucide="layout-dashboard" class="icon"></i>Tableau de bord
+      </button>
+      <button class="tab" data-tab="sales">
+        <i data-lucide="trending-up" class="icon"></i>Ventes
+      </button>
+      <div class="sb-group-label">Gestion</div>
+      <button class="tab" data-tab="clients">
+        <i data-lucide="users" class="icon"></i>Clientes
+      </button>
+      <button class="tab" data-tab="subscriptions">
+        <i data-lucide="calendar-check" class="icon"></i>Abonnements
+      </button>
+      <button class="tab" data-tab="commissions">
+        <i data-lucide="wallet" class="icon"></i>Commissions
+      </button>
+      <div class="sb-group-label">Objectifs</div>
+      <button class="tab" data-tab="goals">
+        <i data-lucide="target" class="icon"></i>Objectifs
+      </button>
     </nav>
 
-    <section id="overview" class="panel active">
-      <div class="overview-brief" id="overviewBrief"></div>
-      <div class="kpis" id="kpiGrid"></div>
-      <div class="grid-2">
-        <article class="card">
-          <div class="card-head"><div><div class="card-title">Evolution du chiffre d'affaires</div><div class="card-sub">CA paye par jour sur la periode filtree</div></div></div>
-          <div class="card-body"><div class="chart-box"><canvas id="revenueChart"></canvas></div></div>
-        </article>
-        <article class="card">
-          <div class="card-head"><div><div class="card-title">Statuts de paiement</div><div class="card-sub">Repartition des prestations</div></div></div>
-          <div class="card-body"><div class="chart-box"><canvas id="statusChart"></canvas></div></div>
-        </article>
+    <div class="sb-bottom">
+      <div id="status" class="status sb-status">
+        <span class="status-dot"></span>
+        <span id="statusText">Chargement…</span>
       </div>
-      <div class="grid-3">
-        <article class="card">
-          <div class="card-head"><div><div class="card-title">Top services</div><div class="card-sub">Contribution au CA paye</div></div></div>
-          <div class="card-body"><div id="topServices" class="split-list"></div></div>
-        </article>
-        <article class="card">
-          <div class="card-head"><div><div class="card-title">Performance equipe</div><div class="card-sub">CA paye par employee</div></div></div>
-          <div class="card-body"><div id="topEmployees" class="split-list"></div></div>
-        </article>
-        <article class="card">
-          <div class="card-head"><div><div class="card-title">Actions client</div><div class="card-sub">Relances et opportunites</div></div></div>
-          <div class="card-body"><div id="actionList" class="split-list"></div></div>
-        </article>
-      </div>
-    </section>
+      <div id="statusLoadedAt" class="sb-version"></div>
+      <span id="appVersion" class="sb-version"></span>
+      <button class="sb-logout" id="logoutBtn">
+        <i data-lucide="log-out" class="icon"></i>Verrouiller
+      </button>
+    </div>
+  </aside>
 
-    <section id="sales" class="panel">
-      <div class="kpis" id="salesKpis"></div>
-      <div class="grid-2">
-        <article class="card">
-          <div class="card-head"><div><div class="card-title">CA par service</div><div class="card-sub">Services les plus rentables</div></div></div>
-          <div class="card-body"><div class="chart-box"><canvas id="serviceRevenueChart"></canvas></div></div>
-        </article>
-        <article class="card">
-          <div class="card-head"><div><div class="card-title">Prestations par employee</div><div class="card-sub">Volume et encaissements</div></div></div>
-          <div class="card-body"><div class="chart-box"><canvas id="employeeChart"></canvas></div></div>
-        </article>
-      </div>
-      <article class="card">
-        <div class="card-head"><div><div class="card-title">Journal des ventes</div><div class="card-sub">Toutes les prestations filtrees</div></div></div>
-        <div class="table-wrap"><table id="salesTable"></table></div>
-      </article>
-    </section>
+  <!-- ── Main area ── -->
+  <div class="app-main">
 
-    <section id="services" class="panel">
-      <div class="kpis" id="servicesKpis"></div>
-      <div class="grid-3">
-        <article class="card">
-          <div class="card-head"><div><div class="card-title">Mix services</div><div class="card-sub">Part de chaque famille</div></div></div>
-          <div class="card-body"><div class="chart-box sm"><canvas id="serviceMixChart"></canvas></div></div>
-        </article>
-        <article class="card">
-          <!-- [FIX-ARCHI-3] Prix moyen calcule uniquement sur les prestations payees. -->
-          <div class="card-head"><div><div class="card-title">Prix moyen</div><div class="card-sub">Panier par service (prestations payees)</div></div></div>
-          <div class="card-body"><div id="avgServiceList" class="split-list"></div></div>
-        </article>
-        <article class="card">
-          <div class="card-head"><div><div class="card-title">Objectifs clients</div><div class="card-sub">Demandes detectees</div></div></div>
-          <div class="card-body"><div id="objectiveList" class="split-list"></div></div>
-        </article>
+    <!-- Top Header -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div id="currentDate"></div>
+        <div class="divider"></div>
+        <button class="filter-toggle" id="filterToggle">
+          <i data-lucide="sliders-horizontal" class="icon"></i>Filtres
+        </button>
       </div>
-      <article class="card">
-        <div class="card-head"><div><div class="card-title">Synthese services</div><div class="card-sub">CA, volume, panier et poids commercial</div></div></div>
-        <div class="table-wrap"><table id="serviceTable"></table></div>
-      </article>
-    </section>
-
-    <section id="clients" class="panel">
-      <div class="kpis" id="clientsKpis"></div>
-      <div class="client-layout">
-        <article class="card">
-          <div class="card-head"><div><div class="card-title">Portefeuille clients</div><div class="card-sub" id="clientCount"></div></div></div>
-          <div id="clientList" class="client-list"></div>
-        </article>
-        <article class="card">
-          <div class="card-head"><div><div class="card-title" id="profileTitle">Profil client</div><div class="card-sub" id="profileSub">Selectionnez une cliente</div></div></div>
-          <div class="card-body" id="clientProfile"></div>
-        </article>
+      <div class="topbar-right">
+        <a class="top-link" href="https://docs.google.com/spreadsheets/d/18O-Eldm9kXzKEtts1TAzVvHXFYcceht0ClZXkIM5BMg/edit" target="_blank" rel="noreferrer">
+          <i data-lucide="table-2" class="icon"></i>Sheets
+        </a>
+        <a class="top-link" href="https://docs.google.com/forms/d/e/1FAIpQLScrmxE5iE2sapEjrCdMbEgWBc2Po5Dm4zg9gCRKBfT1Y9et6A/viewform" target="_blank" rel="noreferrer">
+          <i data-lucide="user-plus" class="icon"></i>Cliente
+        </a>
+        <a class="top-link-primary" href="https://docs.google.com/forms/d/e/1FAIpQLScQh_40U3eej77yrj2mLrrzbtqFGkpMnM9GYETYM27hFQvzng/viewform" target="_blank" rel="noreferrer">
+          <i data-lucide="clipboard-list" class="icon"></i>Visite
+        </a>
+        <div class="divider"></div>
+        <button class="top-btn" id="reloadBtn" title="Actualiser les données">
+          <i data-lucide="refresh-cw" class="icon"></i>
+        </button>
+        <button class="top-btn" id="exportBtn" title="Exporter CSV">
+          <i data-lucide="download" class="icon"></i>
+        </button>
       </div>
-    </section>
+    </header>
 
-    <section id="subscriptions" class="panel">
-      <div class="kpis" id="subscriptionKpis"></div>
-      <article class="card">
-        <div class="card-head">
-          <div>
-            <div class="card-title">Suivi des abonnements</div>
-            <div class="card-sub">Statut, jours restants et séances restantes</div>
-          </div>
+    <!-- Filter Drawer (collapsible) -->
+    <div class="filter-drawer" id="filterDrawer" aria-label="Filtres">
+      <div class="filter-row">
+        <div class="field">
+          <label for="periodFilter">Période</label>
+          <select id="periodFilter">
+            <option value="month">Mois en cours</option>
+            <option value="today">Aujourd'hui</option>
+            <option value="7">7 jours</option>
+            <option value="30">30 jours</option>
+            <option value="90">90 jours</option>
+            <option value="all">Tout</option>
+          </select>
         </div>
-        <div class="table-wrap"><table id="subscriptionsTable"></table></div>
-      </article>
-    </section>
-
-    <section id="commissions" class="panel">
-      <div class="kpis" id="commissionKpis"></div>
-      <!-- [FIX-COM-HTML-3] Courbe d'évolution mensuelle des commissions. -->
-      <article class="card">
-        <div class="card-head">
-          <div>
-            <div class="card-title">Évolution mensuelle des commissions</div>
-            <div class="card-sub">Total commissions par mois</div>
-          </div>
+        <div class="field">
+          <label for="serviceFilter">Service</label>
+          <select id="serviceFilter"><option value="all">Tous</option></select>
         </div>
-        <div class="card-body"><div class="chart-box sm"><canvas id="commissionTrendChart"></canvas></div></div>
-      </article>
-      <div class="grid-2">
+        <div class="field">
+          <label for="employeeFilter">Équipe</label>
+          <select id="employeeFilter"><option value="all">Toute l'équipe</option></select>
+        </div>
+        <div class="field">
+          <label for="statusFilter">Statut</label>
+          <select id="statusFilter">
+            <option value="all">Tous</option>
+            <option value="Paye">Payé</option>
+            <option value="A payer">À payer</option>
+            <option value="En cours">En cours</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="abonnementFilter">Abonnements</label>
+          <select id="abonnementFilter">
+            <option value="all">Tous</option>
+            <option value="Actif">Actifs</option>
+            <option value="Bientôt expiré">Bientôt expirés</option>
+            <option value="Expiré">Expirés</option>
+            <option value="Terminé">Terminés</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="formuleFilter">Formule</label>
+          <select id="formuleFilter"><option value="all">Toutes</option></select>
+        </div>
+        <div class="field" style="flex:1.5">
+          <label for="searchInput">Recherche</label>
+          <input id="searchInput" type="search" placeholder="Nom, téléphone, service…">
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <main class="app-content">
+
+      <!-- ══ TABLEAU DE BORD ══ -->
+      <section id="overview" class="panel active">
+        <!-- Brief exécutif (caché, rendu par JS) -->
+        <div id="overviewBrief"></div>
+        <!-- 4 KPIs principaux -->
+        <div class="kpis" id="kpiGrid"></div>
+        <!-- Courbe CA (pleine largeur) -->
         <article class="card">
           <div class="card-head">
             <div>
-              <div class="card-title">Commissions par prestataire</div>
-              <div class="card-sub">Total calcule sur les montants payes</div>
+              <div class="card-title">Évolution du chiffre d'affaires</div>
+              <div class="card-sub">CA encaissé par jour sur la période filtrée</div>
             </div>
           </div>
-          <div class="card-body"><div class="chart-box"><canvas id="commissionChart"></canvas></div></div>
+          <div class="card-body">
+            <div class="chart-box"><canvas id="revenueChart"></canvas></div>
+          </div>
         </article>
+        <!-- Top services + Top équipe -->
+        <div class="grid-2">
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Top services</div>
+                <div class="card-sub">Contribution au CA encaissé</div>
+              </div>
+            </div>
+            <div class="card-body"><div id="topServices" class="split-list"></div></div>
+          </article>
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Performance équipe</div>
+                <div class="card-sub">CA encaissé par prestataire</div>
+              </div>
+            </div>
+            <div class="card-body"><div id="topEmployees" class="split-list"></div></div>
+          </article>
+        </div>
+        <!-- Relances (actionList caché mais rendu par JS) -->
+        <div style="display:none"><div id="actionList"></div></div>
+        <!-- Statut paiement (statusChart caché mais rendu par JS) -->
+        <div style="display:none"><canvas id="statusChart"></canvas></div>
+      </section>
+
+      <!-- ══ VENTES ══ -->
+      <section id="sales" class="panel">
+        <div class="kpis" id="salesKpis"></div>
+        <div class="grid-2">
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <div class="card-title">CA par service</div>
+                <div class="card-sub">Services les plus rentables</div>
+              </div>
+            </div>
+            <div class="card-body"><div class="chart-box"><canvas id="serviceRevenueChart"></canvas></div></div>
+          </article>
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Prestations par prestataire</div>
+                <div class="card-sub">Volume et encaissements</div>
+              </div>
+            </div>
+            <div class="card-body"><div class="chart-box"><canvas id="employeeChart"></canvas></div></div>
+          </article>
+        </div>
         <article class="card">
           <div class="card-head">
             <div>
-              <div class="card-title">Detail des primes</div>
-              <div class="card-sub">Abonnements, satisfaction, resultats et evenements</div>
+              <div class="card-title">Journal des ventes</div>
+              <div class="card-sub">Toutes les prestations selon les filtres actifs</div>
             </div>
           </div>
-          <div class="card-body"><div id="commissionPrimeList" class="split-list"></div></div>
+          <div class="table-wrap"><table id="salesTable"></table></div>
         </article>
-      </div>
-      <article class="card">
-        <div class="card-head">
-          <div>
-            <div class="card-title">Suivi mensuel des commissions</div>
-            <div class="card-sub">Paiements et montants dus par employee</div>
-          </div>
-          <!-- [FIX-COM-HTML-5] Recharge les commissions depuis Google Sheets. -->
-          <button class="ghost-btn" id="refreshCommissionsBtn"><i data-lucide="refresh-cw" class="icon"></i><span>Actualiser</span></button>
-        </div>
-        <div class="table-wrap"><table id="commissionsTable"></table></div>
-      </article>
-    </section>
+      </section>
 
-    <section id="goals" class="panel">
-      <div class="kpis" id="goalsKpis"></div>
-      <div class="goal-board">
-        <article class="card goal-card">
-          <div class="card-title">Objectif CA mensuel</div>
-          <div class="card-sub">Compare au CA paye du mois</div>
-          <div class="goal-input"><input id="monthlyGoal" type="number" min="0" step="1000"><button class="ghost-btn" data-save-goal="monthlyGoal">OK</button></div>
-          <div id="monthlyGoalView"></div>
-        </article>
-        <article class="card goal-card">
-          <div class="card-title">Objectif visites mensuel</div>
-          <div class="card-sub">Nombre de prestations a atteindre</div>
-          <div class="goal-input"><input id="visitGoal" type="number" min="0" step="1"><button class="ghost-btn" data-save-goal="visitGoal">OK</button></div>
-          <div id="visitGoalView"></div>
-        </article>
-        <article class="card goal-card">
-          <div class="card-title">Objectif nouveaux clients</div>
-          <div class="card-sub">Inscriptions du mois</div>
-          <div class="goal-input"><input id="clientGoal" type="number" min="0" step="1"><button class="ghost-btn" data-save-goal="clientGoal">OK</button></div>
-          <div id="clientGoalView"></div>
-        </article>
-      </div>
-      <article class="card">
-        <div class="card-head"><div><div class="card-title">Clients a accompagner</div><div class="card-sub">Suivi par objectif et derniere activite</div></div></div>
-        <div class="table-wrap"><table id="followupTable"></table></div>
-      </article>
-      <div class="grid-2">
+      <!-- ══ SERVICES (caché, maintenu pour le JS) ══ -->
+      <section id="services" class="panel">
+        <div class="kpis" id="servicesKpis"></div>
+        <div class="grid-3">
+          <article class="card">
+            <div class="card-head"><div><div class="card-title">Mix services</div></div></div>
+            <div class="card-body"><div class="chart-box sm"><canvas id="serviceMixChart"></canvas></div></div>
+          </article>
+          <article class="card">
+            <div class="card-head"><div><div class="card-title">Prix moyen par service</div></div></div>
+            <div class="card-body"><div id="avgServiceList" class="split-list"></div></div>
+          </article>
+          <article class="card">
+            <div class="card-head"><div><div class="card-title">Objectifs clients</div></div></div>
+            <div class="card-body"><div id="objectiveList" class="split-list"></div></div>
+          </article>
+        </div>
         <article class="card">
-          <div class="card-head"><div><div class="card-title">Objectifs par employee</div><div class="card-sub">Seances et CA du mois en cours</div></div></div>
-          <div class="table-wrap"><table id="employeeGoalsTable" class="goal-table"></table></div>
+          <div class="card-head"><div><div class="card-title">Synthèse services</div></div></div>
+          <div class="table-wrap"><table id="serviceTable"></table></div>
         </article>
+      </section>
+
+      <!-- ══ CLIENTES ══ -->
+      <section id="clients" class="panel">
+        <!-- KPIs clientes (caché, rendu par JS) -->
+        <div class="kpis" id="clientsKpis" style="display:none"></div>
+        <div class="client-layout">
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Portefeuille</div>
+                <div class="card-sub" id="clientCount"></div>
+              </div>
+            </div>
+            <div id="clientList" class="client-list"></div>
+          </article>
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <div class="card-title" id="profileTitle">Profil cliente</div>
+                <div class="card-sub" id="profileSub">Sélectionnez une cliente</div>
+              </div>
+            </div>
+            <div class="card-body" id="clientProfile"></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ══ ABONNEMENTS ══ -->
+      <section id="subscriptions" class="panel">
+        <div class="kpis" id="subscriptionKpis"></div>
         <article class="card">
-          <div class="card-head"><div><div class="card-title">Objectifs par service</div><div class="card-sub">CA mensuel par famille de service</div></div></div>
-          <div class="table-wrap"><table id="serviceGoalsTable" class="goal-table"></table></div>
+          <div class="card-head">
+            <div>
+              <div class="card-title">Suivi des abonnements</div>
+              <div class="card-sub">Statut, jours et séances restants — triés par urgence</div>
+            </div>
+          </div>
+          <div class="table-wrap"><table id="subscriptionsTable"></table></div>
         </article>
-      </div>
-    </section>
-  </main>
-</div>
+      </section>
+
+      <!-- ══ COMMISSIONS ══ -->
+      <section id="commissions" class="panel">
+        <div class="kpis" id="commissionKpis"></div>
+        <div class="grid-2">
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Commissions par prestataire</div>
+                <div class="card-sub">Total calculé sur les encaissements</div>
+              </div>
+            </div>
+            <div class="card-body"><div class="chart-box"><canvas id="commissionChart"></canvas></div></div>
+          </article>
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Détail des primes</div>
+                <div class="card-sub">Abonnements, satisfaction, résultat</div>
+              </div>
+            </div>
+            <div class="card-body"><div id="commissionPrimeList" class="split-list"></div></div>
+          </article>
+        </div>
+        <!-- Trend chart caché mais rendu par JS -->
+        <div style="display:none"><canvas id="commissionTrendChart"></canvas></div>
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Suivi mensuel des commissions</div>
+              <div class="card-sub">Paiements et montants dus par prestataire</div>
+            </div>
+            <button class="ghost-btn" id="refreshCommissionsBtn">
+              <i data-lucide="refresh-cw" class="icon"></i><span>Actualiser</span>
+            </button>
+          </div>
+          <div class="table-wrap"><table id="commissionsTable"></table></div>
+        </article>
+      </section>
+
+      <!-- ══ OBJECTIFS ══ -->
+      <section id="goals" class="panel">
+        <div class="kpis" id="goalsKpis"></div>
+        <div class="goal-board">
+          <article class="card goal-card">
+            <div class="card-title">Objectif CA mensuel</div>
+            <div class="card-sub">CA encaissé vs cible du mois</div>
+            <div class="goal-input">
+              <input id="monthlyGoal" type="number" min="0" step="1000" placeholder="3000000">
+              <button class="ghost-btn" data-save-goal="monthlyGoal">OK</button>
+            </div>
+            <div id="monthlyGoalView"></div>
+          </article>
+          <article class="card goal-card">
+            <div class="card-title">Objectif visites</div>
+            <div class="card-sub">Nombre de prestations à atteindre</div>
+            <div class="goal-input">
+              <input id="visitGoal" type="number" min="0" step="1" placeholder="120">
+              <button class="ghost-btn" data-save-goal="visitGoal">OK</button>
+            </div>
+            <div id="visitGoalView"></div>
+          </article>
+          <article class="card goal-card">
+            <div class="card-title">Nouveaux clients</div>
+            <div class="card-sub">Inscriptions du mois en cours</div>
+            <div class="goal-input">
+              <input id="clientGoal" type="number" min="0" step="1" placeholder="40">
+              <button class="ghost-btn" data-save-goal="clientGoal">OK</button>
+            </div>
+            <div id="clientGoalView"></div>
+          </article>
+        </div>
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Clientes à accompagner</div>
+              <div class="card-sub">Relances prioritaires et suivi d'objectifs</div>
+            </div>
+          </div>
+          <div class="table-wrap"><table id="followupTable"></table></div>
+        </article>
+        <!-- ── Objectifs par prestataire ── -->
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Objectifs par prestataire</div>
+              <div class="card-sub">Séances et CA mensuel — définissez une cible par membre de l'équipe</div>
+            </div>
+          </div>
+          <div class="card-body" style="padding-top:16px">
+            <div class="goal-cards" id="employeeGoalCards"></div>
+          </div>
+        </article>
+
+        <!-- ── Objectifs par service ── -->
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Objectifs par service</div>
+              <div class="card-sub">CA mensuel cible par famille de service</div>
+            </div>
+          </div>
+          <div id="serviceGoalList" class="svc-goal-list"></div>
+        </article>
+
+        <!-- Compatibilité JS (non affichés) -->
+        <div style="display:none">
+          <table id="employeeGoalsTable"></table>
+          <table id="serviceGoalsTable"></table>
+        </div>
+      </section>
+
+    </main>
+  </div><!-- .app-main -->
+</div><!-- #appShell -->
 
 <script>
 const CONFIG = {
@@ -951,19 +1206,28 @@ const state = {
   demo: false
 };
 
+/* Dark palette for charts */
 const colors = {
-  plum: "#552477",
-  teal: "#0f766e",
-  amber: "#b76e00",
-  coral: "#c2413f",
-  blue: "#2563eb",
-  green: "#14804a",
-  gray: "#667085"
+  plum: "#9B7CFF",
+  teal: "#2EC4B6",
+  amber: "#F5A623",
+  coral: "#EF6B6B",
+  blue: "#5B9CF6",
+  green: "#38D387",
+  gray: "#6B7280",
+  gold: "#C49A3C"
 };
+
+/* Chart.js default overrides for dark mode */
+Chart.defaults.color = "rgba(235,230,220,.45)";
+Chart.defaults.borderColor = "rgba(255,255,255,.06)";
+Chart.defaults.font.family = '"Plus Jakarta Sans", sans-serif';
+Chart.defaults.font.size = 11;
 
 document.addEventListener("DOMContentLoaded", () => {
   if (window.lucide) lucide.createIcons();
-  document.getElementById("currentDate").textContent = new Intl.DateTimeFormat("fr-FR", { weekday:"long", day:"2-digit", month:"long", year:"numeric" }).format(new Date());
+  document.getElementById("currentDate").textContent =
+    new Intl.DateTimeFormat("fr-FR", { weekday:"long", day:"2-digit", month:"long", year:"numeric" }).format(new Date());
   bindUI();
   initAuth();
 });
@@ -971,16 +1235,29 @@ document.addEventListener("DOMContentLoaded", () => {
 function bindUI(){
   document.getElementById("authForm").addEventListener("submit", handleLogin);
   document.getElementById("logoutBtn").addEventListener("click", logout);
+
+  /* Sidebar tab navigation */
   document.querySelectorAll(".tab").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
       document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
       btn.classList.add("active");
-      document.getElementById(btn.dataset.tab).classList.add("active");
+      const target = document.getElementById(btn.dataset.tab);
+      if(target) target.classList.add("active");
       Object.values(state.charts).forEach(c => c && c.resize());
     });
   });
-  // [FIX-ABO-HTML-2] Le filtre formule participe au recalcul global.
+
+  /* Filter drawer toggle */
+  const toggleBtn = document.getElementById("filterToggle");
+  const drawer = document.getElementById("filterDrawer");
+  toggleBtn.addEventListener("click", () => {
+    const open = drawer.classList.toggle("open");
+    toggleBtn.classList.toggle("active", open);
+    if(window.lucide) lucide.createIcons();
+  });
+
+  /* [FIX-ABO-HTML-2] Le filtre formule participe au recalcul global. */
   ["periodFilter","serviceFilter","employeeFilter","statusFilter","abonnementFilter","formuleFilter","searchInput"].forEach(id => {
     document.getElementById(id).addEventListener(id === "searchInput" ? "input" : "change", applyFilters);
   });
@@ -1113,7 +1390,7 @@ function isApiConfigured(){
 }
 
 async function loadData(){
-  setStatus("load", "Connexion au proxy securise...");
+  setStatus("load", "Connexion au proxy sécurisé…");
   try{
     const [caisse, clients, abonnements, commissions, employees, visites, peau, cheveux, sport, config] = await Promise.all([
       fetchSheet(CONFIG.sheets.caisse),
@@ -1145,7 +1422,7 @@ async function loadData(){
     attachSubscriptions();
     state.lastLoadedAt = new Date();
     renderAppVersion();
-    setStatus("ok", `${state.sales.length} prestations chargees depuis Google Sheets`);
+    setStatus("ok", `${state.sales.length} prestations chargées`);
   }catch(err){
     console.warn(err);
     const demo = demoDataset();
@@ -1161,7 +1438,7 @@ async function loadData(){
     attachSubscriptions();
     state.lastLoadedAt = new Date();
     renderAppVersion();
-    setStatus("demo", "Mode apercu : partage Sheets requis pour les donnees live");
+    setStatus("demo", "Mode aperçu — données de démonstration");
   }
   populateFilters();
   await loadGoals();
@@ -1212,9 +1489,6 @@ function parseCSV(text){
   row.push(cur);
   rows.push(row);
   return rows.filter(r => r.some(c => String(c).trim() !== ""));
-  // Tests manuels :
-  // parseCSV('\uFEFFa,b\n,"x,y"\n"guillemets ""ok""","ligne\ninterne"')
-  // doit gerer BOM, champ vide, virgule, guillemets doubles et saut de ligne cite.
 }
 
 function key(text){
@@ -1323,11 +1597,11 @@ function normalizeSales(rows){
       id: cell(r,0) || `SALE-${n}`,
       date,
       idClient: cell(r,iIdClient),
-      client: cell(r,iClient) || "Cliente non renseignee",
+      client: cell(r,iClient) || "Cliente non renseignée",
       phone: cell(r,iTel),
       phoneKey: normPhone(cell(r,iTel)),
       employee: cell(r,iEmployee) || "Equipe",
-      service: cell(r,iService) || "Service non renseigne",
+      service: cell(r,iService) || "Service non renseigné",
       price: money(cell(r,iPrix)),
       total,
       status: normalizeStatus(cell(r,iStatus)),
@@ -1540,7 +1814,7 @@ function loyalty(visits){
 
 function populateFilters(){
   fillSelect("serviceFilter", [...new Set(state.sales.map(x => x.service).filter(Boolean))].sort(), "Tous les services");
-  fillSelect("employeeFilter", [...new Set([...state.employees.map(x => x.name), ...state.sales.map(x => x.employee)].filter(Boolean))].sort(), "Toute l'equipe");
+  fillSelect("employeeFilter", [...new Set([...state.employees.map(x => x.name), ...state.sales.map(x => x.employee)].filter(Boolean))].sort(), "Toute l'équipe");
   // [FIX-ABO-HTML-2] Liste dynamique des formules d'abonnement.
   fillSelect("formuleFilter", [...new Set(state.subscriptions.map(x => x.formule).filter(Boolean))].sort(), "Toutes les formules");
 }
@@ -1639,37 +1913,22 @@ function renderExecutiveBrief(){
   if(!el) return;
   const k = computeKPIs(state.filtered);
   const period = document.getElementById("periodFilter").value;
-  const periodText = period === "month" ? "mois en cours" : period === "today" ? "journee" : period === "all" ? "toutes periodes" : `${period} derniers jours`;
+  const periodText = period === "month" ? "mois en cours" : period === "today" ? "journée" : period === "all" ? "toutes périodes" : `${period} derniers jours`;
   const activeClients = new Set(state.filtered.map(s => s.idClient || s.phoneKey || normName(s.client))).size;
-  const watchSubs = state.subscriptions.filter(s => ["BientÃ´t expirÃ©","ExpirÃ©","TerminÃ©"].includes(s.status)).length;
+  const watchSubs = state.subscriptions.filter(s => ["Bientôt expiré","Expiré","Terminé"].includes(s.status)).length;
   const unpaidCommissions = state.commissions.filter(c => normName(c.status) !== "paye").reduce((sum,c) => sum + c.total, 0);
-  el.innerHTML = `
-    <div>
-      <div class="brief-title">Apercu executif Maison Lumena</div>
-      <div class="brief-text">
-        Ce tableau relie ventes encaissees, activite client, abonnements, objectifs et commissions.
-        Sur la periode ${escapeHtml(periodText)}, Maison Lumena affiche ${fmtMoney(k.totalPaid)} encaisses,
-        ${fmtNum(k.count)} prestation(s), ${fmtNum(activeClients)} cliente(s) active(s) et ${fmtNum(watchSubs)} abonnement(s) a surveiller.
-      </div>
-    </div>
-    <div class="brief-pills">
-      <span class="brief-pill good"><i data-lucide="wallet" class="icon"></i>${fmtMoney(k.totalPaid)}</span>
-      <span class="brief-pill plum"><i data-lucide="users" class="icon"></i>${fmtNum(activeClients)} clientes</span>
-      <span class="brief-pill ${watchSubs ? "warn" : "good"}"><i data-lucide="calendar-check" class="icon"></i>${fmtNum(watchSubs)} abo. a suivre</span>
-      <span class="brief-pill ${unpaidCommissions ? "warn" : "good"}"><i data-lucide="badge-dollar-sign" class="icon"></i>${fmtMoney(unpaidCommissions)} com.</span>
-    </div>
-  `;
+  el.innerHTML = `<div>${fmtMoney(k.totalPaid)} · ${fmtNum(k.count)} prestations · ${fmtNum(activeClients)} clientes · ${fmtNum(watchSubs)} abonnements à surveiller</div>`;
 }
 
 function renderKPIs(){
   const k = computeKPIs(state.filtered);
   document.getElementById("kpiGrid").innerHTML = [
-    kpi("CA paye", fmtMoney(k.totalPaid), `${fmtNum(k.paidCount)} prestation(s) payee(s)`, "wallet", {variant:"good", progress:k.moneyConversion * 100, chip:`${Math.round(k.moneyConversion * 100)}% du CA saisi`}),
-    kpi("A encaisser", fmtMoney(k.totalWaiting), `${fmtNum(k.waitingCount)} prestation(s) a suivre`, "receipt", {variant:k.totalWaiting ? "warn" : "neutral", progress:k.totalBilled ? k.totalWaiting / k.totalBilled * 100 : 0, chip:k.totalWaiting ? "Relance" : "OK"}),
-    kpi("Prestations", fmtNum(k.count), "Volume sur la periode", "activity", {variant:"blue", meta:`${fmtNum(k.paidCount)} payees`}),
-    kpi("Panier moyen", fmtMoney(k.avg), "Sur prestations payees", "shopping-bag", {variant:"teal", meta:"Prix moyen"}),
-    kpi("Clients actifs", fmtNum(k.uniqueClients), "Clientes vues sur la periode", "users", {variant:"plum", meta:k.count ? `${fmtNum(k.count / Math.max(1,k.uniqueClients))} visite/client` : "0 visite"}),
-    kpi("Taux paye", `${Math.round(k.conversion * 100)}%`, "Prestations payees vs total", "badge-check", {variant:k.conversion >= .8 ? "good" : k.conversion >= .55 ? "warn" : "danger", progress:k.conversion * 100, chip:k.conversion >= .8 ? "Solide" : "A suivre"})
+    kpi("CA encaissé", fmtMoney(k.totalPaid), `${fmtNum(k.paidCount)} prestation(s) payée(s)`, "wallet", {variant:"good", progress:k.moneyConversion * 100, chip:`${Math.round(k.moneyConversion * 100)}% du CA saisi`}),
+    kpi("À encaisser", fmtMoney(k.totalWaiting), `${fmtNum(k.waitingCount)} en attente`, "receipt", {variant:k.totalWaiting ? "warn" : "neutral", chip:k.totalWaiting ? "Relance" : "OK"}),
+    kpi("Prestations", fmtNum(k.count), "Volume sur la période", "activity", {variant:"plum", meta:`${fmtNum(k.paidCount)} payées`}),
+    kpi("Clientes actives", fmtNum(k.uniqueClients), "Vues sur la période filtrée", "users", {variant:"teal", meta:k.count ? `${(k.count / Math.max(1,k.uniqueClients)).toFixed(1)} visite/cliente` : "0"}),
+    kpi("Panier moyen", fmtMoney(k.avg), "Sur prestations payées", "shopping-bag", {variant:"gold", meta:"Ticket moyen"}),
+    kpi("Taux d'encaissement", `${Math.round(k.conversion * 100)}%`, "Prestations payées vs total", "badge-check", {variant:k.conversion >= .8 ? "good" : k.conversion >= .55 ? "warn" : "danger", progress:k.conversion * 100, chip:k.conversion >= .8 ? "Solide" : "À suivre"})
   ].join("");
 }
 
@@ -1680,11 +1939,11 @@ function renderSalesKPIs(){
   const topService = topBy(state.filtered.filter(x => x.status === "Paye"), "service", "sum")[0];
   const topEmployee = topBy(state.filtered.filter(x => x.status === "Paye"), "employee", "sum")[0];
   el.innerHTML = [
-    kpi("CA filtre", fmtMoney(k.totalPaid), "Encaisse sur la periode", "trending-up", {variant:"good", progress:k.moneyConversion * 100, chip:`${Math.round(k.moneyConversion * 100)}% paye`}),
-    kpi("Reste a encaisser", fmtMoney(k.totalWaiting), `${fmtNum(k.waitingCount)} ligne(s) a suivre`, "receipt", {variant:k.totalWaiting ? "warn" : "neutral", progress:k.totalBilled ? k.totalWaiting / k.totalBilled * 100 : 0, chip:k.totalWaiting ? "Relance" : "OK"}),
-    kpi("Top service", topService ? topService.name : "-", topService ? fmtMoney(topService.value) : "Aucune vente payee", "sparkles", {variant:"teal", meta:topService ? `${fmtNum(topService.count)} prestation(s)` : ""}),
-    kpi("Top employee", topEmployee ? topEmployee.name : "-", topEmployee ? fmtMoney(topEmployee.value) : "Aucune vente payee", "user-check", {variant:"plum", meta:topEmployee ? `${fmtNum(topEmployee.count)} prestation(s)` : ""}),
-    kpi("Panier moyen", fmtMoney(k.avg), "Sur ventes payees", "shopping-bag", {variant:"gold", meta:"Ticket moyen"})
+    kpi("CA filtré", fmtMoney(k.totalPaid), "Encaissé sur la période", "trending-up", {variant:"good", progress:k.moneyConversion * 100, chip:`${Math.round(k.moneyConversion * 100)}% payé`}),
+    kpi("À encaisser", fmtMoney(k.totalWaiting), `${fmtNum(k.waitingCount)} ligne(s)`, "receipt", {variant:k.totalWaiting ? "warn" : "neutral", chip:k.totalWaiting ? "Relance" : "OK"}),
+    kpi("Top service", topService ? topService.name : "-", topService ? fmtMoney(topService.value) : "Aucune vente", "sparkles", {variant:"teal", meta:topService ? `${fmtNum(topService.count)} prestation(s)` : ""}),
+    kpi("Top prestataire", topEmployee ? topEmployee.name : "-", topEmployee ? fmtMoney(topEmployee.value) : "Aucune vente", "user-check", {variant:"plum", meta:topEmployee ? `${fmtNum(topEmployee.count)} prestation(s)` : ""}),
+    kpi("Panier moyen", fmtMoney(k.avg), "Sur ventes payées", "shopping-bag", {variant:"gold", meta:"Ticket moyen"})
   ].join("");
 }
 
@@ -1700,11 +1959,11 @@ function renderServicesKPIs(){
   const top3Share = caTotal ? serviceRows.slice(0,3).reduce((sum,row) => sum + row.value, 0) / caTotal : 0;
   const avgService = serviceRows.length ? caTotal / serviceRows.reduce((sum,row) => sum + row.count, 0) : 0;
   el.innerHTML = [
-    kpi("Services actifs", fmtNum(new Set(state.filtered.map(s => s.service).filter(Boolean)).size), "Familles vendues", "grid-2x2", {variant:"plum", meta:"Mix commercial"}),
-    kpi("Meilleur CA", top ? top.name : "-", top ? fmtMoney(top.value) : "Aucun CA paye", "trophy", {variant:"good", progress:top && caTotal ? top.value / caTotal * 100 : 0, chip:top && caTotal ? `${Math.round(top.value / caTotal * 100)}% du CA` : ""}),
-    kpi("Plus demande", volumeTop ? volumeTop.name : "-", volumeTop ? `${fmtNum(volumeTop.count)} prestation(s)` : "Aucun volume", "activity", {variant:"teal", meta:"Volume"}),
-    kpi("Panier service", fmtMoney(avgService), "Moyenne des prestations payees", "badge-dollar-sign", {variant:"gold", meta:"Prix moyen"}),
-    kpi("Concentration top 3", `${Math.round(top3Share * 100)}%`, "Poids CA des 3 premiers", "pie-chart", {variant:top3Share > .75 ? "warn" : "good", progress:top3Share * 100, chip:top3Share > .75 ? "Dependance" : "Equilibre"})
+    kpi("Services actifs", fmtNum(new Set(state.filtered.map(s => s.service).filter(Boolean)).size), "Familles vendues", "grid-2x2", {variant:"plum"}),
+    kpi("Meilleur CA", top ? top.name : "-", top ? fmtMoney(top.value) : "Aucun CA", "trophy", {variant:"good"}),
+    kpi("Plus demandé", volumeTop ? volumeTop.name : "-", volumeTop ? `${fmtNum(volumeTop.count)} prestation(s)` : "Aucun volume", "activity", {variant:"teal"}),
+    kpi("Panier service", fmtMoney(avgService), "Moyenne prestations payées", "badge-dollar-sign", {variant:"gold"}),
+    kpi("Concentration top 3", `${Math.round(top3Share * 100)}%`, "Poids CA des 3 premiers", "pie-chart", {variant:top3Share > .75 ? "warn" : "good", progress:top3Share * 100})
   ].join("");
 }
 
@@ -1720,15 +1979,15 @@ function renderClientsKPIs(){
     const inactiveDays = c.lastVisit ? Math.floor((now - c.lastVisit)/86400000) : 999;
     return c.visits > 0 && (inactiveDays >= 21 || c.objectives.length);
   }).length;
-  const withActiveSub = clients.filter(c => c.subscription && ["Actif","BientÃ´t expirÃ©","Suspendu"].includes(c.subscription.status)).length;
+  const withActiveSub = clients.filter(c => c.subscription && ["Actif","Bientôt expiré","Suspendu"].includes(c.subscription.status)).length;
   const caClient = clients.length ? clients.reduce((sum,c) => sum + c.total, 0) / clients.length : 0;
   el.innerHTML = [
-    kpi("Portefeuille", fmtNum(clients.length), "Clientes dans la base", "users", {variant:"plum", meta:"CRM"}),
-    kpi("Actives periode", fmtNum(activePeriod), "Clientes avec visite filtree", "user-round-check", {variant:"good", progress:clients.length ? activePeriod / clients.length * 100 : 0, chip:clients.length ? `${Math.round(activePeriod / clients.length * 100)}%` : "0%"}),
-    kpi("Nouvelles ce mois", fmtNum(monthClients), "Inscriptions recentes", "user-plus", {variant:"teal", meta:"Acquisition"}),
-    kpi("A accompagner", fmtNum(toFollow), "Relance ou objectif detecte", "bell-ring", {variant:toFollow ? "warn" : "good", progress:clients.length ? toFollow / clients.length * 100 : 0, chip:toFollow ? "Action" : "OK"}),
-    kpi("Avec abonnement", fmtNum(withActiveSub), "Actif, bientot expire ou suspendu", "calendar-check", {variant:"gold", progress:clients.length ? withActiveSub / clients.length * 100 : 0}),
-    kpi("CA moyen/client", fmtMoney(caClient), "CA paye cumule moyen", "wallet", {variant:"neutral", meta:"Valeur client"})
+    kpi("Portefeuille", fmtNum(clients.length), "Clientes dans la base", "users", {variant:"plum"}),
+    kpi("Actives période", fmtNum(activePeriod), "Avec visite filtrée", "user-round-check", {variant:"good"}),
+    kpi("Nouvelles ce mois", fmtNum(monthClients), "Inscriptions récentes", "user-plus", {variant:"teal"}),
+    kpi("À accompagner", fmtNum(toFollow), "Relance ou objectif détecté", "bell-ring", {variant:toFollow ? "warn" : "good"}),
+    kpi("Avec abonnement", fmtNum(withActiveSub), "Actif, bientôt expiré ou suspendu", "calendar-check", {variant:"gold"}),
+    kpi("CA moyen/cliente", fmtMoney(caClient), "CA payé cumulé moyen", "wallet", {variant:"neutral"})
   ].join("");
 }
 
@@ -1743,14 +2002,10 @@ function renderGoalsKPIs(){
   const caTarget = Number(getGoalValue(CONFIG.goalKeys.monthly, 3000000)) || 0;
   const visitTarget = Number(getGoalValue(CONFIG.goalKeys.visits, 120)) || 0;
   const clientTarget = Number(getGoalValue(CONFIG.goalKeys.clients, 40)) || 0;
-  const employeeGoals = readGoalMap(CONFIG.goalKeys.employees);
-  const serviceGoals = readGoalMap(CONFIG.goalKeys.services);
   el.innerHTML = [
     kpi("Objectif CA", fmtMoney(paid), `Cible ${fmtMoney(caTarget)}`, "target", {variant:goalVariant(paid, caTarget), progress:goalPct(paid, caTarget), chip:`${goalPct(paid, caTarget)}%`}),
     kpi("Objectif visites", fmtNum(visits), `Cible ${fmtNum(visitTarget)}`, "footprints", {variant:goalVariant(visits, visitTarget), progress:goalPct(visits, visitTarget), chip:`${goalPct(visits, visitTarget)}%`}),
-    kpi("Nouveaux clients", fmtNum(newClients), `Cible ${fmtNum(clientTarget)}`, "user-plus", {variant:goalVariant(newClients, clientTarget), progress:goalPct(newClients, clientTarget), chip:`${goalPct(newClients, clientTarget)}%`}),
-    kpi("Objectifs employee", fmtNum(Object.keys(employeeGoals).length), "Lignes configurees", "users", {variant:"plum", meta:"Equipe"}),
-    kpi("Objectifs service", fmtNum(Object.keys(serviceGoals).length), "Services suivis", "sparkles", {variant:"teal", meta:"CA par service"})
+    kpi("Nouveaux clients", fmtNum(newClients), `Cible ${fmtNum(clientTarget)}`, "user-plus", {variant:goalVariant(newClients, clientTarget), progress:goalPct(newClients, clientTarget), chip:`${goalPct(newClients, clientTarget)}%`})
   ].join("");
 }
 
@@ -1781,13 +2036,13 @@ function kpi(label,value,note,icon,options={}){
 
 function renderCharts(){
   const daily = groupDaily(state.filtered.filter(x => x.status === "Paye"));
-  makeChart("revenueChart", "line", daily.labels, [{label:"CA paye", data:daily.values, borderColor:colors.plum, backgroundColor:"rgba(85,36,119,.12)", fill:true, tension:.35}], {yMoney:true});
+  makeChart("revenueChart", "line", daily.labels, [{label:"CA encaissé", data:daily.values, borderColor:colors.green, backgroundColor:"rgba(56,211,135,.08)", fill:true, tension:.38, pointRadius:3, pointBackgroundColor:colors.green}], {yMoney:true});
   const status = groupCount(state.filtered, "status");
   makeChart("statusChart", "doughnut", status.labels, [{data:status.values, backgroundColor:[colors.green,colors.amber,colors.blue,colors.gray]}]);
   const services = topBy(state.filtered.filter(x => x.status === "Paye"), "service", "sum");
-  makeChart("serviceRevenueChart", "bar", services.map(x => x.name), [{label:"CA paye", data:services.map(x => x.value), backgroundColor:colors.teal}], {yMoney:true});
+  makeChart("serviceRevenueChart", "bar", services.map(x => x.name), [{label:"CA encaissé", data:services.map(x => x.value), backgroundColor:colors.teal, borderRadius:5}], {yMoney:true});
   const employees = topBy(state.filtered, "employee", "count");
-  makeChart("employeeChart", "bar", employees.map(x => x.name), [{label:"Prestations", data:employees.map(x => x.count), backgroundColor:colors.blue}], {});
+  makeChart("employeeChart", "bar", employees.map(x => x.name), [{label:"Prestations", data:employees.map(x => x.count), backgroundColor:colors.violet, borderRadius:5}], {});
   const mix = topBy(state.filtered, "service", "count");
   makeChart("serviceMixChart", "doughnut", mix.map(x => x.name), [{data:mix.map(x => x.count), backgroundColor:[colors.plum,colors.teal,colors.amber,colors.coral,colors.blue,colors.green]}]);
 }
@@ -1802,8 +2057,39 @@ function makeChart(id,type,labels,datasets,opts={}){
     options:{
       responsive:true,
       maintainAspectRatio:false,
-      plugins:{legend:{display:type !== "bar" && type !== "line", labels:{boxWidth:12,font:{family:"DM Sans"}}}, tooltip:{callbacks:{label:c => opts.yMoney ? `${c.dataset.label || ""}: ${fmtMoney(c.parsed.y ?? c.raw)}` : `${c.label}: ${fmtNum(c.raw ?? c.parsed.y)}`}}},
-      scales:type === "doughnut" ? {} : {x:{grid:{display:false}, ticks:{font:{family:"DM Sans"}}}, y:{beginAtZero:true, ticks:{callback:v => opts.yMoney ? fmtMoney(v).replace(" FCFA","") : v, font:{family:"DM Sans"}}}}
+      plugins:{
+        legend:{
+          display:type === "doughnut",
+          labels:{boxWidth:10,padding:14,color:"rgba(235,230,220,.45)",font:{size:11}}
+        },
+        tooltip:{
+          backgroundColor:"rgba(24,25,36,.96)",
+          borderColor:"rgba(255,255,255,.1)",
+          borderWidth:1,
+          titleColor:"rgba(235,230,220,.9)",
+          bodyColor:"rgba(235,230,220,.6)",
+          padding:10,
+          callbacks:{
+            label:c => opts.yMoney
+              ? `${c.dataset.label || ""}: ${fmtMoney(c.parsed.y ?? c.raw)}`
+              : `${c.label}: ${fmtNum(c.raw ?? c.parsed.y)}`
+          }
+        }
+      },
+      scales: type === "doughnut" ? {} : {
+        x:{
+          grid:{color:"rgba(255,255,255,.04)",drawBorder:false},
+          ticks:{color:"rgba(235,230,220,.4)",font:{size:11}}
+        },
+        y:{
+          beginAtZero:true,
+          grid:{color:"rgba(255,255,255,.04)",drawBorder:false},
+          ticks:{
+            color:"rgba(235,230,220,.4)",font:{size:11},
+            callback:v => opts.yMoney ? (v >= 1000000 ? (v/1000000).toFixed(1)+"M" : v >= 1000 ? (v/1000).toFixed(0)+"k" : v) : v
+          }
+        }
+      }
     }
   });
 }
@@ -1817,14 +2103,18 @@ function renderRankings(){
 }
 
 function renderRank(id, rows, moneyMode){
+  const el = document.getElementById(id);
+  if(!el) return;
   const max = rows[0]?.value || rows[0]?.count || 1;
-  document.getElementById(id).innerHTML = rows.slice(0,6).map(r => {
+  el.innerHTML = rows.slice(0,6).map(r => {
     const val = moneyMode ? r.value : r.count;
     return `<div class="rank-row"><div><div class="rank-name">${escapeHtml(r.name)}</div><div class="rank-meta">${fmtNum(r.count)} prestation(s)</div><div class="progress"><span style="width:${Math.max(4, val/max*100)}%"></span></div></div><div class="rank-val">${moneyMode ? fmtMoney(r.value) : fmtNum(r.count)}</div></div>`;
-  }).join("") || empty("Aucune donnee");
+  }).join("") || empty("Aucune donnée");
 }
 
 function renderActions(){
+  const el = document.getElementById("actionList");
+  if(!el) return;
   const now = new Date();
   const candidates = state.clients
     .filter(c => c.visits > 0)
@@ -1832,33 +2122,38 @@ function renderActions(){
     .filter(c => c.inactiveDays >= 21 || c.objectives.length)
     .sort((a,b) => b.inactiveDays - a.inactiveDays)
     .slice(0,6);
-  document.getElementById("actionList").innerHTML = candidates.map(c => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(c.name)}</div><div class="rank-meta">${c.inactiveDays} jour(s) sans visite${c.objectives[0] ? " · " + escapeHtml(c.objectives[0]) : ""}</div></div><div class="rank-val">${fmtMoney(c.total)}</div></div>`).join("") || empty("Aucune relance prioritaire");
+  el.innerHTML = candidates.map(c => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(c.name)}</div><div class="rank-meta">${c.inactiveDays} j sans visite${c.objectives[0] ? " · " + escapeHtml(c.objectives[0]) : ""}</div></div><div class="rank-val">${fmtMoney(c.total)}</div></div>`).join("") || empty("Aucune relance prioritaire");
 }
 
 function renderAvgServices(){
+  const el = document.getElementById("avgServiceList");
+  if(!el) return;
   // [FIX-ARCHI-3] Le panier moyen par service exclut les ventes non payees.
   const rows = topBy(state.filtered.filter(x => x.status === "Paye"), "service", "sum").map(r => ({...r, avg:r.count ? r.value/r.count : 0}));
-  document.getElementById("avgServiceList").innerHTML = rows.slice(0,7).map(r => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(r.name)}</div><div class="rank-meta">${fmtNum(r.count)} prestation(s)</div></div><div class="rank-val">${fmtMoney(r.avg)}</div></div>`).join("") || empty("Aucun service");
+  el.innerHTML = rows.slice(0,7).map(r => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(r.name)}</div><div class="rank-meta">${fmtNum(r.count)} prestation(s)</div></div><div class="rank-val">${fmtMoney(r.avg)}</div></div>`).join("") || empty("Aucun service");
 }
 
 function renderObjectiveList(){
+  const el = document.getElementById("objectiveList");
+  if(!el) return;
   const all = state.clients.flatMap(c => c.objectives.map(o => ({client:c.name, objective:o})));
   const grouped = {};
   all.forEach(x => { grouped[x.objective] = (grouped[x.objective] || 0) + 1; });
   const rows = Object.entries(grouped).sort((a,b) => b[1]-a[1]).slice(0,7);
-  document.getElementById("objectiveList").innerHTML = rows.map(([name,count]) => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(name)}</div><div class="rank-meta">Objectif client detecte</div></div><div class="rank-val">${count}</div></div>`).join("") || empty("Les objectifs apparaitront apres les diagnostics");
+  el.innerHTML = rows.map(([name,count]) => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(name)}</div><div class="rank-meta">Objectif client détecté</div></div><div class="rank-val">${count}</div></div>`).join("") || empty("Objectifs apparaîtront après les diagnostics");
 }
 
 function renderTables(){
-  renderTable("salesTable", ["Date","Cliente","Service","Employee","Montant","Statut"], state.filtered.slice().sort((a,b) => (b.date||0)-(a.date||0)).map(s => [fmtDate(s.date), s.client, s.service, s.employee, fmtMoney(s.total), pillStatus(s.status)]));
+  renderTable("salesTable", ["Date","Cliente","Service","Prestataire","Montant","Statut"], state.filtered.slice().sort((a,b) => (b.date||0)-(a.date||0)).map(s => [fmtDate(s.date), s.client, s.service, s.employee, fmtMoney(s.total), pillStatus(s.status)]));
   const services = topBy(state.filtered, "service", "sum");
-  renderTable("serviceTable", ["Service","Prestations","CA paye","Panier moyen","Poids"], services.map(s => [s.name, fmtNum(s.count), fmtMoney(s.value), fmtMoney(s.count ? s.value/s.count : 0), `${Math.round((s.value/(services.reduce((a,b)=>a+b.value,0)||1))*100)}%`]));
+  renderTable("serviceTable", ["Service","Prestations","CA encaissé","Panier moyen","Poids"], services.map(s => [s.name, fmtNum(s.count), fmtMoney(s.value), fmtMoney(s.count ? s.value/s.count : 0), `${Math.round((s.value/(services.reduce((a,b)=>a+b.value,0)||1))*100)}%`]));
   const followups = state.clients.slice().sort((a,b) => (a.lastVisit||0)-(b.lastVisit||0)).slice(0,20);
-  renderTable("followupTable", ["Cliente","Derniere visite","Visites","CA paye","Objectifs","Priorite"], followups.map(c => [c.name, fmtDate(c.lastVisit), fmtNum(c.visits), fmtMoney(c.total), c.objectives.join(", ") || "-", priority(c)]));
+  renderTable("followupTable", ["Cliente","Dernière visite","Visites","CA payé","Objectifs","Priorité"], followups.map(c => [c.name, fmtDate(c.lastVisit), fmtNum(c.visits), fmtMoney(c.total), c.objectives.join(", ") || "-", priority(c)]));
 }
 
 function renderTable(id, headers, rows){
   const el = document.getElementById(id);
+  if(!el) return;
   el.innerHTML = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>`;
 }
 
@@ -1876,26 +2171,15 @@ function renderSubscriptions(){
     nouveauxMois: state.subscriptions.filter(s => s.start && s.start.getMonth() === now.getMonth() && s.start.getFullYear() === now.getFullYear()).length,
     expiresMois: state.subscriptions.filter(s => s.end && s.end.getMonth() === now.getMonth() && s.end.getFullYear() === now.getFullYear() && ["Expiré","Terminé"].includes(s.status)).length
   };
-  document.getElementById("subscriptionKpis").innerHTML = [
-    kpi("Actifs", fmtNum(counts.actif), "Abonnements utilisables", "check-circle"),
-    kpi("Bientôt expirés", fmtNum(counts.bientot), "7 jours ou moins", "alert-triangle"),
-    kpi("Expirés", fmtNum(counts.expire), "Date de fin dépassée", "x-circle"),
-    kpi("Terminés", fmtNum(counts.termine), "Séances épuisées", "archive"),
-    kpi("Suspendus", fmtNum(counts.suspendu), "Blocage manuel", "pause-circle"),
-    kpi("Nouveaux ce mois", fmtNum(counts.nouveauxMois), "Debuts sur le mois", "plus-circle"),
-    kpi("Expirés ce mois", fmtNum(counts.expiresMois), "Fin ou seances terminees", "calendar-x")
-  ].join("");
   const totalSubs = state.subscriptions.length || 1;
   const usableSubs = counts.actif + counts.bientot;
   const attentionSubs = counts.bientot + counts.expire + counts.termine;
   document.getElementById("subscriptionKpis").innerHTML = [
-    kpi("Utilisables", fmtNum(usableSubs), "Actifs + bientot expires", "check-circle", {variant:"good", progress:usableSubs / totalSubs * 100, chip:`${fmtNum(totalSubs)} total`}),
-    kpi("Actifs", fmtNum(counts.actif), "Abonnements sans alerte", "badge-check", {variant:"teal", progress:counts.actif / totalSubs * 100, chip:"OK"}),
-    kpi("A surveiller", fmtNum(attentionSubs), "Bientot expires, expires ou termines", "alert-triangle", {variant:attentionSubs ? "warn" : "good", progress:attentionSubs / totalSubs * 100, chip:attentionSubs ? "Action" : "Stable"}),
-    kpi("Expires", fmtNum(counts.expire), "Date de fin depassee", "x-circle", {variant:counts.expire ? "danger" : "neutral", progress:counts.expire / totalSubs * 100}),
-    kpi("Termines", fmtNum(counts.termine), "Seances epuisees", "archive", {variant:counts.termine ? "neutral" : "good", progress:counts.termine / totalSubs * 100}),
-    kpi("Nouveaux ce mois", fmtNum(counts.nouveauxMois), "Souscriptions du mois", "plus-circle", {variant:"plum", meta:"Tendance acquisition"}),
-    kpi("Expires ce mois", fmtNum(counts.expiresMois), "Fin ou seances terminees", "calendar-x", {variant:counts.expiresMois ? "warn" : "neutral", meta:"A renouveler"})
+    kpi("Utilisables", fmtNum(usableSubs), "Actifs + bientôt expirés", "check-circle", {variant:"good", progress:usableSubs / totalSubs * 100, chip:`${fmtNum(totalSubs)} total`}),
+    kpi("Actifs", fmtNum(counts.actif), "Sans alerte", "badge-check", {variant:"teal", progress:counts.actif / totalSubs * 100}),
+    kpi("À surveiller", fmtNum(attentionSubs), "Expirés, terminés ou bientôt", "alert-triangle", {variant:attentionSubs ? "warn" : "good", chip:attentionSubs ? "Action" : "Stable"}),
+    kpi("Nouveaux ce mois", fmtNum(counts.nouveauxMois), "Souscriptions du mois", "plus-circle", {variant:"plum", meta:"Acquisition"}),
+    kpi("Expirés ce mois", fmtNum(counts.expiresMois), "À renouveler", "calendar-x", {variant:counts.expiresMois ? "warn" : "neutral"})
   ].join("");
   renderTable("subscriptionsTable",
     ["Cliente","Formule","Début","Fin","Jours","Séances","Statut","Alerte"],
@@ -1914,9 +2198,7 @@ function renderSubscriptions(){
 
 function renderCommissions(){
   const period = document.getElementById("periodFilter").value;
-  const employee = document.getElementById("employeeFilter").value;
-  const search = normName(document.getElementById("searchInput").value);
-  const data = state.filteredCommissions.length || period !== "all" || employee !== "all" || search
+  const data = state.filteredCommissions.length || period !== "all"
     ? state.filteredCommissions
     : state.commissions;
   const currentMonth = currentMonthKey();
@@ -1927,38 +2209,31 @@ function renderCommissions(){
   const unpaid = data.filter(c => normName(c.status) !== "paye").reduce((sum,c) => sum + c.total, 0);
   const paid = data.filter(c => normName(c.status) === "paye").reduce((sum,c) => sum + c.total, 0);
   const employees = new Set(data.map(c => c.employee).filter(Boolean)).size;
-
-  document.getElementById("commissionKpis").innerHTML = [
-    kpi("Commissions du mois", fmtMoney(monthTotal), currentMonth, "badge-dollar-sign"),
-    kpi("Total filtre", fmtMoney(visibleTotal), `${fmtNum(data.length)} ligne(s)`, "calculator"),
-    // [FIX-COM-HTML-4] Note contextualisée selon le filtre période.
-    kpi("Non paye", fmtMoney(unpaid), commissionPeriodNote(period), "clock"),
-    kpi("Paye", fmtMoney(paid), "Deja solde", "badge-check"),
-    kpi("Prestataires", fmtNum(employees), "Avec commissions", "users")
-  ].join("");
-
   const commissionTotal = paid + unpaid || 1;
+
   document.getElementById("commissionKpis").innerHTML = [
     kpi("Commissions du mois", fmtMoney(monthTotal), currentMonth, "badge-dollar-sign", {variant:"plum", meta:"Mois courant"}),
-    kpi("Total filtre", fmtMoney(visibleTotal), `${fmtNum(data.length)} ligne(s)`, "calculator", {variant:"teal", meta:"Periode affichee"}),
-    kpi("Non paye", fmtMoney(unpaid), commissionPeriodNote(period), "clock", {variant:unpaid ? "warn" : "good", progress:unpaid / commissionTotal * 100, chip:unpaid ? "A regler" : "OK"}),
-    kpi("Paye", fmtMoney(paid), "Commissions soldees", "badge-check", {variant:"good", progress:paid / commissionTotal * 100, chip:`${Math.round(paid / commissionTotal * 100)}%`}),
-    kpi("Prestataires", fmtNum(employees), "Avec commissions", "users", {variant:"neutral", meta:"Equipe"})
+    kpi("Total filtré", fmtMoney(visibleTotal), `${fmtNum(data.length)} ligne(s)`, "calculator", {variant:"teal", meta:"Période affichée"}),
+    // [FIX-COM-HTML-4] Note contextualisée selon le filtre période.
+    kpi("Non payé", fmtMoney(unpaid), commissionPeriodNote(period), "clock", {variant:unpaid ? "warn" : "good", progress:unpaid / commissionTotal * 100, chip:unpaid ? "À régler" : "OK"}),
+    kpi("Payé", fmtMoney(paid), "Commissions soldées", "badge-check", {variant:"good", progress:paid / commissionTotal * 100, chip:`${Math.round(paid / commissionTotal * 100)}%`}),
+    kpi("Prestataires", fmtNum(employees), "Avec commissions", "users", {variant:"neutral"})
   ].join("");
 
   const ranked = data.slice().sort((a,b) => b.total - a.total);
   // [FIX-COM-HTML-3] Graphique line de l'évolution mensuelle.
   const trend = commissionTrendData();
-  makeChart("commissionTrendChart", "line", trend.labels, [{label:"Total commissions", data:trend.values, borderColor:colors.plum, backgroundColor:"rgba(85,36,119,.12)", fill:true, tension:.35}], {yMoney:true});
-  makeChart("commissionChart", "bar", ranked.map(x => x.employee), [{label:"Total commission", data:ranked.map(x => x.total), backgroundColor:colors.plum}], {yMoney:true});
+  makeChart("commissionTrendChart", "line", trend.labels, [{label:"Total commissions", data:trend.values, borderColor:colors.violet, backgroundColor:"rgba(155,124,255,.08)", fill:true, tension:.35}], {yMoney:true});
+  makeChart("commissionChart", "bar", ranked.map(x => x.employee), [{label:"Total commission", data:ranked.map(x => x.total), backgroundColor:colors.violet, borderRadius:5}], {yMoney:true});
+
   document.getElementById("commissionPrimeList").innerHTML = ranked.slice(0,8).map(c => {
     const primes = c.abonnement + c.satisfaction + c.resultat + c.evenement;
-    return `<div class="rank-row"><div><div class="rank-name">${escapeHtml(c.employee)}</div><div class="rank-meta">Abo ${fmtMoney(c.abonnement)} | satisfaction ${fmtMoney(c.satisfaction)} | resultat ${fmtMoney(c.resultat)} | evenements ${fmtMoney(c.evenement)}</div></div><div class="rank-val">${fmtMoney(primes)}</div></div>`;
-  }).join("") || empty("Aucune commission calculee");
+    return `<div class="rank-row"><div><div class="rank-name">${escapeHtml(c.employee)}</div><div class="rank-meta">Abo. ${fmtMoney(c.abonnement)} · Satis. ${fmtMoney(c.satisfaction)} · Résultat ${fmtMoney(c.resultat)} · Événem. ${fmtMoney(c.evenement)}</div></div><div class="rank-val">${fmtMoney(primes)}</div></div>`;
+  }).join("") || empty("Aucune commission calculée");
 
   renderTable("commissionsTable",
     // [FIX-COM-HTML-1] Ajout de la prime satisfaction dans le tableau.
-    ["Mois","Employee","CA individuel","Prestations","Produits","Abonnements","Satisfaction","Resultat","Evenements","Total","Statut"],
+    ["Mois","Prestataire","CA indiv.","Prestations","Produits","Abonnements","Satisfaction","Résultat","Événements","Total","Statut"],
     ranked.map(c => [
       c.month,
       c.employee,
@@ -2002,9 +2277,9 @@ function commissionPeriodNote(period){
 function renderClients(){
   const search = normName(document.getElementById("searchInput").value);
   const clients = state.clients.filter(c => !search || normName([c.name,c.phone,c.objectives.join(" "),c.favoriteService,c.subscription?.formule,c.subscription?.status].join(" ")).includes(search));
-  document.getElementById("clientCount").textContent = `${clients.length} client(s)`;
+  document.getElementById("clientCount").textContent = `${clients.length} cliente(s)`;
   if(!state.selectedClientId && clients[0]) state.selectedClientId = clients[0].id;
-  document.getElementById("clientList").innerHTML = clients.map(c => `<button class="client-item ${c.id === state.selectedClientId ? "active" : ""}" data-client="${escapeHtml(c.id)}"><div class="client-name">${escapeHtml(c.name)}</div><div class="client-mini">${fmtNum(c.visits)} visite(s) · ${fmtMoney(c.total)} · ${escapeHtml(c.loyalty)}</div></button>`).join("") || empty("Aucun client");
+  document.getElementById("clientList").innerHTML = clients.map(c => `<button class="client-item ${c.id === state.selectedClientId ? "active" : ""}" data-client="${escapeHtml(c.id)}"><div class="client-name">${escapeHtml(c.name)}</div><div class="client-mini">${fmtNum(c.visits)} visite(s) · ${fmtMoney(c.total)} · ${escapeHtml(c.loyalty)}</div></button>`).join("") || empty("Aucune cliente");
   document.querySelectorAll(".client-item").forEach(btn => btn.addEventListener("click", () => {state.selectedClientId = btn.dataset.client; renderClients();}));
   const c = clients.find(x => x.id === state.selectedClientId) || clients[0];
   renderClientProfile(c);
@@ -2012,9 +2287,9 @@ function renderClients(){
 
 function renderClientProfile(c){
   const box = document.getElementById("clientProfile");
-  if(!c){box.innerHTML = empty("Selectionnez une cliente"); return;}
+  if(!c){box.innerHTML = empty("Sélectionnez une cliente"); return;}
   document.getElementById("profileTitle").textContent = c.name;
-  document.getElementById("profileSub").textContent = [c.phone, c.area, c.email].filter(Boolean).join(" · ") || "Profil client";
+  document.getElementById("profileSub").textContent = [c.phone, c.area, c.email].filter(Boolean).join(" · ") || "Profil cliente";
   const events = c.sales.slice().sort((a,b) => (b.date||0)-(a.date||0)).slice(0,10);
   const sub = c.subscription;
   // [FIX-ABO-HTML-3] Historique compact des 5 derniers abonnements du client.
@@ -2023,11 +2298,11 @@ function renderClientProfile(c){
     .slice(0,5);
   const subscriptionHistoryHtml = subscriptionHistory.length
     ? `<table><thead><tr><th>Formule</th><th>Début</th><th>Fin</th><th>Séances</th><th>Statut</th></tr></thead><tbody>${subscriptionHistory.map(s => `<tr><td>${escapeHtml(s.formule)}</td><td>${fmtDate(s.start)}</td><td>${fmtDate(s.end)}</td><td>${fmtNum(s.remaining)} / ${fmtNum(s.included)}</td><td>${subscriptionBadge(s.status)}</td></tr>`).join("")}</tbody></table>`
-    : empty("Aucun historique abonnement");
+    : empty("Aucun historique d'abonnement");
   box.innerHTML = `
     <div class="profile-grid">
       <div class="metric"><label>Statut</label><strong>${badgeLoyalty(c.loyalty)}</strong></div>
-      <div class="metric"><label>CA paye</label><strong>${fmtMoney(c.total)}</strong></div>
+      <div class="metric"><label>CA payé</label><strong>${fmtMoney(c.total)}</strong></div>
       <div class="metric"><label>Visites</label><strong>${fmtNum(c.visits)}</strong></div>
       <div class="metric"><label>Service favori</label><strong>${escapeHtml(c.favoriteService)}</strong></div>
       <div class="metric"><label>Abonnement</label><strong>${sub ? escapeHtml(sub.formule) : "Aucun"}</strong></div>
@@ -2035,26 +2310,26 @@ function renderClientProfile(c){
       <div class="metric"><label>Jours restants</label><strong>${sub ? fmtNum(sub.daysRemaining) : "-"}</strong></div>
       <div class="metric"><label>Séances restantes</label><strong>${sub ? fmtNum(sub.remaining) : "-"}</strong></div>
     </div>
-    <div class="grid-2">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
       <div>
-        <div class="card-title">Abonnement</div>
-        <div class="split-list" style="margin-top:12px">${sub ? `
-          <div class="rank-row"><div><div class="rank-name">${escapeHtml(sub.formule)}</div><div class="rank-meta">${fmtDate(sub.start)} - ${fmtDate(sub.end)}</div></div><div class="rank-val">${subscriptionBadge(sub.status)}</div></div>
+        <div class="card-title" style="margin-bottom:12px">Abonnement actif</div>
+        <div class="split-list">${sub ? `
+          <div class="rank-row"><div><div class="rank-name">${escapeHtml(sub.formule)}</div><div class="rank-meta">${fmtDate(sub.start)} — ${fmtDate(sub.end)}</div></div><div class="rank-val">${subscriptionBadge(sub.status)}</div></div>
           <div class="rank-row"><div><div class="rank-name">${fmtNum(sub.remaining)} séance(s) restante(s)</div><div class="rank-meta">${fmtNum(sub.used)} utilisée(s) sur ${fmtNum(sub.included)}</div></div><div class="rank-val">${fmtNum(sub.daysRemaining)} j</div></div>
-        ` : empty("Aucun abonnement connu")}</div>
+        ` : empty("Aucun abonnement actif")}</div>
       </div>
       <div>
-        <div class="card-title">Historique abonnements</div>
-        <div class="table-wrap" style="margin-top:12px">${subscriptionHistoryHtml}</div>
+        <div class="card-title" style="margin-bottom:12px">Objectifs</div>
+        <div class="split-list">${c.objectives.length ? c.objectives.map(o => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(o)}</div><div class="rank-meta">À suivre</div></div></div>`).join("") : empty("Aucun objectif renseigné")}</div>
       </div>
-      <div>
-        <div class="card-title">Objectifs connus</div>
-        <div class="split-list" style="margin-top:12px">${c.objectives.length ? c.objectives.map(o => `<div class="rank-row"><div><div class="rank-name">${escapeHtml(o)}</div><div class="rank-meta">A suivre lors de la prochaine visite</div></div></div>`).join("") : empty("Aucun objectif renseigne")}</div>
-      </div>
-      <div>
-        <div class="card-title">Activite recente</div>
-        <div class="timeline" style="margin-top:12px">${events.map(e => `<div class="event"><div class="event-date">${fmtDate(e.date)}</div><div><div class="event-title">${escapeHtml(e.service)}</div><div class="event-sub">${escapeHtml(e.employee)} · ${escapeHtml(e.status)}</div></div><strong>${fmtMoney(e.total)}</strong></div>`).join("") || empty("Aucune activite")}</div>
-      </div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="card-title" style="margin-bottom:12px">Historique abonnements</div>
+      <div class="table-wrap">${subscriptionHistoryHtml}</div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="card-title" style="margin-bottom:12px">Activité récente</div>
+      <div class="timeline">${events.map(e => `<div class="event"><div class="event-date">${fmtDate(e.date)}</div><div><div class="event-title">${escapeHtml(e.service)}</div><div class="event-sub">${escapeHtml(e.employee)} · ${escapeHtml(e.status)}</div></div><strong>${fmtMoney(e.total)}</strong></div>`).join("") || empty("Aucune activité")}</div>
     </div>`;
 }
 
@@ -2074,10 +2349,14 @@ function renderGoals(){
 
 function renderGoal(id, value, target, formatter){
   const pct = target ? Math.min(100, Math.round(value / target * 100)) : 0;
-  document.getElementById(id).innerHTML = `<div style="margin-top:14px"><div class="rank-row"><div><div class="rank-name">${formatter(value)} realises</div><div class="rank-meta">Objectif : ${formatter(target)}</div><div class="progress"><span style="width:${pct}%"></span></div></div><div class="rank-val">${pct}%</div></div></div>`;
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.innerHTML = `<div style="margin-top:14px"><div class="rank-row"><div><div class="rank-name">${formatter(value)} réalisés</div><div class="rank-meta">Objectif : ${formatter(target)}</div><div class="progress"><span style="width:${pct}%"></span></div></div><div class="rank-val">${pct}%</div></div></div>`;
 }
 
 function renderEmployeeGoals(monthSales){
+  const el = document.getElementById("employeeGoalCards");
+  if(!el) return;
   const goals = readGoalMap(CONFIG.goalKeys.employees);
   const stats = {};
   monthSales.forEach(s => {
@@ -2092,25 +2371,103 @@ function renderEmployeeGoals(monthSales){
     ...Object.keys(goals)
   ].filter(Boolean))].sort();
 
-  const rows = employees.map(name => {
-    const g = goals[name] || {sessions:0, ca:0};
-    const s = stats[name] || {sessions:0, ca:0};
-    return `<tr data-goal-name="${escapeHtml(name)}">
-      <td>${escapeHtml(name)}</td>
-      <td>${fmtNum(s.sessions)}</td>
-      <td><input type="number" min="0" step="1" data-goal-field="sessions" value="${Number(g.sessions) || 0}"></td>
-      <td>${fmtMoney(s.ca)}</td>
-      <td><input type="number" min="0" step="1000" data-goal-field="ca" value="${Number(g.ca) || 0}"></td>
-      <td>${goalMeter(s.sessions, g.sessions, fmtNum)}${goalMeter(s.ca, g.ca, fmtMoney)}</td>
-      <td><button class="ghost-btn" data-save-dynamic-goal="employee">OK</button></td>
-    </tr>`;
-  }).join("");
+  if(!employees.length){
+    el.innerHTML = `<div class="empty" style="grid-column:1/-1">Aucun prestataire dans la base</div>`;
+    return;
+  }
 
-  document.getElementById("employeeGoalsTable").innerHTML =
-    `<thead><tr><th>Employee</th><th>Seances</th><th>Obj. seances</th><th>CA paye</th><th>Obj. CA</th><th>Avancement</th><th></th></tr></thead><tbody>${rows}</tbody>`;
+  function avatarInitials(name){
+    return name.split(" ").map(w => w[0] || "").slice(0,2).join("").toUpperCase() || "?";
+  }
+  function barClass(pct){
+    if(!pct) return "";
+    if(pct >= 90) return "";
+    if(pct >= 55) return " warn";
+    return " danger";
+  }
+  function pctClass(pct){
+    if(!pct) return "neutral";
+    if(pct >= 90) return "";
+    if(pct >= 55) return "warn";
+    return "danger";
+  }
+  const avatarGradients = [
+    "linear-gradient(135deg,#9B7CFF,#5B9CF6)",
+    "linear-gradient(135deg,#2EC4B6,#38D387)",
+    "linear-gradient(135deg,#F5A623,#EF6B6B)",
+    "linear-gradient(135deg,#C49A3C,#D4AC52)",
+    "linear-gradient(135deg,#EF6B6B,#9B7CFF)",
+    "linear-gradient(135deg,#5B9CF6,#2EC4B6)"
+  ];
+
+  el.innerHTML = employees.map((name, idx) => {
+    const g = goals[name] || {sessions: 0, ca: 0};
+    const s = stats[name] || {sessions: 0, ca: 0};
+    const tSessions = Number(g.sessions) || 0;
+    const tCa = Number(g.ca) || 0;
+    const pctS = tSessions ? Math.min(100, Math.round(s.sessions / tSessions * 100)) : 0;
+    const pctC = tCa ? Math.min(100, Math.round(s.ca / tCa * 100)) : 0;
+    const gradient = avatarGradients[idx % avatarGradients.length];
+    const empRole = state.employees.find(e => e.name === name)?.role || "Équipe";
+
+    return `<div class="goal-person-card" data-goal-emp="${escapeHtml(name)}">
+      <div class="gpc-head">
+        <div class="gpc-avatar" style="background:${gradient}">${avatarInitials(name)}</div>
+        <div>
+          <div class="gpc-name">${escapeHtml(name)}</div>
+          <div class="gpc-role">${escapeHtml(empRole)}</div>
+        </div>
+      </div>
+
+      <div class="gpc-metrics">
+        <div class="gpc-metric">
+          <div class="gpc-metric-row">
+            <span class="gpc-metric-label">Séances</span>
+            <div class="gpc-metric-vals">
+              <span class="gpc-val">${fmtNum(s.sessions)}</span>
+              ${tSessions ? `<span class="gpc-target">/ ${fmtNum(tSessions)}</span>` : `<span class="gpc-target">Pas de cible</span>`}
+              ${tSessions ? `<span class="gpc-pct ${pctClass(pctS)}">${pctS}%</span>` : ""}
+            </div>
+          </div>
+          <div class="gpc-bar"><span style="width:${pctS}%" class="${barClass(pctS)}"></span></div>
+        </div>
+        <div class="gpc-metric">
+          <div class="gpc-metric-row">
+            <span class="gpc-metric-label">CA encaissé</span>
+            <div class="gpc-metric-vals">
+              <span class="gpc-val">${fmtMoney(s.ca)}</span>
+              ${tCa ? `<span class="gpc-target">/ ${fmtMoney(tCa)}</span>` : `<span class="gpc-target">Pas de cible</span>`}
+              ${tCa ? `<span class="gpc-pct ${pctClass(pctC)}">${pctC}%</span>` : ""}
+            </div>
+          </div>
+          <div class="gpc-bar"><span style="width:${pctC}%" class="${barClass(pctC)}"></span></div>
+        </div>
+      </div>
+
+      <div class="gpc-inputs">
+        <div class="gpc-input-group">
+          <label>Cible séances</label>
+          <input type="number" min="0" step="1"
+                 data-goal-field="sessions"
+                 value="${tSessions || ""}"
+                 placeholder="ex: 30">
+        </div>
+        <div class="gpc-input-group">
+          <label>Cible CA (FCFA)</label>
+          <input type="number" min="0" step="1000"
+                 data-goal-field="ca"
+                 value="${tCa || ""}"
+                 placeholder="ex: 500000">
+        </div>
+      </div>
+      <button class="gpc-save" data-save-dynamic-goal="employee">Enregistrer</button>
+    </div>`;
+  }).join("");
 }
 
 function renderServiceGoals(monthSales){
+  const el = document.getElementById("serviceGoalList");
+  if(!el) return;
   const goals = readGoalMap(CONFIG.goalKeys.services);
   const stats = {};
   monthSales.filter(s => s.status === "Paye").forEach(s => {
@@ -2122,20 +2479,51 @@ function renderServiceGoals(monthSales){
     ...Object.keys(goals)
   ].filter(Boolean))].sort();
 
+  if(!services.length){
+    el.innerHTML = `<div class="empty">Aucun service enregistré</div>`;
+    return;
+  }
+
+  function pctInfo(ca, target){
+    if(!target) return {pct:0, cls:"neutral"};
+    const pct = Math.min(100, Math.round(ca / target * 100));
+    const cls = pct >= 90 ? "good" : pct >= 55 ? "warn" : "danger";
+    return {pct, cls};
+  }
+
+  const header = `<div class="svc-goal-row header">
+    <span>Service</span>
+    <span>CA encaissé</span>
+    <span>Cible CA (FCFA)</span>
+    <span>Avancement</span>
+    <span></span>
+    <span></span>
+  </div>`;
+
   const rows = services.map(name => {
     const target = Number(goals[name]?.ca) || 0;
     const ca = stats[name] || 0;
-    return `<tr data-goal-name="${escapeHtml(name)}">
-      <td>${escapeHtml(name)}</td>
-      <td>${fmtMoney(ca)}</td>
-      <td><input type="number" min="0" step="1000" data-goal-field="ca" value="${target}"></td>
-      <td>${goalMeter(ca, target, fmtMoney)}</td>
-      <td><button class="ghost-btn" data-save-dynamic-goal="service">OK</button></td>
-    </tr>`;
+    const {pct, cls} = pctInfo(ca, target);
+    return `<div class="svc-goal-row" data-goal-name="${escapeHtml(name)}">
+      <span class="svc-name">${escapeHtml(name)}</span>
+      <span class="svc-ca">${fmtMoney(ca)}</span>
+      <input class="svc-input" type="number" min="0" step="1000"
+             data-goal-field="ca"
+             value="${target || ""}"
+             placeholder="Cible">
+      <div class="svc-progress-cell">
+        <div class="svc-progress-info">
+          <span class="svc-progress-pct ${cls}">${target ? pct + "%" : "—"}</span>
+          ${target ? `<span style="font-size:11px;color:var(--t3)">${fmtMoney(target)}</span>` : ""}
+        </div>
+        <div class="gpc-bar"><span style="width:${pct}%" class="${cls === "good" ? "" : cls}"></span></div>
+      </div>
+      <span></span>
+      <button class="svc-save-btn" data-save-dynamic-goal="service">Sauv.</button>
+    </div>`;
   }).join("");
 
-  document.getElementById("serviceGoalsTable").innerHTML =
-    `<thead><tr><th>Service</th><th>CA paye</th><th>Obj. CA</th><th>Avancement</th><th></th></tr></thead><tbody>${rows}</tbody>`;
+  el.innerHTML = header + rows;
 }
 
 function goalMeter(value, target, formatter){
@@ -2164,21 +2552,33 @@ async function writeGoalMap(key, value){
 async function handleDynamicGoalSave(event){
   const btn = event.target.closest("[data-save-dynamic-goal]");
   if(!btn) return;
-  const row = btn.closest("tr");
-  if(!row) return;
-  const name = row.dataset.goalName;
   const type = btn.dataset.saveDynamicGoal;
   const keyName = type === "employee" ? CONFIG.goalKeys.employees : CONFIG.goalKeys.services;
   const goals = readGoalMap(keyName);
-  const ca = Number(row.querySelector('[data-goal-field="ca"]')?.value || 0);
+
+  // Support: .goal-person-card (new card UI) ou tr (legacy)
+  const container = btn.closest(".goal-person-card") || btn.closest(".svc-goal-row") || btn.closest("tr");
+  if(!container) return;
+
+  const name = container.dataset.goalName || container.dataset.goalEmp;
+  if(!name) return;
+
+  const ca = Number(container.querySelector('[data-goal-field="ca"]')?.value || 0);
+
   if(type === "employee"){
-    const sessions = Number(row.querySelector('[data-goal-field="sessions"]')?.value || 0);
+    const sessions = Number(container.querySelector('[data-goal-field="sessions"]')?.value || 0);
     goals[name] = {sessions, ca};
+    // Feedback visuel
+    container.classList.add("editing");
+    setTimeout(() => container.classList.remove("editing"), 800);
   }else{
     goals[name] = {ca};
   }
+
   await writeGoalMap(keyName, goals);
   renderGoals();
+  renderGoalsKPIs();
+  if(window.lucide) lucide.createIcons();
 }
 
 async function loadGoals(){
@@ -2198,12 +2598,12 @@ async function loadGoals(){
 
 async function saveGoals(){
   // [FIX-ARCHI-1] Sauvegarde des trois objectifs globaux dans OBJECTIFS.
-  await Promise.all([
-    saveGoalValue(CONFIG.goalKeys.monthly, document.getElementById("monthlyGoal").value || 0),
-    saveGoalValue(CONFIG.goalKeys.visits, document.getElementById("visitGoal").value || 0),
-    saveGoalValue(CONFIG.goalKeys.clients, document.getElementById("clientGoal").value || 0)
-  ]);
+  await saveGoalValue(CONFIG.goalKeys.monthly, document.getElementById("monthlyGoal").value);
+  await saveGoalValue(CONFIG.goalKeys.visits, document.getElementById("visitGoal").value);
+  await saveGoalValue(CONFIG.goalKeys.clients, document.getElementById("clientGoal").value);
   renderGoals();
+  renderGoalsKPIs();
+  if(window.lucide) lucide.createIcons();
 }
 
 function getGoalValue(key, fallback){
@@ -2271,7 +2671,7 @@ function commissionBadge(status){
   let cls = "com-pending";
   if(normalized === "paye") cls = "com-paid";
   else if(normalized.includes("non")) cls = "com-unpaid";
-  return `<span class="pill ${cls}">${escapeHtml(status || "Non paye")}</span>`;
+  return `<span class="pill ${cls}">${escapeHtml(status || "Non payé")}</span>`;
 }
 
 function currentMonthKey(){
@@ -2333,12 +2733,12 @@ function updateStatusFreshness(){
     const age = Date.now() - state.lastLoadedAt.getTime();
     stale = age > 30 * 60 * 1000;
     loaded.textContent = stale
-      ? "Donnees > 30 min · Actualiser"
-      : `· Charge a ${state.lastLoadedAt.toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"})}`;
+      ? "Données > 30 min"
+      : `Chargé à ${state.lastLoadedAt.toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"})}`;
   }else{
     loaded.textContent = "";
   }
-  el.className = `status ${base}${stale ? " warn" : ""}`.trim();
+  el.className = `status sb-status ${base}${stale ? " warn" : ""}`.trim();
 }
 
 function startFreshnessTimer(){
@@ -2360,7 +2760,7 @@ function empty(text){return `<div class="empty">${escapeHtml(text)}</div>`;}
 function escapeHtml(v){return String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
 
 function exportCurrentCsv(){
-  const headers = ["Date","Cliente","Telephone","Service","Employee","Montant","Statut","Paiement"];
+  const headers = ["Date","Cliente","Téléphone","Service","Prestataire","Montant","Statut","Paiement"];
   const rows = state.filtered.map(s => [fmtDate(s.date), s.client, s.phone, s.service, s.employee, s.total, s.status, s.payment]);
   const csv = [headers, ...rows].map(r => r.map(v => `"${String(v ?? "").replace(/"/g,'""')}"`).join(",")).join("\n");
   const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
@@ -2373,9 +2773,9 @@ function exportCurrentCsv(){
 }
 
 function demoDataset(){
-  const services = ["Soin visage / Institut","Coiffure / Soin capillaire","Sport / Fitness","Massage / Relaxation","Manucure / Pedicure","Epilation"];
+  const services = ["Soin visage / Institut","Coiffure / Soin capillaire","Sport / Fitness","Massage / Relaxation","Manucure / Pédicure","Épilation"];
   const employees = ["Awa","Mariam","Nadine","Fatou","Sarah"];
-  const clients = ["Aissatou Kone","Mariam Diallo","Nadia Traore","Fatou Bamba","Aminata Coulibaly","Sarah Kouame","Kadi Diarra","Maya Soro"];
+  const clients = ["Aissatou Koné","Mariam Diallo","Nadia Traoré","Fatou Bamba","Aminata Coulibaly","Sarah Kouamé","Kadi Diarra","Maya Soro"];
   const sales = [];
   for(let i=0;i<80;i++){
     const d = new Date(); d.setDate(d.getDate() - Math.floor(Math.random()*55));
@@ -2414,9 +2814,9 @@ function demoDataset(){
     }),
     diagnostics: [
       {idClient:"CLI-0",objective:"Hydratation profonde"},
-      {idClient:"CLI-1",objective:"Reparation capillaire"},
+      {idClient:"CLI-1",objective:"Réparation capillaire"},
       {idClient:"CLI-2",objective:"Perte de poids"},
-      {idClient:"CLI-3",objective:"Teint unifie"}
+      {idClient:"CLI-3",objective:"Teint unifié"}
     ]
   };
 }
