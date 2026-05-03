@@ -1593,6 +1593,32 @@ function dateMatchesPeriod(date, period, now){
   return (now - d) / 86400000 <= days;
 }
 
+function subscriptionMatchesPeriod(subscription, period, now){
+  if(period === "all") return true;
+  const start = subscription.start ? new Date(subscription.start) : null;
+  const end = subscription.end ? new Date(subscription.end) : start;
+  if(!start && !end) return false;
+  if(start) start.setHours(0,0,0,0);
+  if(end) end.setHours(0,0,0,0);
+  let from;
+  let to = new Date(now);
+  to.setHours(0,0,0,0);
+  if(period === "today"){
+    from = new Date(now);
+    from.setHours(0,0,0,0);
+  } else if(period === "month"){
+    from = new Date(now.getFullYear(), now.getMonth(), 1);
+    to = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  } else {
+    from = new Date(now);
+    from.setDate(from.getDate() - Number(period));
+    from.setHours(0,0,0,0);
+  }
+  const rangeStart = start || end;
+  const rangeEnd = end || start;
+  return rangeStart <= to && rangeEnd >= from;
+}
+
 function normalizeStatus(raw){
   const s = normName(raw);
   if(s === "a payer" || s.includes("a payer") || s.includes("payer")) return "A payer";
@@ -1924,8 +1950,8 @@ function applyFilters(){
     return (now - d) / 86400000 <= days;
   });
   state.filteredSubscriptions = state.subscriptions.filter(s => {
-    // [FIX-ABO-HTML-1] Les abonnements suivent le filtre période via leur date de début.
-    if(!dateMatchesPeriod(s.start, period, now)) return false;
+    // [FIX-ABO-HTML-1] Les abonnements suivent la période s'ils la chevauchent.
+    if(!subscriptionMatchesPeriod(s, period, now)) return false;
     if(abonnementStatus !== "all" && s.status !== abonnementStatus) return false;
     // [FIX-ABO-HTML-2] Filtre par formule.
     if(formule !== "all" && s.formule !== formule) return false;
@@ -2235,7 +2261,10 @@ function renderTables(){
 function renderTable(id, headers, rows){
   const el = document.getElementById(id);
   if(!el) return;
-  el.innerHTML = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>`;
+  const body = rows.length
+    ? rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")
+    : `<tr><td colspan="${headers.length}"><div class="empty">Aucune ligne pour les filtres actuels</div></td></tr>`;
+  el.innerHTML = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>${body}</tbody>`;
 }
 
 function renderSubscriptions(){
@@ -2255,12 +2284,10 @@ function renderSubscriptions(){
   const totalSubs = state.subscriptions.length || 1;
   const usableSubs = counts.actif + counts.bientot;
   const attentionSubs = counts.bientot + counts.expire + counts.termine;
-  const subscriptionRevenue = state.subscriptions.reduce((sum,s) => sum + (Number(s.pricePaid) || 0), 0);
   document.getElementById("subscriptionKpis").innerHTML = [
     kpi("Utilisables", fmtNum(usableSubs), "Actifs + bientôt expirés", "check-circle", {variant:"good", progress:usableSubs / totalSubs * 100, chip:`${fmtNum(totalSubs)} total`}),
     kpi("Actifs", fmtNum(counts.actif), "Sans alerte", "badge-check", {variant:"teal", progress:counts.actif / totalSubs * 100}),
     kpi("À surveiller", fmtNum(attentionSubs), "Expirés, terminés ou bientôt", "alert-triangle", {variant:attentionSubs ? "warn" : "good", chip:attentionSubs ? "Action" : "Stable"}),
-    kpi("CA abonnements", fmtMoney(subscriptionRevenue), "Prix payes enregistres", "wallet", {variant:"gold", meta:"ABONNEMENTS"}),
     kpi("Nouveaux ce mois", fmtNum(counts.nouveauxMois), "Souscriptions du mois", "plus-circle", {variant:"plum", meta:"Acquisition"}),
     kpi("Expirés ce mois", fmtNum(counts.expiresMois), "À renouveler", "calendar-x", {variant:counts.expiresMois ? "warn" : "neutral"})
   ].join("");
