@@ -1200,6 +1200,12 @@ const CONFIG = {
     employees: "mlEmployeeGoals",
     services: "mlServiceGoals"
   },
+  officialEmployees: [
+    "ASSILAMEHOU Régina",
+    "DIARRASSOUBA Fatoumata",
+    "MELESSI BROU",
+    "N'GUESSAN Viviane K"
+  ],
   sheets: {
     caisse: "CAISSE",
     clients: "BASE_CLIENTS",
@@ -1845,7 +1851,7 @@ function loyalty(visits){
 
 function populateFilters(){
   fillSelect("serviceFilter", [...new Set(state.sales.map(x => x.service).filter(Boolean))].sort(), "Tous les services");
-  fillSelect("employeeFilter", [...new Set([...state.employees.map(x => x.name), ...state.sales.map(x => x.employee)].filter(Boolean))].sort(), "Toute l'équipe");
+  fillSelect("employeeFilter", employeeNamesForDashboard(), "Toute l'équipe");
   // [FIX-ABO-HTML-2] Liste dynamique des formules d'abonnement.
   fillSelect("formuleFilter", [...new Set(state.subscriptions.map(x => x.formule).filter(Boolean))].sort(), "Toutes les formules");
 }
@@ -1855,6 +1861,29 @@ function fillSelect(id, values, label){
   const current = el.value || "all";
   el.innerHTML = `<option value="all">${label}</option>` + values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
   el.value = values.includes(current) ? current : "all";
+}
+
+function isSystemEmployeeName(name){
+  const n = normName(name);
+  return !n || n === "vente abonnement" || n === "non attribue" || n === "equipe";
+}
+
+function employeeNamesForDashboard(){
+  const official = CONFIG.officialEmployees || [];
+  if(official.length) return official.slice();
+  const fromSheet = state.employees.map(e => e.name).filter(name => !isSystemEmployeeName(name));
+  if(fromSheet.length) return [...new Set(fromSheet)].sort();
+  return [...new Set(state.sales.map(s => s.employee).filter(name => !isSystemEmployeeName(name)))].sort();
+}
+
+function canonicalEmployeeName(name){
+  const n = normName(name);
+  if(!n || isSystemEmployeeName(name)) return "";
+  return employeeNamesForDashboard().find(emp => normName(emp) === n) || "";
+}
+
+function employeeScopedSales(data){
+  return data.map(s => ({...s, employee: canonicalEmployeeName(s.employee)})).filter(s => s.employee);
 }
 
 function applyFilters(){
@@ -1868,7 +1897,7 @@ function applyFilters(){
   const now = new Date(); now.setHours(0,0,0,0);
   state.filtered = state.sales.filter(s => {
     if(service !== "all" && s.service !== service) return false;
-    if(employee !== "all" && s.employee !== employee) return false;
+    if(employee !== "all" && canonicalEmployeeName(s.employee) !== employee) return false;
     if(status !== "all" && s.status !== status) return false;
     if(search && !normName([s.client,s.phone,s.service,s.employee].join(" ")).includes(search)) return false;
     if(period === "all") return true;
@@ -2078,7 +2107,7 @@ function renderCharts(){
   makeChart("statusChart", "doughnut", status.labels, [{data:status.values, backgroundColor:[colors.green,colors.amber,colors.blue,colors.gray]}]);
   const services = topBy(state.filtered.filter(x => x.status === "Paye"), "service", "sum");
   makeChart("serviceRevenueChart", "bar", services.map(x => x.name), [{label:"CA encaissé", data:services.map(x => x.value), backgroundColor:colors.teal, borderRadius:5}], {yMoney:true});
-  const employees = topBy(state.filtered, "employee", "count");
+  const employees = topBy(employeeScopedSales(state.filtered), "employee", "count");
   makeChart("employeeChart", "bar", employees.map(x => x.name), [{label:"Prestations", data:employees.map(x => x.count), backgroundColor:colors.violet, borderRadius:5}], {});
   const mix = topBy(state.filtered, "service", "count");
   makeChart("serviceMixChart", "doughnut", mix.map(x => x.name), [{data:mix.map(x => x.count), backgroundColor:[colors.plum,colors.teal,colors.amber,colors.coral,colors.blue,colors.green]}]);
@@ -2133,7 +2162,7 @@ function makeChart(id,type,labels,datasets,opts={}){
 
 function renderRankings(){
   renderRank("topServices", topBy(state.filtered.filter(x => x.status === "Paye"), "service", "sum"), true);
-  renderRank("topEmployees", topBy(state.filtered.filter(x => x.status === "Paye"), "employee", "sum"), true);
+  renderRank("topEmployees", topBy(employeeScopedSales(state.filtered.filter(x => x.status === "Paye")), "employee", "sum"), true);
   renderActions();
   renderAvgServices();
   renderObjectiveList();
@@ -2403,16 +2432,13 @@ function renderEmployeeGoals(monthSales){
   const goals = readGoalMap(CONFIG.goalKeys.employees);
   const stats = {};
   monthSales.forEach(s => {
-    const name = s.employee || "Equipe";
+    const name = canonicalEmployeeName(s.employee);
+    if(!name) return;
     if(!stats[name]) stats[name] = {sessions:0, ca:0};
     stats[name].sessions += 1;
     if(s.status === "Paye") stats[name].ca += s.total;
   });
-  const employees = [...new Set([
-    ...state.employees.map(e => e.name),
-    ...state.sales.map(s => s.employee),
-    ...Object.keys(goals)
-  ].filter(Boolean))].sort();
+  const employees = employeeNamesForDashboard();
 
   if(!employees.length){
     el.innerHTML = `<div class="empty" style="grid-column:1/-1">Aucun prestataire dans la base</div>`;
