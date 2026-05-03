@@ -258,6 +258,42 @@ a{color:inherit;text-decoration:none}
 .panel{display:none}
 .panel.active{display:block}
 
+.overview-brief{
+  background:linear-gradient(135deg,#fff,rgba(244,240,248,.86));
+  border:1px solid var(--line);
+  border-left:4px solid var(--gold);
+  border-radius:var(--r-md);
+  box-shadow:var(--shadow);
+  padding:16px 18px;
+  margin-bottom:18px;
+  display:grid;
+  grid-template-columns:minmax(0,1.45fr) minmax(280px,.55fr);
+  gap:16px;
+  align-items:center;
+}
+.brief-title{
+  font-family:"Lora",serif;
+  font-weight:700;
+  font-size:16px;
+  margin-bottom:4px;
+}
+.brief-text{color:var(--muted);font-size:13px;max-width:980px}
+.brief-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.brief-pill{
+  min-height:28px;
+  display:inline-flex;align-items:center;gap:7px;
+  padding:0 10px;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid var(--line);
+  color:var(--ink);
+  font-size:12px;
+  font-weight:800;
+}
+.brief-pill.good{background:var(--green-bg);color:var(--green);border-color:rgba(18,111,66,.16)}
+.brief-pill.warn{background:var(--amber-bg);color:var(--amber);border-color:rgba(168,98,10,.18)}
+.brief-pill.plum{background:#F0E6FD;color:var(--plum);border-color:rgba(90,31,140,.16)}
+
 /* ─── KPI Grid ─── */
 .kpis{
   display:grid;
@@ -557,6 +593,8 @@ tbody tr:hover td{background:#F7F2FC}
 /* ─── Responsive ─── */
 @media(max-width:1120px){
   .toolbar{grid-template-columns:repeat(3,1fr)}
+  .overview-brief{grid-template-columns:1fr}
+  .brief-pills{justify-content:flex-start}
   .kpis{grid-template-columns:repeat(3,1fr)}
   .grid-2,.grid-3,.goal-board{grid-template-columns:1fr}
   .client-layout{grid-template-columns:1fr}
@@ -567,6 +605,8 @@ tbody tr:hover td{background:#F7F2FC}
   .top-actions{justify-content:flex-start}
   .main{padding:16px 14px 36px}
   .status-row{align-items:flex-start;flex-direction:column}
+  .overview-brief{padding:14px}
+  .brief-pills{gap:6px}
   .toolbar{grid-template-columns:1fr}
   .kpis{grid-template-columns:1fr}
   .tabs{width:100%}
@@ -681,6 +721,7 @@ tbody tr:hover td{background:#F7F2FC}
     </nav>
 
     <section id="overview" class="panel active">
+      <div class="overview-brief" id="overviewBrief"></div>
       <div class="kpis" id="kpiGrid"></div>
       <div class="grid-2">
         <article class="card">
@@ -1551,6 +1592,7 @@ function applyFilters(){
 }
 
 function renderAll(){
+  renderExecutiveBrief();
   renderKPIs();
   renderPageKPIs();
   renderCharts();
@@ -1590,6 +1632,33 @@ function computeKPIs(data){
     conversion:data.length ? paid.length / data.length : 0,
     moneyConversion:totalBilled ? totalPaid / totalBilled : 0
   };
+}
+
+function renderExecutiveBrief(){
+  const el = document.getElementById("overviewBrief");
+  if(!el) return;
+  const k = computeKPIs(state.filtered);
+  const period = document.getElementById("periodFilter").value;
+  const periodText = period === "month" ? "mois en cours" : period === "today" ? "journee" : period === "all" ? "toutes periodes" : `${period} derniers jours`;
+  const activeClients = new Set(state.filtered.map(s => s.idClient || s.phoneKey || normName(s.client))).size;
+  const watchSubs = state.subscriptions.filter(s => ["BientÃ´t expirÃ©","ExpirÃ©","TerminÃ©"].includes(s.status)).length;
+  const unpaidCommissions = state.commissions.filter(c => normName(c.status) !== "paye").reduce((sum,c) => sum + c.total, 0);
+  el.innerHTML = `
+    <div>
+      <div class="brief-title">Apercu executif Maison Lumena</div>
+      <div class="brief-text">
+        Ce tableau relie ventes encaissees, activite client, abonnements, objectifs et commissions.
+        Sur la periode ${escapeHtml(periodText)}, Maison Lumena affiche ${fmtMoney(k.totalPaid)} encaisses,
+        ${fmtNum(k.count)} prestation(s), ${fmtNum(activeClients)} cliente(s) active(s) et ${fmtNum(watchSubs)} abonnement(s) a surveiller.
+      </div>
+    </div>
+    <div class="brief-pills">
+      <span class="brief-pill good"><i data-lucide="wallet" class="icon"></i>${fmtMoney(k.totalPaid)}</span>
+      <span class="brief-pill plum"><i data-lucide="users" class="icon"></i>${fmtNum(activeClients)} clientes</span>
+      <span class="brief-pill ${watchSubs ? "warn" : "good"}"><i data-lucide="calendar-check" class="icon"></i>${fmtNum(watchSubs)} abo. a suivre</span>
+      <span class="brief-pill ${unpaidCommissions ? "warn" : "good"}"><i data-lucide="badge-dollar-sign" class="icon"></i>${fmtMoney(unpaidCommissions)} com.</span>
+    </div>
+  `;
 }
 
 function renderKPIs(){
