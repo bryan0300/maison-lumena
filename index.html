@@ -1206,6 +1206,15 @@ const CONFIG = {
     "MELESSI BROU",
     "N'GUESSAN Viviane K"
   ],
+  visitServices: [
+    "Soin visage / Institut",
+    "Coiffure / Soin capillaire",
+    "Sport / Fitness",
+    "Manucure / Pedicure",
+    "Massage / Relaxation",
+    "Epilation",
+    "Autre prestation"
+  ],
   sheets: {
     caisse: "CAISSE",
     clients: "BASE_CLIENTS",
@@ -1886,6 +1895,12 @@ function employeeScopedSales(data){
   return data.map(s => ({...s, employee: canonicalEmployeeName(s.employee)})).filter(s => s.employee);
 }
 
+function canonicalVisitService(service){
+  const raw = String(service || "").split(" + ")[0].trim();
+  const normalized = normName(raw);
+  return (CONFIG.visitServices || []).find(name => normName(name) === normalized) || "";
+}
+
 function applyFilters(){
   const period = document.getElementById("periodFilter").value;
   const service = document.getElementById("serviceFilter").value;
@@ -2540,16 +2555,14 @@ function renderServiceGoals(monthSales){
   const goals = readGoalMap(CONFIG.goalKeys.services);
   const stats = {};
   monthSales.filter(s => s.status === "Paye").forEach(s => {
-    const name = s.service || "Service";
+    const name = canonicalVisitService(s.service);
+    if(!name) return;
     stats[name] = (stats[name] || 0) + s.total;
   });
-  const services = [...new Set([
-    ...state.sales.map(s => s.service),
-    ...Object.keys(goals)
-  ].filter(Boolean))].sort();
+  const services = (CONFIG.visitServices || []).slice();
 
   if(!services.length){
-    el.innerHTML = `<div class="empty">Aucun service enregistré</div>`;
+    el.innerHTML = `<div class="empty">Aucun service defini</div>`;
     return;
   }
 
