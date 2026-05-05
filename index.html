@@ -1187,7 +1187,7 @@ tbody tr:last-child td{border-bottom:0}
 <script>
 const CONFIG = {
   // [FIX-SEC-1] Coller ici l'URL /exec du deploiement Web App Apps Script.
-  apiUrl: "https://script.google.com/macros/s/AKfycbw5QzWmfI_4PVmmF8wEiaZPfM1O_mKNT5AcuyNOQGJGNmSQ82Ys4DxVhz7Ug6SWFFW-/exec",
+  apiUrl: "https://script.google.com/macros/s/AKfycby35cbF8KXCAlN13SASVTR3FqLOcUDSSrGkZRrh-tFYTI-wNCB06VBdbi9OUPAW5dwkjw/exec",
   auth: {
     sessionKey: "maisonLumenaDashboardAuth",
     tokenKey: "maisonLumenaDashboardToken",
@@ -1214,6 +1214,19 @@ const CONFIG = {
     "Massage / Relaxation",
     "Epilation",
     "Autre prestation"
+  ],
+  subscriptionFormulas: [
+    "Fitness séance",
+    "Yoga séance",
+    "Yoga mensuel",
+    "Zumba séance",
+    "Zumba mensuel",
+    "Haltères séance",
+    "Haltères mensuel",
+    "Pack soirée",
+    "Pack événement",
+    "Pack mariage invité",
+    "Pack mariée"
   ],
   sheets: {
     caisse: "CAISSE",
@@ -1661,6 +1674,9 @@ function normalizeSales(rows){
   return rows.slice(1).map((r, n) => {
     const date = parseDate(cell(r,iDate));
     const total = money(cell(r,iTotal)) || money(cell(r,iPrix));
+    const serviceRaw = cell(r,iService) || "Service non renseigné";
+    const formula = detectFormulaInService(serviceRaw);
+    const baseService = serviceRaw.split(" + ")[0].trim() || serviceRaw;
     return {
       id: cell(r,0) || `SALE-${n}`,
       date,
@@ -1669,13 +1685,29 @@ function normalizeSales(rows){
       phone: cell(r,iTel),
       phoneKey: normPhone(cell(r,iTel)),
       employee: cell(r,iEmployee) || "Equipe",
-      service: cell(r,iService) || "Service non renseigné",
+      service: serviceRaw,
+      baseService,
+      formula,
+      saleType: formula ? saleTypeFromFormula(formula) : "Prestation",
       price: money(cell(r,iPrix)),
       total,
       status: normalizeStatus(cell(r,iStatus)),
       payment: cell(r,iPay)
     };
   }).filter(x => x.client || x.service || x.total);
+}
+
+function detectFormulaInService(service){
+  const s = normName(service);
+  return (CONFIG.subscriptionFormulas || []).find(formule => s.includes(normName(formule))) || "";
+}
+
+function saleTypeFromFormula(formula){
+  const f = normName(formula);
+  if(f.startsWith("pack")) return "Pack";
+  if(f.includes("mensuel")) return "Abonnement mensuel";
+  if(f.includes("seance")) return "Abonnement séance";
+  return "Abonnement";
 }
 
 function normalizeClients(rows){
@@ -1885,7 +1917,7 @@ function loyalty(visits){
 }
 
 function populateFilters(){
-  fillSelect("serviceFilter", [...new Set(state.sales.map(x => x.service).filter(Boolean))].sort(), "Tous les services");
+  fillSelect("serviceFilter", [...new Set(state.sales.map(x => x.baseService || x.service).filter(Boolean))].sort(), "Tous les services");
   fillSelect("employeeFilter", employeeNamesForDashboard(), "Toute l'équipe");
   // [FIX-ABO-HTML-2] Liste dynamique des formules d'abonnement.
   fillSelect("formuleFilter", [...new Set(state.subscriptions.map(x => x.formule).filter(Boolean))].sort(), "Toutes les formules");
@@ -1937,7 +1969,7 @@ function applyFilters(){
   const search = normName(document.getElementById("searchInput").value);
   const now = new Date(); now.setHours(0,0,0,0);
   state.filtered = state.sales.filter(s => {
-    if(service !== "all" && s.service !== service) return false;
+    if(service !== "all" && (s.baseService || s.service) !== service) return false;
     if(employee !== "all" && canonicalEmployeeName(s.employee) !== employee) return false;
     if(status !== "all" && s.status !== status) return false;
     if(search && !normName([s.client,s.phone,s.service,s.employee].join(" ")).includes(search)) return false;
@@ -2043,7 +2075,7 @@ function renderSalesKPIs(){
   const el = document.getElementById("salesKpis");
   if(!el) return;
   const k = computeKPIs(state.filtered);
-  const topService = topBy(state.filtered.filter(x => x.status === "Paye"), "service", "sum")[0];
+  const topService = topBy(state.filtered.filter(x => x.status === "Paye"), "baseService", "sum")[0];
   const topEmployee = topBy(state.filtered.filter(x => x.status === "Paye"), "employee", "sum")[0];
   el.innerHTML = [
     kpi("CA filtré", fmtMoney(k.totalPaid), "Encaissé sur la période", "trending-up", {variant:"good", progress:k.moneyConversion * 100, chip:`${Math.round(k.moneyConversion * 100)}% payé`}),
@@ -2058,15 +2090,15 @@ function renderServicesKPIs(){
   const el = document.getElementById("servicesKpis");
   if(!el) return;
   const paid = state.filtered.filter(x => x.status === "Paye");
-  const serviceRows = topBy(paid, "service", "sum");
-  const volumeRows = topBy(state.filtered, "service", "count");
+  const serviceRows = topBy(paid, "baseService", "sum");
+  const volumeRows = topBy(state.filtered, "baseService", "count");
   const top = serviceRows[0];
   const volumeTop = volumeRows[0];
   const caTotal = paid.reduce((sum,s) => sum + s.total, 0);
   const top3Share = caTotal ? serviceRows.slice(0,3).reduce((sum,row) => sum + row.value, 0) / caTotal : 0;
   const avgService = serviceRows.length ? caTotal / serviceRows.reduce((sum,row) => sum + row.count, 0) : 0;
   el.innerHTML = [
-    kpi("Services actifs", fmtNum(new Set(state.filtered.map(s => s.service).filter(Boolean)).size), "Familles vendues", "grid-2x2", {variant:"plum"}),
+    kpi("Services actifs", fmtNum(new Set(state.filtered.map(s => s.baseService || s.service).filter(Boolean)).size), "Familles vendues", "grid-2x2", {variant:"plum"}),
     kpi("Meilleur CA", top ? top.name : "-", top ? fmtMoney(top.value) : "Aucun CA", "trophy", {variant:"good"}),
     kpi("Plus demandé", volumeTop ? volumeTop.name : "-", volumeTop ? `${fmtNum(volumeTop.count)} prestation(s)` : "Aucun volume", "activity", {variant:"teal"}),
     kpi("Panier service", fmtMoney(avgService), "Moyenne prestations payées", "badge-dollar-sign", {variant:"gold"}),
@@ -2146,11 +2178,11 @@ function renderCharts(){
   makeChart("revenueChart", "line", daily.labels, [{label:"CA encaissé", data:daily.values, borderColor:colors.green, backgroundColor:"rgba(56,211,135,.08)", fill:true, tension:.38, pointRadius:3, pointBackgroundColor:colors.green}], {yMoney:true});
   const status = groupCount(state.filtered, "status");
   makeChart("statusChart", "doughnut", status.labels, [{data:status.values, backgroundColor:[colors.green,colors.amber,colors.blue,colors.gray]}]);
-  const services = topBy(state.filtered.filter(x => x.status === "Paye"), "service", "sum");
+  const services = topBy(state.filtered.filter(x => x.status === "Paye"), "baseService", "sum");
   makeChart("serviceRevenueChart", "bar", services.map(x => x.name), [{label:"CA encaissé", data:services.map(x => x.value), backgroundColor:colors.teal, borderRadius:5}], {yMoney:true});
   const employees = topBy(employeeScopedSales(state.filtered), "employee", "count");
   makeChart("employeeChart", "bar", employees.map(x => x.name), [{label:"Prestations", data:employees.map(x => x.count), backgroundColor:colors.violet, borderRadius:5}], {});
-  const mix = topBy(state.filtered, "service", "count");
+  const mix = topBy(state.filtered, "baseService", "count");
   makeChart("serviceMixChart", "doughnut", mix.map(x => x.name), [{data:mix.map(x => x.count), backgroundColor:[colors.plum,colors.teal,colors.amber,colors.coral,colors.blue,colors.green]}]);
 }
 
@@ -2202,7 +2234,7 @@ function makeChart(id,type,labels,datasets,opts={}){
 }
 
 function renderRankings(){
-  renderRank("topServices", topBy(state.filtered.filter(x => x.status === "Paye"), "service", "sum"), true);
+  renderRank("topServices", topBy(state.filtered.filter(x => x.status === "Paye"), "baseService", "sum"), true);
   renderRank("topEmployees", topBy(employeeScopedSales(state.filtered.filter(x => x.status === "Paye")), "employee", "sum"), true);
   renderActions();
   renderAvgServices();
@@ -2251,8 +2283,8 @@ function renderObjectiveList(){
 }
 
 function renderTables(){
-  renderTable("salesTable", ["Date","Cliente","Service","Prestataire","Montant","Statut"], state.filtered.slice().sort((a,b) => (b.date||0)-(a.date||0)).map(s => [fmtDate(s.date), s.client, s.service, s.employee, fmtMoney(s.total), pillStatus(s.status)]));
-  const services = topBy(state.filtered, "service", "sum");
+  renderTable("salesTable", ["Date","Cliente","Service","Type","Prestataire","Montant","Statut"], state.filtered.slice().sort((a,b) => (b.date||0)-(a.date||0)).map(s => [fmtDate(s.date), s.client, s.baseService || s.service, s.saleType || "Prestation", s.employee, fmtMoney(s.total), pillStatus(s.status)]));
+  const services = topBy(state.filtered, "baseService", "sum");
   renderTable("serviceTable", ["Service","Prestations","CA encaissé","Panier moyen","Poids"], services.map(s => [s.name, fmtNum(s.count), fmtMoney(s.value), fmtMoney(s.count ? s.value/s.count : 0), `${Math.round((s.value/(services.reduce((a,b)=>a+b.value,0)||1))*100)}%`]));
   const followups = state.clients.slice().sort((a,b) => (a.lastVisit||0)-(b.lastVisit||0)).slice(0,20);
   renderTable("followupTable", ["Cliente","Dernière visite","Visites","CA payé","Objectifs","Priorité"], followups.map(c => [c.name, fmtDate(c.lastVisit), fmtNum(c.visits), fmtMoney(c.total), c.objectives.join(", ") || "-", priority(c)]));
