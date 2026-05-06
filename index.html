@@ -1822,7 +1822,7 @@ function normalizeCommissions(rows){
 
   return rows.slice(1).map((r,n) => ({
     id:`COM-${n}`,
-    month: cell(r,iMois),
+    month: commissionMonthKey(cell(r,iMois)),
     employee: cell(r,iEmployee) || "Equipe",
     ca: money(cell(r,iCa)),
     prestation: money(cell(r,iPresta)),
@@ -2820,7 +2820,17 @@ function currentMonthKey(){
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,"0")}`;
 }
 
+function commissionMonthKey(value){
+  const raw = String(value || "").trim();
+  let m = raw.match(/^(\d{4})[-/](\d{1,2})(?:[-/]\d{1,2}.*)?$/);
+  if(m) return `${m[1]}-${String(Number(m[2])).padStart(2,"0")}`;
+  const d = parseDate(raw);
+  if(d) return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,"0")}`;
+  return raw;
+}
+
 function commissionMonthMatchesPeriod(month, period, now){
+  month = commissionMonthKey(month);
   if(period === "all") return true;
   if(!month) return false;
   const parts = String(month).split("-");
